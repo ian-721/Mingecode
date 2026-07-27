@@ -2,7 +2,7 @@
 
 **状态：冻结 / Accepted**
 
-ADR 记录影响产品本体、性别策略、隐私、规则引擎、品牌架构或合作边界的决定。`Accepted` 表示冻结；`Proposed` 表示候选。改变已接受决定必须新增 ADR，不得静默改写历史。
+本目录当前包含八份 ADR，记录影响产品本体、性别策略、隐私、规则引擎、品牌架构、时间口径或合作边界的决定。`Accepted` 表示冻结；`Proposed` 表示候选。改变已接受决定必须新增 ADR，不得静默改写历史。
 
 | ADR | 状态 | 决定 |
 |---|---|---|
@@ -13,3 +13,4 @@ ADR 记录影响产品本体、性别策略、隐私、规则引擎、品牌架�
 | [ADR-0005](ADR-0005-minimise-birth-data-storage.md) | Accepted | 最小化出生资料处理 |
 | [ADR-0006](ADR-0006-collaboration-and-decision-boundaries.md) | Accepted | 冻结双人角色与决策边界 |
 | [ADR-0007](ADR-0007-brand-architecture-and-public-name-candidate.md) | Proposed | 品牌分层与公开产品名候选 |
+| [ADR-0008](ADR-0008-mvp-civil-time-convention.md) | Accepted | MVP 使用 `civil_time_v1`，暂不启用真太阳时 |
