@@ -1,0 +1,75 @@
+# 第一部分｜项目立项判断
+
+**结论：值得正式立项，但当前只批准进入 M1 研究阶段，不批准编码。**
+
+1. **真正需求**  
+   用户需要的不是预测未来，而是一套具有东方文化亲近感、能够解释自身矛盾并公开认领的人格语言。
+
+2. **为什么可能传播**  
+   “古代负面判词 → 现代机制翻译 → 优势与代价 → 可分享宣言”天然包含反差、身份认领和朋友对照。
+
+3. **最可能失败之处**  
+   不是排盘功能不完整，而是人格结果缺乏区分度，最终变成谁看都像自己的漂亮话。
+
+4. **第一版唯一验证目标**  
+   用户是否愿意认领、保存、分享，并邀请第二个人测试。暂不验证完整命理体系、付费或小程序。
+
+5. **命名冻结**
+
+   - 中文产品名：**命格译码**
+   - 英文产品名：**Mingecode**
+   - 英文描述：**Eastern Personality Translator**
+   - 传播栏目：**古人误会你了**
+   - 仓库名：**`mingecode`**
+
+`fate-translator` 和 `destiny-code` 都强化宿命预测联想；`mingge-decoder` 则不如 `mingecode` 简短、统一。
+
+## 关键冻结决策
+
+- MVP 不收集姓名和性别。
+- 默认使用民用标准时间口径 `civil_time_v1`，暂不启用真太阳时。
+- 原始出生日期、时间和地点默认不保存。
+- 不登录也能获得完整结果。
+- 运行时不使用大模型；AI只能辅助内部内容生产。
+- 维度、原型和规则在盲测前统一标记为研究候选。
+- 首发采用 **Next.js 实现的独立响应式 H5/网站**。
+- 微信小程序推迟到 M7，必须先核验当时有效的类目和审核政策。
+- 当前只批准 M1：维度、原型、规则与盲测研究。
+
+隐私基线采用最小必要原则；中国《个人信息保护法》明确要求收集限于处理目的的最小范围，澳大利亚 OAIC 也将出生日期和位置列为个人信息示例。[中国网信办](https://www.cac.gov.cn/2021-08/20/c_1631050028355286.htm)、[OAIC](https://www.oaic.gov.au/privacy/your-privacy-rights/your-personal-information/what-is-personal-information)
+
+技术候选经过必要核验：Next.js App Router 可承载响应式网站及端点；`lunar-typescript` 可作为排盘候选依赖，但必须经过独立夹具和边界交叉验证，不能直接把库当作理论权威。[Next.js 官方文档](https://nextjs.org/docs/app)、[`lunar-typescript` 官方仓库](https://github.com/6tail/lunar-typescript)
+
+## 交付物
+
+完整规划包包含 24 份文档、2643 行，没有业务代码：
+
+- [完整规划包 ZIP](sandbox:/workspace/scratch/c38dca889e77/00_MINGECODE_M0_PLANNING_PACKAGE.zip)
+- [项目总览 README](sandbox:/workspace/scratch/c38dca889e77/mingecode-planning/README.md)
+- [MVP PRD](sandbox:/workspace/scratch/c38dca889e77/mingecode-planning/docs/PRD_MVP.md)
+- [人格体系研究框架](sandbox:/workspace/scratch/c38dca889e77/mingecode-planning/docs/PERSONA_SYSTEM.md)
+- [规则引擎技术基线](sandbox:/workspace/scratch/c38dca889e77/mingecode-planning/docs/RULE_ENGINE.md)
+- [系统架构](sandbox:/workspace/scratch/c38dca889e77/mingecode-planning/docs/ARCHITECTURE.md)
+- [平台策略比较](sandbox:/workspace/scratch/c38dca889e77/mingecode-planning/docs/PLATFORM_STRATEGY.md)
+- [M0—M7 路线图](sandbox:/workspace/scratch/c38dca889e77/mingecode-planning/docs/ROADMAP.md)
+- [风险清单](sandbox:/workspace/scratch/c38dca889e77/mingecode-planning/docs/RISKS.md)
+- [仓库结构](sandbox:/workspace/scratch/c38dca889e77/mingecode-planning/docs/REPOSITORY_STRUCTURE.md)
+
+## M0剩余人工确认
+
+规划工作已经完成，冻结前只需你确认：
+
+- `命格译码 / Mingecode / mingecode`；
+- 不收集性别；
+- 暂不启用真太阳时；
+- 不保存原始出生信息；
+- 不使用运行时大模型；
+- 当前只进入 M1，不开始编码。
+
+完整清单：[M0任务清单](sandbox:/workspace/scratch/c38dca889e77/mingecode-planning/docs/M0_TASKS.md)
+
+## 下一对话启动提示词
+
+下一阶段将研究排盘口径、4–6个人格维度、6–8个原型、首批30–50条规则及四选一盲测，不进入编码：
+
+[《01｜命格译码｜人格维度、原型体系与首批规则研究》启动提示词](sandbox:/workspace/scratch/c38dca889e77/mingecode-planning/docs/NEXT_PROMPT_M1.md)
