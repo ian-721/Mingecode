@@ -1,0 +1,149 @@
+package_id: mingecode-m1a-candidate-v0.1
+source_conversation: "01｜命格译码｜排盘口径、人格维度与首批规则研究"
+research_date: 2026-07-27
+source_repo_baseline: 89e5f829256fba8bd05c5b49a90b59a767e0f136
+status: Research Candidate
+validation_status: Not Human-Tested
+archive_state: draft_ingest
+capture_policy:
+  source_of_record: ChatGPT File Library object
+  silent_rewrite: forbidden
+  parsed_text_normalization_must_be_disclosed: true
+  uploaded_byte_identity_claimed: false
+files:
+  - source_filename: README(1).md
+    source_object_id: file_0000000018ac81f68147b42a36870ec0
+    target_path: research/candidates/m1a/v0.1/original/README(1).md
+    body_ingest_status: transcribed_from_retrieved_text
+    content_transform: none_intended
+    source_byte_sha256: null
+    repository_text_sha256: null
+    validation_status: Not Human-Tested
+  - source_filename: M1A_EXECUTION_AUDIT.md
+    source_object_id: pending_exact_object_id_registration
+    target_path: research/candidates/m1a/v0.1/original/M1A_EXECUTION_AUDIT.md
+    body_ingest_status: pending
+    content_transform: none_intended
+    source_byte_sha256: null
+    repository_text_sha256: null
+    validation_status: Not Human-Tested
+  - source_filename: TIME_BOUNDARY_RESEARCH.md
+    source_object_id: file_0000000010d481f6a4a3eaa971f36f36
+    target_path: research/candidates/m1a/v0.1/original/TIME_BOUNDARY_RESEARCH.md
+    body_ingest_status: pending
+    content_transform: none_intended
+    source_byte_sha256: null
+    repository_text_sha256: null
+    validation_status: Not Human-Tested
+  - source_filename: PERSONALITY_DIMENSIONS_V0.1.md
+    source_object_id: pending_exact_object_id_registration
+    target_path: research/candidates/m1a/v0.1/original/PERSONALITY_DIMENSIONS_V0.1.md
+    body_ingest_status: pending
+    content_transform: none_intended
+    source_byte_sha256: null
+    repository_text_sha256: null
+    validation_status: Not Human-Tested
+  - source_filename: PERSONA_CANDIDATES_V0.1.md
+    source_object_id: file_00000000343081f696020f3c5d73244a
+    target_path: research/candidates/m1a/v0.1/original/PERSONA_CANDIDATES_V0.1.md
+    body_ingest_status: pending
+    content_transform: none_intended
+    source_byte_sha256: null
+    repository_text_sha256: null
+    validation_status: Not Human-Tested
+  - source_filename: RULE_ONTOLOGY_V0.1.md
+    source_object_id: pending_exact_object_id_registration
+    target_path: research/candidates/m1a/v0.1/original/RULE_ONTOLOGY_V0.1.md
+    body_ingest_status: pending
+    content_transform: none_intended
+    source_byte_sha256: null
+    repository_text_sha256: null
+    validation_status: Not Human-Tested
+  - source_filename: RULE_CANDIDATES_V0.1.md
+    source_object_id: file_000000009d2c81f6bd06372d8ee7b989
+    target_path: research/candidates/m1a/v0.1/original/RULE_CANDIDATES_V0.1.md
+    body_ingest_status: pending
+    content_transform: none_intended
+    source_byte_sha256: null
+    repository_text_sha256: null
+    validation_status: Not Human-Tested
+  - source_filename: TRADITIONAL_TRANSLATION_SAMPLE.md
+    source_object_id: pending_exact_object_id_registration
+    target_path: research/candidates/m1a/v0.1/original/TRADITIONAL_TRANSLATION_SAMPLE.md
+    body_ingest_status: pending
+    content_transform: none_intended
+    source_byte_sha256: null
+    repository_text_sha256: null
+    validation_status: Not Human-Tested
+  - source_filename: BLIND_TEST_PREREGISTRATION.md
+    source_object_id: pending_exact_object_id_registration
+    target_path: research/candidates/m1a/v0.1/original/BLIND_TEST_PREREGISTRATION.md
+    body_ingest_status: pending
+    content_transform: none_intended
+    source_byte_sha256: null
+    repository_text_sha256: null
+    validation_status: Not Human-Tested
+  - source_filename: NAMING_TEST_PLAN.md
+    source_object_id: file_00000000f0f481f683fead372f45503b
+    target_path: research/candidates/m1a/v0.1/original/NAMING_TEST_PLAN.md
+    body_ingest_status: pending
+    content_transform: none_intended
+    source_byte_sha256: null
+    repository_text_sha256: null
+    validation_status: Not Human-Tested
+  - source_filename: VISUAL_BRIEF_CANDIDATE_A.md
+    source_object_id: pending_exact_object_id_registration
+    target_path: research/candidates/m1a/v0.1/original/VISUAL_BRIEF_CANDIDATE_A.md
+    body_ingest_status: pending
+    content_transform: none_intended
+    source_byte_sha256: null
+    repository_text_sha256: null
+    validation_status: Not Human-Tested
+  - source_filename: VISUAL_BRIEF_CANDIDATE_B.md
+    source_object_id: pending_exact_object_id_registration
+    target_path: research/candidates/m1a/v0.1/original/VISUAL_BRIEF_CANDIDATE_B.md
+    body_ingest_status: pending
+    content_transform: none_intended
+    source_byte_sha256: null
+    repository_text_sha256: null
+    validation_status: Not Human-Tested
+  - source_filename: MOODBOARD_TASKS_FOR_YUTING.md
+    source_object_id: pending_exact_object_id_registration
+    target_path: research/candidates/m1a/v0.1/original/MOODBOARD_TASKS_FOR_YUTING.md
+    body_ingest_status: pending
+    content_transform: none_intended
+    source_byte_sha256: null
+    repository_text_sha256: null
+    validation_status: Not Human-Tested
+  - source_filename: M1A_FREEZE_MATRIX.md
+    source_object_id: pending_exact_object_id_registration
+    target_path: research/candidates/m1a/v0.1/original/M1A_FREEZE_MATRIX.md
+    body_ingest_status: pending
+    content_transform: none_intended
+    source_byte_sha256: null
+    repository_text_sha256: null
+    validation_status: Not Human-Tested
+  - source_filename: SOURCE_REGISTER_V0.1.md
+    source_object_id: pending_exact_object_id_registration
+    target_path: research/candidates/m1a/v0.1/original/SOURCE_REGISTER_V0.1.md
+    body_ingest_status: pending
+    content_transform: none_intended
+    source_byte_sha256: null
+    repository_text_sha256: null
+    validation_status: Not Human-Tested
+  - source_filename: DISAGREEMENT_LOG_V0.1.md
+    source_object_id: pending_exact_object_id_registration
+    target_path: research/candidates/m1a/v0.1/original/DISAGREEMENT_LOG_V0.1.md
+    body_ingest_status: pending
+    content_transform: none_intended
+    source_byte_sha256: null
+    repository_text_sha256: null
+    validation_status: Not Human-Tested
+  - source_filename: UNRESOLVED_QUESTIONS_AND_NEXT_PROMPT.md
+    source_object_id: pending_exact_object_id_registration
+    target_path: research/candidates/m1a/v0.1/original/UNRESOLVED_QUESTIONS_AND_NEXT_PROMPT.md
+    body_ingest_status: pending
+    content_transform: none_intended
+    source_byte_sha256: null
+    repository_text_sha256: null
+    validation_status: Not Human-Tested
