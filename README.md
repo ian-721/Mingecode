@@ -67,6 +67,7 @@
 - [产品愿景](docs/PRODUCT_VISION.md)
 - [品牌架构](docs/BRAND_ARCHITECTURE.md)
 - [协作治理](docs/COLLABORATION.md)
+- [高风险操作协议](docs/HIGH_RISK_OPERATION_PROTOCOL.md)
 - [M0 基线](docs/M0_BASELINE.md)
 - [M1 研究计划](docs/M1_RESEARCH_PLAN.md)
 - [术语表](docs/GLOSSARY.md)
