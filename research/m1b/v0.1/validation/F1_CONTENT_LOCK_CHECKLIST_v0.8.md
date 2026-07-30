@@ -61,8 +61,9 @@
 |---|---|---|
 | 巴纳姆控制草案 | PASS as F0 | 尚未内容锁 |
 | 通用漂亮话控制草案 | PASS as F0 | 尚未内容锁 |
-| 错配三类原则 | PASS as concept | 仍含旧六维措辞，需四机制更新 |
-| 近邻错配算法针对四报告 | FAIL / needs update | F1前重写 |
+| 四机制错配三类角色 | PASS as candidate | `DECOY_SELECTION_SPEC_v0.8.md` |
+| 近邻错配算法针对四报告 | PASS as candidate | 固定本人报告对应的近邻/共享接口/远距角色 |
+| 报告合并时算法自动失效 | PASS | 必须升版本并重建 |
 | 同版本、同质量约束 | PASS as policy | 未来执行 |
 | 真实错配池 | NOT APPLICABLE / prohibited now | 尚无真人报告 |
 
@@ -84,7 +85,7 @@ claim_traceability_gate: pass_as_candidate
 interaction_definition_gate: pass
 selected_edition_source_gate: fail_open
 independent_masked_review_gate: fail_not_executed
-decoy_algorithm_four_mechanism_update: fail_pending
+decoy_algorithm_four_mechanism_update: pass_as_candidate
 M1A_archive_gate: fail_open
 F1_content_lock_ready: no
 F2_operational_lock_ready: no
@@ -94,10 +95,11 @@ PR_ready_for_merge: no
 
 ## 8. 最小剩余条件
 
-在不新增业务范围的前提下，F1只剩三类实质内容工作：
+在不新增业务范围的前提下，F1只剩两类外部证据工作：
 
 1. 关闭13项选定版本页码、引文与文本层；
-2. 完成至少一次合格独立遮名评审，并按预设合并门裁决；
-3. 将错配规范从旧六维距离改成四机制对象距离。
+2. 完成至少一次合格独立遮名评审，并按预设合并门裁决。
+
+若独立评审触发报告合并，则需重建报告、声明映射、错配角色和候选清单后再次评审。
 
 M1-A 17/17归档门另行阻止 PR Ready/Merge。任何一项未完成，都不得用“研究材料已经很多”替代。
