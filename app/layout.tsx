@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "命格译码｜非生产 Demo",
-  description: "用生辰和三道小问题，看看你习惯怎么把事情往前推。",
+  description: "用生辰安排起题，再用四到六道小问题看看你习惯怎么把事情往前推。",
 };
 
 export default function RootLayout({

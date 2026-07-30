@@ -40,7 +40,7 @@ export function HomeClient() {
             是重新翻译你。
           </h1>
           <p className="hero-lede">
-            填一次生辰，再答三道很具体的小问题。看看你平时到底怎么把事情往前推。
+            填一次生辰，再答四到六道很具体的小问题。看看你平时到底怎么把事情往前推。
           </p>
           <div className="hero-actions">
             <Link className="button button-primary button-large" href="/test">
@@ -56,12 +56,12 @@ export function HomeClient() {
       <section className="home-notes" aria-label="Demo 说明">
         <article>
           <span>01</span>
-          <h2>生辰先提候选</h2>
+          <h2>生辰只安排起题</h2>
           <p>它只给出几条可能路线，不抢着替现实下结论。</p>
         </article>
         <article>
           <span>02</span>
-          <h2>三道题来校准</h2>
+          <h2>四到六道题来校准</h2>
           <p>都问具体场景，没有“更优秀”的标准答案。</p>
         </article>
         <article>

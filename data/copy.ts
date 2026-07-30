@@ -50,12 +50,12 @@ export const RELATION_COPY: Record<
   { label: string; description: string }
 > = {
   aligned: {
-    label: "底色和现实路线对上了",
-    description: "生辰提出的第一候选，也正是你在几个现实场景里反复选择的做法。",
+    label: "起题方向和现实路线同向",
+    description: "命盘先引出的话题，也正是你在几个现实场景里反复选择的做法。",
   },
   adapted: {
-    label: "你后来练出了另一套走法",
-    description: "生辰先指向一种处理顺序，但你的现实选择稳定地走向另一条路线。",
+    label: "现实里你更常走另一条路",
+    description: "命盘先引出一个话题，但你的现实选择稳定地集中在另一条路线。",
   },
   mixed: {
     label: "你会按场景换挡",

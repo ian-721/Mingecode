@@ -1,5 +1,5 @@
 import { RESULT_COPY } from "@/data/copy";
-import type { CalibrationVerdict, SignatureId } from "@/lib/types";
+import type { HybridVerdict, SignatureId } from "@/lib/types";
 
 export type SharePayload = {
   product: "命格译码";
@@ -10,30 +10,30 @@ export type SharePayload = {
 };
 
 export function createSharePayload(
-  verdict: CalibrationVerdict,
+  verdict: HybridVerdict,
 ): SharePayload {
   const route = getResultRoute(verdict);
   const copy = RESULT_COPY[route];
   return {
     product: "命格译码",
     resultName:
-      verdict.relation === "unresolved" ? "这次先不定稿" : copy.name,
+      verdict.relationship === "unresolved" ? "这次先不定稿" : copy.name,
     recognition:
-      verdict.relation === "unresolved"
-        ? "有些习惯靠三道题分不清，先留一点余地。"
+      verdict.relationship === "unresolved"
+        ? "有些习惯靠这几道题分不清，先留一点余地。"
         : copy.recognition,
     crash:
-      verdict.relation === "unresolved"
+      verdict.relationship === "unresolved"
         ? "至少这回没有硬给你套一个万能标签。"
         : copy.crash,
     invitation: "测测你的",
   };
 }
 
-export function getResultRoute(verdict: CalibrationVerdict): SignatureId {
+export function getResultRoute(verdict: HybridVerdict): SignatureId {
   return (
-    verdict.realityRoutes[0] ??
-    verdict.chartRoute ??
+    verdict.reality.primaryRoute ??
+    verdict.chartPrompt.primaryRoute ??
     "SIG-A1"
   );
 }

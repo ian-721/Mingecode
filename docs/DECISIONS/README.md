@@ -2,7 +2,7 @@
 
 **状态：冻结 / Accepted**
 
-本目录当前包含十一份 ADR。`Accepted` 表示冻结；`Proposed` 表示候选。改变已接受决定必须新增 ADR，不得静默改写历史。
+本目录当前包含十二份 ADR。`Accepted` 表示冻结；`Proposed` 表示候选。改变已接受决定必须新增 ADR，不得静默改写历史。
 
 | ADR | 状态 | 决定 |
 |---|---|---|
@@ -14,8 +14,9 @@
 | [ADR-0006](ADR-0006-collaboration-and-decision-boundaries.md) | Accepted | 冻结双人角色与决策边界 |
 | [ADR-0007](ADR-0007-brand-architecture-and-public-name-candidate.md) | Proposed | 品牌分层与公开产品名候选 |
 | [ADR-0008](ADR-0008-mvp-civil-time-convention.md) | Accepted | MVP 使用 `civil_time_v1`，暂不启用真太阳时 |
-| [ADR-0009](ADR-0009-hybrid-chart-candidate-and-calibration.md) | Accepted（研究方向） | 命盘只提出候选，默认三道校准题完成混合译码 |
+| [ADR-0009](ADR-0009-hybrid-chart-candidate-and-calibration.md) | Accepted（研究方向） | 历史混合模型：命盘候选 + 默认三题校准 |
 | [ADR-0010](ADR-0010-backstage-rigor-frontstage-lightness.md) | Accepted | 后台保留严谨研究，前台保持轻松、幽默、易分享 |
 | [ADR-0011](ADR-0011-h5-demo-implementation-authorization.md) | Accepted | 窄范围授权非生产 H5 Demo；不授权部署或合并业务 PR |
+| [ADR-0012](ADR-0012-chart-prompt-and-light-calibration.md) | Accepted | 命盘只负责起题，四至六题独立裁决现实路线 |
 
-ADR-0011 只在其明确范围内覆盖 ADR-0001 的代码禁令，不改变旧决定的历史状态。
+ADR-0011 只在其明确范围内覆盖 ADR-0001 的代码禁令，不改变旧决定的历史状态。ADR-0012 在同一非生产 H5 边界内替代 ADR-0009 的运行模型。

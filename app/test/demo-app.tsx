@@ -86,7 +86,7 @@ export function DemoApp() {
         <QuestionCard
           instance={currentQuestion}
           index={state.answers.length}
-          total={state.questions.length === 4 ? 4 : 3}
+          total={Math.max(4, state.questions.length)}
           canGoBack={state.answers.length > 0}
           onBack={() => dispatch({ type: "back" })}
           onAnswer={(selected) => dispatch({ type: "answer", selected })}

@@ -110,9 +110,30 @@ describe("time and pillar fixtures T01-T08", () => {
     expect(unknown.ok).toBe(true);
     if (unknown.ok) {
       expect(unknown.value.timeStability).toBe("insufficient");
+      expect(unknown.value.charts[0].facts.pillars.hour).toBeNull();
+      expect(
+        unknown.value.chartPrompt.cues.find(
+          (cue) => cue.family === "authority",
+        )?.state,
+      ).toBe("unknown");
       expect(
         unknown.value.notices.some((notice) => notice.includes("不会假装")),
       ).toBe(true);
     }
+  });
+
+  it("T09 marks repeated instants stable when their aggregated cues are identical", async () => {
+    const result = await resolveBirthInput({
+      date: "2024-11-03",
+      time: "01:30",
+      timePrecision: "exact",
+      cityId: "new-york",
+    });
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.value.timeStability).toBe("stable");
+    expect(
+      result.value.chartPrompt.uncertaintyFlags,
+    ).not.toContain("boundary_variant");
   });
 });

@@ -161,7 +161,7 @@ export function BirthForm({ onSubmit }: BirthFormProps) {
         </div>
 
         <button className="button button-primary button-block" type="submit">
-          生成候选，去答三题
+          安排起题，去答四到六题
           <span aria-hidden="true">→</span>
         </button>
       </form>

@@ -28,14 +28,24 @@ export type TimeStability =
   | "boundary_sensitive"
   | "insufficient";
 
-export type NodeState = "established" | "present" | "absent";
-export type Capacity = "supported" | "candidate" | "fragile";
-export type RelationNode =
+export type CueFamily =
   | "input"
   | "output"
   | "peer"
   | "authority"
   | "completion";
+
+export type CueState =
+  | "stable_visible"
+  | "stable_hidden"
+  | "variant"
+  | "not_observed"
+  | "unknown";
+
+export type ChartCue = {
+  family: CueFamily;
+  state: CueState;
+};
 
 export type VisibleStemFact = {
   position: "year" | "month" | "hour";
@@ -51,30 +61,27 @@ export type HiddenStemFact = {
   isMain: boolean;
 };
 
+export type ChartPillars = Omit<FourPillars, "hour"> & {
+  hour: FourPillars["hour"] | null;
+};
+
 export type ChartFacts = {
-  pillars: FourPillars;
+  pillars: ChartPillars;
   visibleStems: VisibleStemFact[];
   hiddenStems: HiddenStemFact[];
-  nodes: Record<RelationNode, NodeState>;
-  capacity: Capacity;
-  timeStability: TimeStability;
-  uncertaintyCount: number;
 };
 
 export type SignatureId = "SIG-A1" | "SIG-A2" | "SIG-B1" | "SIG-C1";
-export type SignatureLevel = "supported" | "candidate" | "closed";
 
-export type SignatureAssessment = {
-  id: SignatureId;
-  level: SignatureLevel;
-  routeComplete: boolean;
-  uncertaintyCount: number;
-  stableAcrossCharts: boolean;
-  evidenceClusters: string[];
-};
-
-export type SignatureCandidate = SignatureAssessment & {
-  rank: number;
+export type ChartPrompt = {
+  routeOrder: SignatureId[];
+  primaryRoute: SignatureId;
+  cues: ChartCue[];
+  uncertaintyFlags: Array<
+    | "unknown_hour"
+    | "boundary_variant"
+    | "insufficient_stable_cues"
+  >;
 };
 
 export type ChartCandidate = {
@@ -91,7 +98,7 @@ export type ChartCandidate = {
 
 export type ChartResolution = {
   charts: ChartCandidate[];
-  candidates: SignatureCandidate[];
+  chartPrompt: ChartPrompt;
   timeStability: TimeStability;
   notices: string[];
 };
@@ -139,6 +146,7 @@ export type AnswerRecord = {
   selected: AnswerChoice;
   supportedSignature: SignatureId | null;
   contextTag: string;
+  pair: [SignatureId, SignatureId];
 };
 
 export type VerdictRelation =
@@ -147,11 +155,20 @@ export type VerdictRelation =
   | "mixed"
   | "unresolved";
 
-export type CalibrationVerdict = {
-  relation: VerdictRelation;
-  chartRoute: SignatureId | null;
-  realityRoutes: SignatureId[];
-  answerCount: number;
+export type HybridVerdict = {
+  modelVersion: "m1br-hybrid-r2-0.1";
+  chartPrompt: ChartPrompt;
+  calibration: {
+    questionIds: string[];
+    questionsUsed: 4 | 5 | 6;
+    routeSupport: Partial<Record<SignatureId, number>>;
+    uncertainCount: number;
+  };
+  reality: {
+    primaryRoute: SignatureId | null;
+    secondaryRoute: SignatureId | null;
+  };
+  relationship: VerdictRelation;
 };
 
 export type DemoStep =
@@ -175,6 +192,6 @@ export type DemoState = {
   chartResolution: ChartResolution | null;
   questions: QuestionInstance[];
   answers: AnswerRecord[];
-  verdict: CalibrationVerdict | null;
+  verdict: HybridVerdict | null;
   error: DemoError | null;
 };

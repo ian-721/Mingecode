@@ -1,12 +1,12 @@
 import { RELATION_COPY, RESULT_COPY } from "@/data/copy";
 import { getResultRoute } from "@/lib/share";
 import type {
-  CalibrationVerdict,
   ChartResolution,
+  HybridVerdict,
 } from "@/lib/types";
 
 type ResultViewProps = {
-  verdict: CalibrationVerdict;
+  verdict: HybridVerdict;
   chartResolution: ChartResolution;
   onShare: () => void;
   onRestart: () => void;
@@ -31,14 +31,12 @@ export function ResultView({
 }: ResultViewProps) {
   const route = getResultRoute(verdict);
   const result = RESULT_COPY[route];
-  const relation = RELATION_COPY[verdict.relation];
-  const chartRoute = verdict.chartRoute
-    ? RESULT_COPY[verdict.chartRoute]
+  const relation = RELATION_COPY[verdict.relationship];
+  const chartRoute = RESULT_COPY[verdict.chartPrompt.primaryRoute];
+  const secondaryRoute = verdict.reality.secondaryRoute
+    ? RESULT_COPY[verdict.reality.secondaryRoute]
     : null;
-  const secondaryRoute = verdict.realityRoutes[1]
-    ? RESULT_COPY[verdict.realityRoutes[1]]
-    : null;
-  const unresolved = verdict.relation === "unresolved";
+  const unresolved = verdict.relationship === "unresolved";
 
   return (
     <article className="result-page">
@@ -93,11 +91,10 @@ export function ResultView({
         <div className="result-section">
           <p className="section-index">02</p>
           <div>
-            <p className="eyebrow">生辰先看见的底色</p>
-            <h2>{chartRoute?.name ?? "暂时没有稳定候选"}</h2>
+            <p className="eyebrow">命盘先引出的话题</p>
+            <h2>{chartRoute.name}</h2>
             <p>
-              {chartRoute?.recognition ??
-                "出生时间提供的信息有限，所以这里不补一个看起来完整的答案。"}
+              它只决定先从哪类场景问起，不给任何现实路线加分。
             </p>
           </div>
         </div>
@@ -136,8 +133,8 @@ export function ResultView({
           <summary>查看依据</summary>
           <div>
             <p>
-              生辰只负责提出几条可能的处理路线；你回答的 {verdict.answerCount}{" "}
-              个具体场景，再判断现实里哪条更常出现。
+              命盘只负责安排提问顺序；你回答的{" "}
+              {verdict.calibration.questionsUsed} 个具体场景，独立判断现实里哪条更常出现。
             </p>
             <p>{relation.description}</p>
             {chartResolution.notices.map((notice) => (

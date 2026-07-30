@@ -5,10 +5,10 @@ import {
   createSharePayload,
   GENERIC_SHARE_PATH,
 } from "@/lib/share";
-import type { CalibrationVerdict } from "@/lib/types";
+import type { HybridVerdict } from "@/lib/types";
 
 type ShareViewProps = {
-  verdict: CalibrationVerdict;
+  verdict: HybridVerdict;
   onClose: () => void;
 };
 

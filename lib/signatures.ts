@@ -6,13 +6,10 @@ import type {
 } from "@4n6h4x0r/stem-branch";
 import type {
   ChartFacts,
-  NodeState,
-  RelationNode,
-  SignatureAssessment,
-  SignatureCandidate,
+  ChartPrompt,
+  CueFamily,
+  CueState,
   SignatureId,
-  SignatureLevel,
-  TimeStability,
 } from "@/lib/types";
 
 type RelationTools = {
@@ -20,14 +17,31 @@ type RelationTools = {
   getTenRelation: typeof getTenRelation;
 };
 
-const SIGNATURE_ORDER: SignatureId[] = [
+type SingleChartCueState = "visible" | "hidden" | "not_observed";
+
+export const SIGNATURE_ORDER: SignatureId[] = [
   "SIG-A1",
   "SIG-A2",
   "SIG-B1",
   "SIG-C1",
 ];
 
-const RELATION_NODE: Record<TenRelation, RelationNode> = {
+export const CUE_FAMILIES: CueFamily[] = [
+  "input",
+  "output",
+  "peer",
+  "authority",
+  "completion",
+];
+
+export const ROUTE_CUES: Record<SignatureId, CueFamily[]> = {
+  "SIG-A1": ["input", "output"],
+  "SIG-A2": ["output"],
+  "SIG-B1": ["peer", "authority"],
+  "SIG-C1": ["output", "completion"],
+};
+
+const RELATION_FAMILY: Record<TenRelation, CueFamily> = {
   正印: "input",
   偏印: "input",
   食神: "output",
@@ -43,7 +57,6 @@ const RELATION_NODE: Record<TenRelation, RelationNode> = {
 export function deriveChartFacts(
   pillars: FourPillars,
   includeHour: boolean,
-  timeStability: TimeStability,
   tools: RelationTools,
 ): ChartFacts {
   const positions = includeHour
@@ -70,198 +83,116 @@ export function deriveChartFacts(
     }));
   });
 
-  const nodes = {} as Record<RelationNode, NodeState>;
-  const nodeNames: RelationNode[] = [
-    "input",
-    "output",
-    "peer",
-    "authority",
-    "completion",
-  ];
-
-  for (const node of nodeNames) {
-    const visible = visibleStems.filter(
-      (fact) => RELATION_NODE[fact.relation] === node,
-    ).length;
-    const roots = hiddenStems.filter(
-      (fact) => RELATION_NODE[fact.relation] === node,
-    );
-    const monthMain = roots.some(
-      (fact) => fact.position === "month" && fact.isMain,
-    );
-
-    if ((visible > 0 && roots.length > 0) || monthMain || roots.length >= 2) {
-      nodes[node] = "established";
-    } else if (visible > 0 || roots.length > 0) {
-      nodes[node] = "present";
-    } else {
-      nodes[node] = "absent";
-    }
-  }
-
-  const establishedCount = Object.values(nodes).filter(
-    (state) => state === "established",
-  ).length;
-  const uncertaintyCount =
-    Object.values(nodes).filter((state) => state === "present").length +
-    (timeStability === "stable" ? 0 : 1);
-
   return {
-    pillars,
+    pillars: {
+      year: pillars.year,
+      month: pillars.month,
+      day: pillars.day,
+      hour: includeHour ? pillars.hour : null,
+    },
     visibleStems,
     hiddenStems,
-    nodes,
-    capacity:
-      establishedCount >= 3
-        ? "supported"
-        : establishedCount >= 1
-          ? "candidate"
-          : "fragile",
-    timeStability,
-    uncertaintyCount,
   };
 }
 
-export function assessSignatures(facts: ChartFacts): SignatureAssessment[] {
-  const outputVisible = facts.visibleStems.some((fact) =>
-    ["食神", "傷官"].includes(fact.relation),
-  );
-  const unstable = facts.timeStability !== "stable";
-
-  return [
-    assessment(
-      "SIG-A1",
-      facts.nodes.input,
-      facts.nodes.output,
-      unstable,
-      ["input-output"],
+export function createChartPrompt(
+  charts: ChartFacts[],
+  unknownHour: boolean,
+): ChartPrompt {
+  const cues = CUE_FAMILIES.map((family) => ({
+    family,
+    state: aggregateCueState(
+      charts.map((chart) => cueStateForChart(chart, family)),
+      unknownHour,
     ),
-    singleNodeAssessment(
-      "SIG-A2",
-      facts.nodes.output,
-      outputVisible,
-      unstable,
-      ["input-output"],
-    ),
-    assessment(
-      "SIG-B1",
-      facts.nodes.peer,
-      facts.nodes.authority,
-      unstable,
-      ["peer-authority"],
-    ),
-    assessment(
-      "SIG-C1",
-      facts.nodes.output,
-      facts.nodes.completion,
-      unstable,
-      ["output-completion"],
-    ),
-  ];
-}
-
-function assessment(
-  id: SignatureId,
-  left: NodeState,
-  right: NodeState,
-  unstable: boolean,
-  evidenceClusters: string[],
-): SignatureAssessment {
-  const level: SignatureLevel =
-    left === "absent" || right === "absent"
-      ? "closed"
-      : left === "established" && right === "established" && !unstable
-        ? "supported"
-        : "candidate";
-
-  return {
-    id,
-    level,
-    routeComplete: left !== "absent" && right !== "absent",
-    uncertaintyCount:
-      Number(left === "present") + Number(right === "present") + Number(unstable),
-    stableAcrossCharts: true,
-    evidenceClusters,
-  };
-}
-
-function singleNodeAssessment(
-  id: SignatureId,
-  node: NodeState,
-  publiclyVisible: boolean,
-  unstable: boolean,
-  evidenceClusters: string[],
-): SignatureAssessment {
-  const level: SignatureLevel =
-    node === "absent"
-      ? "closed"
-      : node === "established" && publiclyVisible && !unstable
-        ? "supported"
-        : "candidate";
-
-  return {
-    id,
-    level,
-    routeComplete: node !== "absent",
-    uncertaintyCount:
-      Number(node === "present") + Number(!publiclyVisible) + Number(unstable),
-    stableAcrossCharts: true,
-    evidenceClusters,
-  };
-}
-
-export function aggregateAndRankSignatures(
-  chartAssessments: SignatureAssessment[][],
-): SignatureCandidate[] {
-  if (chartAssessments.length === 0) return [];
-
-  const aggregate = SIGNATURE_ORDER.map((id) => {
-    const items = chartAssessments.map(
-      (assessments) => assessments.find((item) => item.id === id)!,
+  }));
+  const cueByFamily = new Map(cues.map((cue) => [cue.family, cue.state]));
+  const routeOrder = [...SIGNATURE_ORDER].sort((left, right) => {
+    const leftMatch = promptMatch(left, cueByFamily);
+    const rightMatch = promptMatch(right, cueByFamily);
+    const leftVisible = stableVisibleCount(left, cueByFamily);
+    const rightVisible = stableVisibleCount(right, cueByFamily);
+    return (
+      rightMatch - leftMatch ||
+      rightVisible - leftVisible ||
+      SIGNATURE_ORDER.indexOf(left) - SIGNATURE_ORDER.indexOf(right)
     );
-    const levels = items.map((item) => item.level);
-    const stableAcrossCharts = levels.every((level) => level === levels[0]);
-    const level: SignatureLevel = levels.every((value) => value === "closed")
-      ? "closed"
-      : levels.every((value) => value === "supported")
-        ? "supported"
-        : "candidate";
-
-    return {
-      id,
-      level,
-      routeComplete: items.every((item) => item.routeComplete),
-      uncertaintyCount: Math.max(
-        ...items.map((item) => item.uncertaintyCount),
-      ),
-      stableAcrossCharts,
-      evidenceClusters: [...new Set(items.flatMap((item) => item.evidenceClusters))],
-    };
   });
+  const stableCueCount = cues.filter((cue) =>
+    ["stable_visible", "stable_hidden"].includes(cue.state),
+  ).length;
+  const uncertaintyFlags: ChartPrompt["uncertaintyFlags"] = [];
 
-  return aggregate
-    .filter((item) => item.level !== "closed")
-    .sort(compareSignature)
-    .slice(0, 3)
-    .map((item, index) => ({ ...item, rank: index + 1 }));
+  if (unknownHour) uncertaintyFlags.push("unknown_hour");
+  if (cues.some((cue) => cue.state === "variant")) {
+    uncertaintyFlags.push("boundary_variant");
+  }
+  if (stableCueCount === 0) {
+    uncertaintyFlags.push("insufficient_stable_cues");
+  }
+
+  return {
+    routeOrder,
+    primaryRoute: routeOrder[0],
+    cues,
+    uncertaintyFlags,
+  };
 }
 
-function compareSignature(
-  left: SignatureAssessment,
-  right: SignatureAssessment,
-): number {
-  const levelRank = { supported: 0, candidate: 1, closed: 2 };
-  return (
-    levelRank[left.level] - levelRank[right.level] ||
-    Number(right.stableAcrossCharts) - Number(left.stableAcrossCharts) ||
-    Number(right.routeComplete) - Number(left.routeComplete) ||
-    left.uncertaintyCount - right.uncertaintyCount ||
-    SIGNATURE_ORDER.indexOf(left.id) - SIGNATURE_ORDER.indexOf(right.id)
-  );
+function cueStateForChart(
+  facts: ChartFacts,
+  family: CueFamily,
+): SingleChartCueState {
+  if (
+    facts.visibleStems.some(
+      (fact) => RELATION_FAMILY[fact.relation] === family,
+    )
+  ) {
+    return "visible";
+  }
+  if (
+    facts.hiddenStems.some(
+      (fact) => RELATION_FAMILY[fact.relation] === family,
+    )
+  ) {
+    return "hidden";
+  }
+  return "not_observed";
 }
 
-export function countUniqueEvidenceClusters(
-  assessments: SignatureAssessment[],
+function aggregateCueState(
+  states: SingleChartCueState[],
+  unknownHour: boolean,
+): CueState {
+  if (states.length === 0) return "unknown";
+  if (states.every((state) => state === "visible")) {
+    return "stable_visible";
+  }
+  if (states.every((state) => state === "hidden")) {
+    return "stable_hidden";
+  }
+  if (states.every((state) => state === "not_observed")) {
+    return unknownHour ? "unknown" : "not_observed";
+  }
+  return "variant";
+}
+
+function promptMatch(
+  route: SignatureId,
+  cues: Map<CueFamily, CueState>,
 ): number {
-  return new Set(assessments.flatMap((item) => item.evidenceClusters)).size;
+  return ROUTE_CUES[route].filter((family) =>
+    ["stable_visible", "stable_hidden"].includes(
+      cues.get(family) ?? "unknown",
+    ),
+  ).length;
+}
+
+function stableVisibleCount(
+  route: SignatureId,
+  cues: Map<CueFamily, CueState>,
+): number {
+  return ROUTE_CUES[route].filter(
+    (family) => cues.get(family) === "stable_visible",
+  ).length;
 }

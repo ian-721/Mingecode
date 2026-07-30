@@ -10,7 +10,7 @@ test("share return opens a generic invitation without personal payload", async (
   expect(page.url()).toMatch(/\/\?from=share$/);
 });
 
-test("standard birth input completes three questions and creates a safe share card", async ({
+test("standard birth input completes four questions and creates a safe share card", async ({
   page,
   context,
 }) => {
@@ -20,11 +20,12 @@ test("standard birth input completes three questions and creates a safe share ca
   await chooseMainAnswer(page);
   await chooseMainAnswer(page);
   await chooseMainAnswer(page);
+  await chooseMainAnswer(page);
 
   await expect(page.getByText("你的本次结果")).toBeVisible({
     timeout: 15_000,
   });
-  await expect(page.getByText("第 4 / 4 题")).toHaveCount(0);
+  await expect(page.getByText("第 5 / 5 题")).toHaveCount(0);
 
   await page.getByRole("button", { name: /生成分享卡/ }).click();
   const card = page.getByTestId("share-card");
@@ -45,7 +46,7 @@ test("standard birth input completes three questions and creates a safe share ca
   expect(copied).not.toContain("result");
 });
 
-test("conflicting answers ask exactly one fourth question and stay unresolved", async ({
+test("conflicting answers use the six-question cap and stay unresolved", async ({
   page,
 }) => {
   await startStandardFlow(page);
@@ -54,11 +55,15 @@ test("conflicting answers ask exactly one fourth question and stay unresolved", 
   await chooseUncertain(page);
   await expect(page.getByText("第 4 / 4 题")).toBeVisible();
   await chooseUncertain(page);
+  await expect(page.getByText("第 5 / 5 题")).toBeVisible();
+  await chooseUncertain(page);
+  await expect(page.getByText("第 6 / 6 题")).toBeVisible();
+  await chooseUncertain(page);
 
   await expect(page.getByRole("heading", { name: "这次先不定稿" })).toBeVisible({
     timeout: 15_000,
   });
-  await expect(page.getByText("第 5")).toHaveCount(0);
+  await expect(page.getByText("第 7")).toHaveCount(0);
 });
 
 test("going back changes the route and restarting clears the old result", async ({
@@ -67,16 +72,12 @@ test("going back changes the route and restarting clears the old result", async 
   await startStandardFlow(page);
   await chooseMainAnswer(page);
   await chooseMainAnswer(page);
-  await expect(page.getByText("第 3 / 3 题")).toBeVisible();
+  await expect(page.getByText("第 3 / 4 题")).toBeVisible();
 
   await page.getByRole("button", { name: "返回上一题" }).click();
-  await expect(page.getByText("第 2 / 3 题")).toBeVisible();
+  await expect(page.getByText("第 2 / 4 题")).toBeVisible();
   await page.locator(".answer-option").nth(1).click();
-  await page.locator(".answer-option").first().click();
-
-  if (await page.getByText("第 4 / 4 题").isVisible().catch(() => false)) {
-    await page.locator(".answer-option").first().click();
-  }
+  await finishWithMainAnswers(page);
 
   await expect(page.getByText("你的本次结果")).toBeVisible({
     timeout: 15_000,
@@ -94,7 +95,7 @@ test("nonexistent DST time returns a minimal actionable error", async ({
   await page.getByLabel("出生日期").fill("2024-03-10");
   await page.getByLabel("出生时间").fill("02:30");
   await chooseCity(page, "纽约", "纽约");
-  await page.getByRole("button", { name: /生成候选/ }).click();
+  await page.getByRole("button", { name: /安排起题/ }).click();
 
   await expect(
     page.getByText("这个当地时间刚好被夏令时跳过去了。请把时间前后调整一小时再试。"),
@@ -107,7 +108,7 @@ async function startStandardFlow(page: Page) {
   await page.getByLabel("出生日期").fill("2024-02-10");
   await page.getByLabel("出生时间").fill("14:20");
   await chooseCity(page, "北京", "北京");
-  await page.getByRole("button", { name: /生成候选/ }).click();
+  await page.getByRole("button", { name: /安排起题/ }).click();
 
   await page.waitForSelector(
     ".question-stage, .notice-stage, .result-page",
@@ -135,4 +136,13 @@ async function chooseMainAnswer(page: Page) {
 
 async function chooseUncertain(page: Page) {
   await page.getByRole("button", { name: /都不太像/ }).click();
+}
+
+async function finishWithMainAnswers(page: Page) {
+  for (let index = 0; index < 5; index += 1) {
+    if (await page.locator(".result-page").isVisible().catch(() => false)) {
+      return;
+    }
+    await chooseMainAnswer(page);
+  }
 }

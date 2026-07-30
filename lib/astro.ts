@@ -1,7 +1,6 @@
 import { getCity } from "@/data/cities";
 import {
-  aggregateAndRankSignatures,
-  assessSignatures,
+  createChartPrompt,
   deriveChartFacts,
 } from "@/lib/signatures";
 import type {
@@ -76,20 +75,21 @@ export async function resolveBirthInput(
       return { ok: false, error: "too_many_candidates" };
     }
 
-    const preliminaryStability: TimeStability =
-      input.timePrecision === "unknown"
-        ? "insufficient"
-        : instantCandidates.length > 1
-          ? "boundary_sensitive"
-          : "stable";
     const includeHour = input.timePrecision !== "unknown";
 
     const chartMap = new Map<string, ChartCandidate>();
     for (const item of instantCandidates) {
       const civilDate = asCivilDate(item.instant, item.wall);
       const pillars = stemBranch.computeFourPillars(civilDate);
-      const key = Object.values(pillars)
-        .map((pillar) => `${pillar.stem}${pillar.branch}`)
+      const key = [
+        pillars.year,
+        pillars.month,
+        pillars.day,
+        includeHour ? pillars.hour : null,
+      ]
+        .map((pillar) =>
+          pillar ? `${pillar.stem}${pillar.branch}` : "unknown-hour",
+        )
         .join("|");
       if (chartMap.has(key)) continue;
       chartMap.set(key, {
@@ -98,7 +98,6 @@ export async function resolveBirthInput(
         facts: deriveChartFacts(
           pillars,
           includeHour,
-          preliminaryStability,
           stemBranch,
         ),
       });
@@ -109,18 +108,20 @@ export async function resolveBirthInput(
       return { ok: false, error: "calculation_failed" };
     }
 
-    const assessments = charts.map((chart) => assessSignatures(chart.facts));
-    const candidates = aggregateAndRankSignatures(assessments);
+    const chartPrompt = createChartPrompt(
+      charts.map((chart) => chart.facts),
+      input.timePrecision === "unknown",
+    );
     const timeStability = deriveFinalStability(
-      preliminaryStability,
-      assessments,
+      input.timePrecision,
+      chartPrompt.uncertaintyFlags,
     );
 
     const value: ChartResolution = {
       charts,
-      candidates,
+      chartPrompt,
       timeStability,
-      notices: buildNotices(input, timeStability, charts.length, candidates.length),
+      notices: buildNotices(input, timeStability, charts.length),
     };
     return { ok: true, value };
   } catch {
@@ -369,24 +370,19 @@ function asCivilDate(instant: Date, wall: WallTime): Date {
 }
 
 function deriveFinalStability(
-  preliminary: TimeStability,
-  assessments: ReturnType<typeof assessSignatures>[],
+  precision: BirthInput["timePrecision"],
+  uncertaintyFlags: ChartResolution["chartPrompt"]["uncertaintyFlags"],
 ): TimeStability {
-  if (preliminary === "insufficient") return "insufficient";
-  if (assessments.length <= 1) return preliminary;
-  const fingerprints = assessments.map((items) =>
-    items.map((item) => `${item.id}:${item.level}`).join("|"),
-  );
-  return fingerprints.every((value) => value === fingerprints[0])
-    ? preliminary
-    : "boundary_sensitive";
+  if (precision === "unknown") return "insufficient";
+  return uncertaintyFlags.includes("boundary_variant")
+    ? "boundary_sensitive"
+    : "stable";
 }
 
 function buildNotices(
   input: BirthInput,
   stability: TimeStability,
   chartCount: number,
-  candidateCount: number,
 ): string[] {
   const notices: string[] = [];
   if (input.timePrecision === "unknown") {
@@ -399,9 +395,6 @@ function buildNotices(
   }
   if (chartCount > 1) {
     notices.push(`后台保留了 ${chartCount} 个合理版本，前台只呈现共同部分。`);
-  }
-  if (candidateCount < 2) {
-    notices.push("目前能确认的路线太少，结果会收缩为“还不能定稿”。");
   }
   return notices;
 }

@@ -8,7 +8,7 @@ export function HeroMark() {
         <strong>再看你</strong>
         <span>怎么活成今天</span>
       </div>
-      <div className="floating-note note-one">默认三题</div>
+      <div className="floating-note note-one">默认四题</div>
       <div className="floating-note note-two">允许未决</div>
       <div className="floating-glyph">译</div>
     </div>

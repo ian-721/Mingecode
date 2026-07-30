@@ -38,7 +38,7 @@ export function QuestionCard({
         <p>
           第 <strong>{index + 1}</strong> / {total} 题
         </p>
-        <span>{index === 3 ? "再确认一个场景" : "按第一反应选"}</span>
+        <span>{index >= 3 ? "再确认一个场景" : "按第一反应选"}</span>
       </div>
       <div
         className="progress-track"

@@ -1,11 +1,12 @@
 import {
-  createFourthQuestion,
   createInitialQuestions,
+  createNextQuestion,
   createThirdQuestion,
   decideVerdict,
   rebuildQuestions,
   recordAnswer,
-  shouldAskFourth,
+  shouldAskFifth,
+  shouldAskSixth,
 } from "@/lib/calibration";
 import type {
   AnswerChoice,
@@ -50,18 +51,9 @@ export function demoReducer(
         birthInput: action.input,
       };
     case "resolve_succeeded": {
-      const questions = createInitialQuestions(action.resolution.candidates);
-      if (questions.length === 0) {
-        return {
-          ...state,
-          step: "transition",
-          chartResolution: action.resolution,
-          questions: [],
-          answers: [],
-          verdict: decideVerdict(action.resolution.candidates, []),
-          error: null,
-        };
-      }
+      const questions = createInitialQuestions(
+        action.resolution.chartPrompt,
+      );
       return {
         ...state,
         step:
@@ -91,7 +83,7 @@ export function demoReducer(
         step: "question",
         answers,
         questions: rebuildQuestions(
-          state.chartResolution.candidates,
+          state.chartResolution.chartPrompt,
           answers,
         ),
         verdict: null,
@@ -130,24 +122,60 @@ function answerCurrentQuestion(
       answers,
       questions: [
         ...state.questions,
-        createThirdQuestion(resolution.candidates, answers),
+        createThirdQuestion(resolution.chartPrompt, answers),
+      ],
+    };
+  }
+
+  if (answers.length === 3) {
+    return {
+      ...state,
+      answers,
+      questions: [
+        ...state.questions,
+        createNextQuestion(
+          resolution.chartPrompt,
+          answers,
+          state.questions,
+          "fourth",
+        ),
       ],
     };
   }
 
   if (
-    answers.length === 3 &&
-    shouldAskFourth(resolution.candidates, answers)
+    answers.length === 4 &&
+    shouldAskFifth(resolution.chartPrompt, answers)
   ) {
     return {
       ...state,
       answers,
       questions: [
         ...state.questions,
-        createFourthQuestion(
-          resolution.candidates,
+        createNextQuestion(
+          resolution.chartPrompt,
           answers,
           state.questions,
+          "fifth",
+        ),
+      ],
+    };
+  }
+
+  if (
+    answers.length === 5 &&
+    shouldAskSixth(resolution.chartPrompt, answers)
+  ) {
+    return {
+      ...state,
+      answers,
+      questions: [
+        ...state.questions,
+        createNextQuestion(
+          resolution.chartPrompt,
+          answers,
+          state.questions,
+          "sixth",
         ),
       ],
     };
@@ -157,6 +185,6 @@ function answerCurrentQuestion(
     ...state,
     step: "transition",
     answers,
-    verdict: decideVerdict(resolution.candidates, answers),
+    verdict: decideVerdict(resolution.chartPrompt, answers),
   };
 }
