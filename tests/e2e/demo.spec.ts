@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 
 test("share return opens a generic invitation without personal payload", async ({
   page,
@@ -76,7 +76,10 @@ test("going back changes the route and restarting clears the old result", async 
 
   await page.getByRole("button", { name: "返回上一题" }).click();
   await expect(page.getByText("第 2 / 4 题")).toBeVisible();
-  await page.locator(".answer-option").nth(1).click();
+  await answerAndWait(
+    page,
+    page.locator(".answer-option").nth(1),
+  );
   await finishWithMainAnswers(page);
 
   await expect(page.getByText("你的本次结果")).toBeVisible({
@@ -131,18 +134,44 @@ async function chooseCity(page: Page, query: string, optionName: string) {
 }
 
 async function chooseMainAnswer(page: Page) {
-  await page.locator(".answer-option").first().click();
+  return answerAndWait(page, page.locator(".answer-option").first());
 }
 
 async function chooseUncertain(page: Page) {
-  await page.getByRole("button", { name: /都不太像/ }).click();
+  return answerAndWait(
+    page,
+    page.getByRole("button", { name: /都不太像/ }),
+  );
+}
+
+async function answerAndWait(
+  page: Page,
+  answer: Locator,
+): Promise<"question" | "result"> {
+  const currentQuestionNumber = await page
+    .getByRole("progressbar")
+    .getAttribute("aria-valuenow");
+  if (currentQuestionNumber === null) {
+    throw new Error("Expected an active question before answering");
+  }
+
+  const nextQuestionNumber = Number(currentQuestionNumber) + 1;
+  await answer.click();
+  await page
+    .locator(
+      `.result-page, .question-stage [role="progressbar"][aria-valuenow="${nextQuestionNumber}"]`,
+    )
+    .waitFor({ state: "visible" });
+
+  return (await page.locator(".result-page").isVisible())
+    ? "result"
+    : "question";
 }
 
 async function finishWithMainAnswers(page: Page) {
   for (let index = 0; index < 5; index += 1) {
-    if (await page.locator(".result-page").isVisible().catch(() => false)) {
+    if ((await chooseMainAnswer(page)) === "result") {
       return;
     }
-    await chooseMainAnswer(page);
   }
 }
