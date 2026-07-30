@@ -2,7 +2,7 @@
 
 **状态：冻结 / Accepted**
 
-本目录当前包含十份 ADR，记录影响产品本体、性别策略、隐私、规则引擎、品牌架构、时间口径、合作边界或前后台表达边界的决定。`Accepted` 表示冻结；`Proposed` 表示候选。改变已接受决定必须新增 ADR，不得静默改写历史。
+本目录当前包含十一份 ADR。`Accepted` 表示冻结；`Proposed` 表示候选。改变已接受决定必须新增 ADR，不得静默改写历史。
 
 | ADR | 状态 | 决定 |
 |---|---|---|
@@ -16,3 +16,6 @@
 | [ADR-0008](ADR-0008-mvp-civil-time-convention.md) | Accepted | MVP 使用 `civil_time_v1`，暂不启用真太阳时 |
 | [ADR-0009](ADR-0009-hybrid-chart-candidate-and-calibration.md) | Accepted（研究方向） | 命盘只提出候选，默认三道校准题完成混合译码 |
 | [ADR-0010](ADR-0010-backstage-rigor-frontstage-lightness.md) | Accepted | 后台保留严谨研究，前台保持轻松、幽默、易分享 |
+| [ADR-0011](ADR-0011-h5-demo-implementation-authorization.md) | Accepted | 窄范围授权非生产 H5 Demo；不授权部署或合并业务 PR |
+
+ADR-0011 只在其明确范围内覆盖 ADR-0001 的代码禁令，不改变旧决定的历史状态。
