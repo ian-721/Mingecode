@@ -161,7 +161,6 @@ export type VerdictRelation =
 
 export type HybridVerdict = {
   modelVersion: "m1br-hybrid-r2-0.1";
-  timeConventionVersion: TimeConventionVersion;
   chartPrompt: ChartPrompt;
   calibration: {
     questionIds: string[];
