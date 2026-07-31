@@ -3,12 +3,13 @@ import {
   createChartPrompt,
   deriveChartFacts,
 } from "@/lib/signatures";
-import type {
-  BirthInput,
-  BirthResolutionResult,
-  ChartCandidate,
-  ChartResolution,
-  TimeStability,
+import {
+  TIME_CONVENTION_VERSION,
+  type BirthInput,
+  type BirthResolutionResult,
+  type ChartCandidate,
+  type ChartResolution,
+  type TimeStability,
 } from "@/lib/types";
 
 type StemBranchModule = typeof import("@4n6h4x0r/stem-branch");
@@ -71,10 +72,6 @@ export async function resolveBirthInput(
       );
     }
 
-    if (instantCandidates.length > 16) {
-      return { ok: false, error: "too_many_candidates" };
-    }
-
     const includeHour = input.timePrecision !== "unknown";
 
     const chartMap = new Map<string, ChartCandidate>();
@@ -107,6 +104,9 @@ export async function resolveBirthInput(
     if (charts.length === 0) {
       return { ok: false, error: "calculation_failed" };
     }
+    if (charts.length > 16) {
+      return { ok: false, error: "too_many_candidates" };
+    }
 
     const chartPrompt = createChartPrompt(
       charts.map((chart) => chart.facts),
@@ -118,6 +118,7 @@ export async function resolveBirthInput(
     );
 
     const value: ChartResolution = {
+      timeConventionVersion: TIME_CONVENTION_VERSION,
       charts,
       chartPrompt,
       timeStability,
