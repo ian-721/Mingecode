@@ -19,6 +19,7 @@ const chartPrompt: ChartPrompt = {
 };
 
 const resolution: ChartResolution = {
+  timeConventionVersion: "civil_time_v1",
   charts: [],
   timeStability: "stable",
   notices: [],
@@ -93,6 +94,7 @@ describe("state reset and share whitelist", () => {
     expect(sharePayloadContainsSensitiveFields(payload)).toBe(false);
     expect(JSON.stringify(payload)).not.toContain("SIG-");
     expect(JSON.stringify(payload)).not.toContain("routeSupport");
+    expect(JSON.stringify(payload)).not.toContain("civil_time_v1");
   });
 });
 
