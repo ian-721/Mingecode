@@ -1,0 +1,219 @@
+{
+  "schemaVersion": "archetype-fixtures-v0.4",
+  "factsVersion": "atomic-occurrence-facts-v0.4",
+  "relationMatrixVersion": "role-relation-matrix-v0.4",
+  "timeConventionVersion": "civil_time_v1",
+  "containsRealPeople": false,
+  "containsBirthData": false,
+  "projectAssumption": "project_assumption_minimum_v0.4",
+  "factSets": {
+    "F01": {
+      "precision":"exact","missingPositions":[],
+      "seasonalStrength":{"subject":"旺","peer":"旺","input":"相","output":"休","resource":"囚","constraint":"死"},
+      "occurrences":[
+        {"role":"subject","kind":"day_anchor","objectKey":"f01-s","originClusterKey":"a1","hiddenStemProportion":null,"rootOccurrence":false},
+        {"role":"input","kind":"hidden","objectKey":"f01-i","originClusterKey":"a2","hiddenStemProportion":0.6,"rootOccurrence":true},
+        {"role":"output","kind":"hidden","objectKey":"f01-o","originClusterKey":"a3","hiddenStemProportion":0.6,"rootOccurrence":true},
+        {"role":"resource","kind":"hidden","objectKey":"f01-r","originClusterKey":"a4","hiddenStemProportion":0.3,"rootOccurrence":true}
+      ]
+    },
+    "F02": {
+      "precision":"exact","missingPositions":[],
+      "seasonalStrength":{"subject":"旺","peer":"旺","input":"相","output":"休","resource":"囚","constraint":"死"},
+      "occurrences":[
+        {"role":"subject","kind":"day_anchor","objectKey":"f02-s","originClusterKey":"one","hiddenStemProportion":null,"rootOccurrence":false},
+        {"role":"input","kind":"hidden","objectKey":"f02-i","originClusterKey":"one","hiddenStemProportion":0.6,"rootOccurrence":true},
+        {"role":"output","kind":"hidden","objectKey":"f02-o","originClusterKey":"one","hiddenStemProportion":0.6,"rootOccurrence":true},
+        {"role":"resource","kind":"hidden","objectKey":"f02-r","originClusterKey":"one","hiddenStemProportion":0.3,"rootOccurrence":true}
+      ]
+    },
+    "F03": {
+      "precision":"exact","missingPositions":[],
+      "seasonalStrength":{"subject":"囚","peer":"囚","input":"相","output":"休","resource":"囚","constraint":"死"},
+      "occurrences":[
+        {"role":"subject","kind":"day_anchor","objectKey":"f03-s","originClusterKey":"a1","hiddenStemProportion":null,"rootOccurrence":false},
+        {"role":"input","kind":"hidden","objectKey":"f03-i","originClusterKey":"a2","hiddenStemProportion":0.6,"rootOccurrence":true},
+        {"role":"output","kind":"hidden","objectKey":"f03-o","originClusterKey":"a3","hiddenStemProportion":0.6,"rootOccurrence":true},
+        {"role":"resource","kind":"hidden","objectKey":"f03-r","originClusterKey":"a4","hiddenStemProportion":0.3,"rootOccurrence":true}
+      ]
+    },
+    "F04": {
+      "precision":"exact","missingPositions":[],
+      "seasonalStrength":{"subject":"旺","peer":"旺","input":"相","output":"休","resource":"囚","constraint":"旺"},
+      "occurrences":[
+        {"role":"subject","kind":"day_anchor","objectKey":"f04-s","originClusterKey":"a1","hiddenStemProportion":null,"rootOccurrence":false},
+        {"role":"input","kind":"hidden","objectKey":"f04-i","originClusterKey":"a2","hiddenStemProportion":0.6,"rootOccurrence":true},
+        {"role":"output","kind":"hidden","objectKey":"f04-o","originClusterKey":"a3","hiddenStemProportion":0.6,"rootOccurrence":true},
+        {"role":"resource","kind":"hidden","objectKey":"f04-r","originClusterKey":"a4","hiddenStemProportion":0.3,"rootOccurrence":true},
+        {"role":"constraint","kind":"visible","objectKey":"f04-c","originClusterKey":"a5","hiddenStemProportion":null,"rootOccurrence":false}
+      ]
+    },
+    "F05": {
+      "precision":"exact","missingPositions":[],
+      "seasonalStrength":{"subject":"囚","peer":"囚","input":"死","output":"旺","resource":"死","constraint":"相"},
+      "occurrences":[
+        {"role":"subject","kind":"day_anchor","objectKey":"f05-s","originClusterKey":"b1","hiddenStemProportion":null,"rootOccurrence":false},
+        {"role":"output","kind":"visible","objectKey":"f05-o","originClusterKey":"b2","hiddenStemProportion":null,"rootOccurrence":false},
+        {"role":"constraint","kind":"visible","objectKey":"f05-c","originClusterKey":"b3","hiddenStemProportion":null,"rootOccurrence":false}
+      ]
+    },
+    "F06": {
+      "precision":"exact","missingPositions":[],
+      "seasonalStrength":{"subject":"囚","peer":"囚","input":"死","output":"旺","resource":"死","constraint":"相"},
+      "occurrences":[
+        {"role":"subject","kind":"day_anchor","objectKey":"f06-s","originClusterKey":"one","hiddenStemProportion":null,"rootOccurrence":false},
+        {"role":"output","kind":"visible","objectKey":"f06-o","originClusterKey":"one","hiddenStemProportion":null,"rootOccurrence":false},
+        {"role":"constraint","kind":"visible","objectKey":"f06-c","originClusterKey":"one","hiddenStemProportion":null,"rootOccurrence":false}
+      ]
+    },
+    "F07": {
+      "precision":"exact","missingPositions":[],
+      "seasonalStrength":{"subject":"囚","peer":"囚","input":"死","output":"囚","resource":"死","constraint":"相"},
+      "occurrences":[
+        {"role":"subject","kind":"day_anchor","objectKey":"f07-s","originClusterKey":"b1","hiddenStemProportion":null,"rootOccurrence":false},
+        {"role":"output","kind":"visible","objectKey":"f07-o","originClusterKey":"b2","hiddenStemProportion":null,"rootOccurrence":false},
+        {"role":"constraint","kind":"visible","objectKey":"f07-c","originClusterKey":"b3","hiddenStemProportion":null,"rootOccurrence":false}
+      ]
+    },
+    "F08": {
+      "precision":"exact","missingPositions":[],
+      "seasonalStrength":{"subject":"囚","peer":"囚","input":"死","output":"旺","resource":"死","constraint":"相"},
+      "occurrences":[
+        {"role":"subject","kind":"day_anchor","objectKey":"f08-s","originClusterKey":"b1","hiddenStemProportion":null,"rootOccurrence":false},
+        {"role":"output","kind":"visible","objectKey":"f08-o","originClusterKey":"b2","hiddenStemProportion":null,"rootOccurrence":false},
+        {"role":"constraint","kind":"visible","objectKey":"f08-c1","originClusterKey":"b3","hiddenStemProportion":null,"rootOccurrence":false},
+        {"role":"constraint","kind":"hidden","objectKey":"f08-c2","originClusterKey":"b4","hiddenStemProportion":0.6,"rootOccurrence":true}
+      ]
+    },
+    "F09": {
+      "precision":"exact","missingPositions":[],
+      "seasonalStrength":{"subject":"旺","peer":"旺","input":"死","output":"旺","resource":"死","constraint":"旺"},
+      "occurrences":[
+        {"role":"subject","kind":"day_anchor","objectKey":"f09-s","originClusterKey":"c1","hiddenStemProportion":null,"rootOccurrence":false},
+        {"role":"output","kind":"visible","objectKey":"f09-o","originClusterKey":"c2","hiddenStemProportion":null,"rootOccurrence":false},
+        {"role":"constraint","kind":"visible","objectKey":"f09-c","originClusterKey":"c3","hiddenStemProportion":null,"rootOccurrence":false}
+      ]
+    },
+    "F10": {
+      "precision":"exact","missingPositions":[],
+      "seasonalStrength":{"subject":"旺","peer":"旺","input":"死","output":"旺","resource":"死","constraint":"旺"},
+      "occurrences":[
+        {"role":"subject","kind":"day_anchor","objectKey":"f10-s","originClusterKey":"one","hiddenStemProportion":null,"rootOccurrence":false},
+        {"role":"output","kind":"visible","objectKey":"f10-o","originClusterKey":"one","hiddenStemProportion":null,"rootOccurrence":false},
+        {"role":"constraint","kind":"visible","objectKey":"f10-c","originClusterKey":"one","hiddenStemProportion":null,"rootOccurrence":false}
+      ]
+    },
+    "F11": {
+      "precision":"exact","missingPositions":[],
+      "seasonalStrength":{"subject":"旺","peer":"旺","input":"死","output":"囚","resource":"死","constraint":"旺"},
+      "occurrences":[
+        {"role":"subject","kind":"day_anchor","objectKey":"f11-s","originClusterKey":"c1","hiddenStemProportion":null,"rootOccurrence":false},
+        {"role":"output","kind":"visible","objectKey":"f11-o","originClusterKey":"c2","hiddenStemProportion":null,"rootOccurrence":false},
+        {"role":"constraint","kind":"visible","objectKey":"f11-c","originClusterKey":"c3","hiddenStemProportion":null,"rootOccurrence":false}
+      ]
+    },
+    "F12": {
+      "precision":"exact","missingPositions":[],
+      "seasonalStrength":{"subject":"旺","peer":"旺","input":"相","output":"旺","resource":"死","constraint":"旺"},
+      "occurrences":[
+        {"role":"subject","kind":"day_anchor","objectKey":"f12-s","originClusterKey":"c1","hiddenStemProportion":null,"rootOccurrence":false},
+        {"role":"input","kind":"visible","objectKey":"f12-i","originClusterKey":"c4","hiddenStemProportion":null,"rootOccurrence":false},
+        {"role":"output","kind":"visible","objectKey":"f12-o","originClusterKey":"c2","hiddenStemProportion":null,"rootOccurrence":false},
+        {"role":"constraint","kind":"visible","objectKey":"f12-c","originClusterKey":"c3","hiddenStemProportion":null,"rootOccurrence":false}
+      ]
+    },
+    "F13": {
+      "precision":"exact","missingPositions":[],
+      "seasonalStrength":{"subject":"旺","peer":"旺","input":"相","output":"旺","resource":"旺","constraint":"死"},
+      "occurrences":[
+        {"role":"subject","kind":"day_anchor","objectKey":"f13-s","originClusterKey":"d1","hiddenStemProportion":null,"rootOccurrence":false},
+        {"role":"input","kind":"visible","objectKey":"f13-i","originClusterKey":"d2","hiddenStemProportion":null,"rootOccurrence":false},
+        {"role":"output","kind":"visible","objectKey":"f13-o","originClusterKey":"d3","hiddenStemProportion":null,"rootOccurrence":false},
+        {"role":"resource","kind":"visible","objectKey":"f13-r","originClusterKey":"d4","hiddenStemProportion":null,"rootOccurrence":false}
+      ]
+    },
+    "F14": {
+      "precision":"exact","missingPositions":[],
+      "seasonalStrength":{"subject":"旺","peer":"旺","input":"相","output":"旺","resource":"旺","constraint":"死"},
+      "occurrences":[
+        {"role":"subject","kind":"day_anchor","objectKey":"f14-s","originClusterKey":"one","hiddenStemProportion":null,"rootOccurrence":false},
+        {"role":"input","kind":"visible","objectKey":"f14-i","originClusterKey":"one","hiddenStemProportion":null,"rootOccurrence":false},
+        {"role":"output","kind":"visible","objectKey":"f14-o","originClusterKey":"one","hiddenStemProportion":null,"rootOccurrence":false},
+        {"role":"resource","kind":"visible","objectKey":"f14-r","originClusterKey":"one","hiddenStemProportion":null,"rootOccurrence":false}
+      ]
+    },
+    "F15": {
+      "precision":"exact","missingPositions":[],
+      "seasonalStrength":{"subject":"旺","peer":"旺","input":"囚","output":"旺","resource":"囚","constraint":"死"},
+      "occurrences":[
+        {"role":"subject","kind":"day_anchor","objectKey":"f15-s","originClusterKey":"d1","hiddenStemProportion":null,"rootOccurrence":false},
+        {"role":"input","kind":"hidden","objectKey":"f15-i","originClusterKey":"d2","hiddenStemProportion":0.3,"rootOccurrence":true},
+        {"role":"output","kind":"visible","objectKey":"f15-o","originClusterKey":"d3","hiddenStemProportion":null,"rootOccurrence":false},
+        {"role":"resource","kind":"hidden","objectKey":"f15-r","originClusterKey":"d4","hiddenStemProportion":0.3,"rootOccurrence":true}
+      ]
+    },
+    "F16": {
+      "precision":"exact","missingPositions":[],
+      "seasonalStrength":{"subject":"旺","peer":"旺","input":"相","output":"旺","resource":"旺","constraint":"旺"},
+      "occurrences":[
+        {"role":"subject","kind":"day_anchor","objectKey":"f16-s","originClusterKey":"d1","hiddenStemProportion":null,"rootOccurrence":false},
+        {"role":"input","kind":"visible","objectKey":"f16-i","originClusterKey":"d2","hiddenStemProportion":null,"rootOccurrence":false},
+        {"role":"output","kind":"visible","objectKey":"f16-o","originClusterKey":"d3","hiddenStemProportion":null,"rootOccurrence":false},
+        {"role":"resource","kind":"visible","objectKey":"f16-r","originClusterKey":"d4","hiddenStemProportion":null,"rootOccurrence":false},
+        {"role":"constraint","kind":"visible","objectKey":"f16-c","originClusterKey":"d5","hiddenStemProportion":null,"rootOccurrence":false}
+      ]
+    }
+  },
+  "expectedProfiles": {
+    "F01":{"nodeAvailability":{"subject":"usable","peer":"absent","input":"usable","output":"usable","resource":"limited","constraint":"absent"},"rawRelationCount":6,"relationEffectivenessCounts":{"effective":3,"limited":3,"blocked":0,"unknown":0},"criticalRelationStates":{"generates:f01-i>f01-s":"effective","generates:f01-s>f01-o":"effective","generates:f01-o>f01-r":"limited"},"evidence":{"E1":"established","E2":"established","E3":"not_supported","E4":"established","E5":"established","E6":"established"},"dimensions":{"D1":"supply_continuous","D2":"output_supported","D3":"blocked","D4":"conversion_limited","D5":"uncoupled","D6":"resource_interface_limited"},"evidenceFamilies":["node_availability","complete_relation_closure","same_origin_tension"],"originClusterKeys":["a1","a2","a3","a4"],"tension":"established","exclusion":false,"coreMechanism":"A01","finalState":"established"},
+    "F02":{"nodeAvailability":{"subject":"usable","peer":"absent","input":"usable","output":"usable","resource":"limited","constraint":"absent"},"rawRelationCount":6,"relationEffectivenessCounts":{"effective":3,"limited":3,"blocked":0,"unknown":0},"criticalRelationStates":{"generates:f02-i>f02-s":"effective","generates:f02-s>f02-o":"effective","generates:f02-o>f02-r":"limited"},"evidence":{"E1":"established","E2":"established","E3":"not_supported","E4":"established","E5":"not_supported","E6":"not_supported"},"dimensions":{"D1":"supply_continuous","D2":"output_supported","D3":"blocked","D4":"conversion_limited","D5":"uncoupled","D6":"resource_interface_limited"},"evidenceFamilies":["node_availability","complete_relation_closure","same_origin_tension"],"originClusterKeys":["one"],"tension":"established","exclusion":false,"coreMechanism":null,"finalState":"not_supported"},
+    "F03":{"nodeAvailability":{"subject":"limited","peer":"absent","input":"usable","output":"usable","resource":"limited","constraint":"absent"},"rawRelationCount":6,"relationEffectivenessCounts":{"effective":1,"limited":5,"blocked":0,"unknown":0},"criticalRelationStates":{"generates:f03-i>f03-s":"limited","generates:f03-s>f03-o":"limited","generates:f03-o>f03-r":"limited"},"evidence":{"E1":"established","E2":"candidate","E3":"not_supported","E4":"candidate","E5":"candidate","E6":"candidate"},"dimensions":{"D1":"supply_limited","D2":"unresolved","D3":"blocked","D4":"conversion_limited","D5":"uncoupled","D6":"resource_interface_limited"},"evidenceFamilies":["node_availability","complete_relation_closure","same_origin_tension"],"originClusterKeys":["a1","a2","a3","a4"],"tension":"candidate","exclusion":false,"coreMechanism":null,"finalState":"candidate"},
+    "F04":{"nodeAvailability":{"subject":"usable","peer":"absent","input":"usable","output":"usable","resource":"limited","constraint":"usable"},"rawRelationCount":10,"relationEffectivenessCounts":{"effective":6,"limited":4,"blocked":0,"unknown":0},"criticalRelationStates":{"generates:f04-i>f04-s":"effective","generates:f04-s>f04-o":"effective","controls:f04-o>f04-c":"effective","controls:f04-c>f04-s":"effective","generates:f04-c>f04-i":"effective","generates:f04-o>f04-r":"limited"},"evidence":{"E1":"established","E2":"established","E3":"not_supported","E4":"established","E5":"conflicted","E6":"conflicted"},"dimensions":{"D1":"supply_continuous","D2":"output_supported","D3":"mixed","D4":"conversion_limited","D5":"output_constraint_feedback","D6":"resource_interface_limited"},"evidenceFamilies":["node_availability","complete_relation_closure","same_origin_tension","exclusion_boundary"],"originClusterKeys":["a1","a2","a3","a4","a5"],"tension":"established","exclusion":true,"coreMechanism":null,"finalState":"conflicted"},
+    "F05":{"nodeAvailability":{"subject":"limited","peer":"absent","input":"absent","output":"usable","resource":"absent","constraint":"usable"},"rawRelationCount":3,"relationEffectivenessCounts":{"effective":1,"limited":2,"blocked":0,"unknown":0},"criticalRelationStates":{"generates:f05-s>f05-o":"limited","controls:f05-o>f05-c":"effective","controls:f05-c>f05-s":"limited"},"evidence":{"E1":"established","E2":"established","E3":"not_supported","E4":"established","E5":"established","E6":"established"},"dimensions":{"D1":"supply_blocked","D2":"output_visible_asymmetric","D3":"unresolved","D4":"conversion_blocked","D5":"output_constraint_regulating","D6":"resource_interface_blocked"},"evidenceFamilies":["node_availability","complete_relation_closure","same_origin_tension"],"originClusterKeys":["b1","b2","b3"],"tension":"established","exclusion":false,"coreMechanism":"A02","finalState":"established"},
+    "F06":{"nodeAvailability":{"subject":"limited","peer":"absent","input":"absent","output":"usable","resource":"absent","constraint":"usable"},"rawRelationCount":3,"relationEffectivenessCounts":{"effective":1,"limited":2,"blocked":0,"unknown":0},"criticalRelationStates":{"generates:f06-s>f06-o":"limited","controls:f06-o>f06-c":"effective","controls:f06-c>f06-s":"limited"},"evidence":{"E1":"established","E2":"established","E3":"not_supported","E4":"established","E5":"not_supported","E6":"not_supported"},"dimensions":{"D1":"supply_blocked","D2":"output_visible_asymmetric","D3":"unresolved","D4":"conversion_blocked","D5":"output_constraint_regulating","D6":"resource_interface_blocked"},"evidenceFamilies":["node_availability","complete_relation_closure","same_origin_tension"],"originClusterKeys":["one"],"tension":"established","exclusion":false,"coreMechanism":null,"finalState":"not_supported"},
+    "F07":{"nodeAvailability":{"subject":"limited","peer":"absent","input":"absent","output":"limited","resource":"absent","constraint":"usable"},"rawRelationCount":3,"relationEffectivenessCounts":{"effective":0,"limited":3,"blocked":0,"unknown":0},"criticalRelationStates":{"generates:f07-s>f07-o":"limited","controls:f07-o>f07-c":"limited","controls:f07-c>f07-s":"limited"},"evidence":{"E1":"established","E2":"candidate","E3":"not_supported","E4":"candidate","E5":"candidate","E6":"candidate"},"dimensions":{"D1":"supply_blocked","D2":"output_limited","D3":"unresolved","D4":"conversion_blocked","D5":"unresolved","D6":"resource_interface_blocked"},"evidenceFamilies":["node_availability","complete_relation_closure","same_origin_tension"],"originClusterKeys":["b1","b2","b3"],"tension":"candidate","exclusion":false,"coreMechanism":null,"finalState":"candidate"},
+    "F08":{"nodeAvailability":{"subject":"limited","peer":"absent","input":"absent","output":"usable","resource":"absent","constraint":"usable"},"rawRelationCount":6,"relationEffectivenessCounts":{"effective":1,"limited":5,"blocked":0,"unknown":0},"criticalRelationStates":{"generates:f08-s>f08-o":"limited","controls:f08-o>f08-c1":"limited","controls:f08-o>f08-c2":"limited","controls:f08-c1>f08-s":"limited","controls:f08-c2>f08-s":"limited","same_role:f08-c1>f08-c2":"effective"},"evidence":{"E1":"established","E2":"conflicted","E3":"established","E4":"conflicted","E5":"conflicted","E6":"conflicted"},"dimensions":{"D1":"supply_blocked","D2":"output_visible_asymmetric","D3":"unresolved","D4":"conversion_blocked","D5":"shared_endpoint_competition","D6":"resource_interface_blocked"},"evidenceFamilies":["node_availability","complete_relation_closure","same_origin_tension","exclusion_boundary"],"originClusterKeys":["b1","b2","b3","b4"],"tension":"conflicted","exclusion":true,"coreMechanism":null,"finalState":"conflicted"},
+    "F09":{"nodeAvailability":{"subject":"usable","peer":"absent","input":"absent","output":"usable","resource":"absent","constraint":"usable"},"rawRelationCount":3,"relationEffectivenessCounts":{"effective":3,"limited":0,"blocked":0,"unknown":0},"criticalRelationStates":{"generates:f09-s>f09-o":"effective","controls:f09-o>f09-c":"effective","controls:f09-c>f09-s":"effective"},"evidence":{"E1":"established","E2":"established","E3":"not_supported","E4":"established","E5":"established","E6":"established"},"dimensions":{"D1":"supply_blocked","D2":"output_supported","D3":"constraint_mediated_by_output","D4":"conversion_blocked","D5":"output_constraint_feedback","D6":"resource_interface_blocked"},"evidenceFamilies":["node_availability","complete_relation_closure","same_origin_tension"],"originClusterKeys":["c1","c2","c3"],"tension":"established","exclusion":false,"coreMechanism":"A03","finalState":"established"},
+    "F10":{"nodeAvailability":{"subject":"usable","peer":"absent","input":"absent","output":"usable","resource":"absent","constraint":"usable"},"rawRelationCount":3,"relationEffectivenessCounts":{"effective":3,"limited":0,"blocked":0,"unknown":0},"criticalRelationStates":{"generates:f10-s>f10-o":"effective","controls:f10-o>f10-c":"effective","controls:f10-c>f10-s":"effective"},"evidence":{"E1":"established","E2":"established","E3":"not_supported","E4":"established","E5":"not_supported","E6":"not_supported"},"dimensions":{"D1":"supply_blocked","D2":"output_supported","D3":"constraint_mediated_by_output","D4":"conversion_blocked","D5":"output_constraint_feedback","D6":"resource_interface_blocked"},"evidenceFamilies":["node_availability","complete_relation_closure","same_origin_tension"],"originClusterKeys":["one"],"tension":"established","exclusion":false,"coreMechanism":null,"finalState":"not_supported"},
+    "F11":{"nodeAvailability":{"subject":"usable","peer":"absent","input":"absent","output":"limited","resource":"absent","constraint":"usable"},"rawRelationCount":3,"relationEffectivenessCounts":{"effective":1,"limited":2,"blocked":0,"unknown":0},"criticalRelationStates":{"generates:f11-s>f11-o":"limited","controls:f11-o>f11-c":"limited","controls:f11-c>f11-s":"effective"},"evidence":{"E1":"established","E2":"candidate","E3":"not_supported","E4":"candidate","E5":"candidate","E6":"candidate"},"dimensions":{"D1":"supply_blocked","D2":"output_limited","D3":"unresolved","D4":"conversion_blocked","D5":"unresolved","D6":"resource_interface_blocked"},"evidenceFamilies":["node_availability","complete_relation_closure","same_origin_tension"],"originClusterKeys":["c1","c2","c3"],"tension":"candidate","exclusion":false,"coreMechanism":null,"finalState":"candidate"},
+    "F12":{"nodeAvailability":{"subject":"usable","peer":"absent","input":"usable","output":"usable","resource":"absent","constraint":"usable"},"rawRelationCount":6,"relationEffectivenessCounts":{"effective":6,"limited":0,"blocked":0,"unknown":0},"criticalRelationStates":{"generates:f12-s>f12-o":"effective","controls:f12-o>f12-c":"effective","controls:f12-c>f12-s":"effective","generates:f12-c>f12-i":"effective","generates:f12-i>f12-s":"effective"},"evidence":{"E1":"established","E2":"established","E3":"not_supported","E4":"established","E5":"conflicted","E6":"conflicted"},"dimensions":{"D1":"supply_continuous","D2":"output_supported","D3":"mixed","D4":"conversion_blocked","D5":"output_constraint_feedback","D6":"resource_interface_blocked"},"evidenceFamilies":["node_availability","complete_relation_closure","same_origin_tension","exclusion_boundary"],"originClusterKeys":["c1","c2","c3","c4"],"tension":"established","exclusion":true,"coreMechanism":null,"finalState":"conflicted"},
+    "F13":{"nodeAvailability":{"subject":"usable","peer":"absent","input":"usable","output":"usable","resource":"usable","constraint":"absent"},"rawRelationCount":6,"relationEffectivenessCounts":{"effective":6,"limited":0,"blocked":0,"unknown":0},"criticalRelationStates":{"generates:f13-i>f13-s":"effective","generates:f13-s>f13-o":"effective","generates:f13-o>f13-r":"effective"},"evidence":{"E1":"established","E2":"established","E3":"not_supported","E4":"established","E5":"established","E6":"established"},"dimensions":{"D1":"supply_continuous","D2":"output_supported","D3":"blocked","D4":"conversion_continuous","D5":"uncoupled","D6":"resource_interface_effective"},"evidenceFamilies":["node_availability","complete_relation_closure","same_origin_tension"],"originClusterKeys":["d1","d2","d3","d4"],"tension":"established","exclusion":false,"coreMechanism":"A04","finalState":"established"},
+    "F14":{"nodeAvailability":{"subject":"usable","peer":"absent","input":"usable","output":"usable","resource":"usable","constraint":"absent"},"rawRelationCount":6,"relationEffectivenessCounts":{"effective":6,"limited":0,"blocked":0,"unknown":0},"criticalRelationStates":{"generates:f14-i>f14-s":"effective","generates:f14-s>f14-o":"effective","generates:f14-o>f14-r":"effective"},"evidence":{"E1":"established","E2":"established","E3":"not_supported","E4":"established","E5":"not_supported","E6":"not_supported"},"dimensions":{"D1":"supply_continuous","D2":"output_supported","D3":"blocked","D4":"conversion_continuous","D5":"uncoupled","D6":"resource_interface_effective"},"evidenceFamilies":["node_availability","complete_relation_closure","same_origin_tension"],"originClusterKeys":["one"],"tension":"established","exclusion":false,"coreMechanism":null,"finalState":"not_supported"},
+    "F15":{"nodeAvailability":{"subject":"usable","peer":"absent","input":"limited","output":"usable","resource":"limited","constraint":"absent"},"rawRelationCount":6,"relationEffectivenessCounts":{"effective":1,"limited":5,"blocked":0,"unknown":0},"criticalRelationStates":{"generates:f15-i>f15-s":"limited","generates:f15-s>f15-o":"effective","generates:f15-o>f15-r":"limited"},"evidence":{"E1":"established","E2":"candidate","E3":"not_supported","E4":"candidate","E5":"candidate","E6":"candidate"},"dimensions":{"D1":"supply_limited","D2":"output_supported","D3":"blocked","D4":"conversion_limited","D5":"uncoupled","D6":"resource_interface_limited"},"evidenceFamilies":["node_availability","complete_relation_closure","same_origin_tension"],"originClusterKeys":["d1","d2","d3","d4"],"tension":"candidate","exclusion":false,"coreMechanism":null,"finalState":"candidate"},
+    "F16":{"nodeAvailability":{"subject":"usable","peer":"absent","input":"usable","output":"usable","resource":"usable","constraint":"usable"},"rawRelationCount":10,"relationEffectivenessCounts":{"effective":10,"limited":0,"blocked":0,"unknown":0},"criticalRelationStates":{"generates:f16-i>f16-s":"effective","generates:f16-s>f16-o":"effective","generates:f16-o>f16-r":"effective","controls:f16-o>f16-c":"effective","controls:f16-c>f16-s":"effective","generates:f16-c>f16-i":"effective"},"evidence":{"E1":"established","E2":"established","E3":"not_supported","E4":"established","E5":"conflicted","E6":"conflicted"},"dimensions":{"D1":"supply_continuous","D2":"output_supported","D3":"mixed","D4":"conversion_continuous","D5":"output_constraint_feedback","D6":"resource_interface_effective"},"evidenceFamilies":["node_availability","complete_relation_closure","same_origin_tension","exclusion_boundary"],"originClusterKeys":["d1","d2","d3","d4","d5"],"tension":"established","exclusion":true,"coreMechanism":null,"finalState":"conflicted"}
+  },
+  "fixtures": [
+    {"id":"CF-001","coverageMechanism":"A01","type":"positive","input":{"candidates":[{"candidateId":"c1","factSetRef":"F01"}]},"expected":{"coreMechanism":"A01","finalState":"established","profileRefs":["F01"],"manifestationVariant":"unselected"}},
+    {"id":"CF-002","coverageMechanism":"A01","type":"near_neighbor","input":{"candidates":[{"candidateId":"c1","factSetRef":"F13"}]},"expected":{"coreMechanism":"A04","finalState":"established","profileRefs":["F13"],"boundary":"A01_A04_resource_interface"}},
+    {"id":"CF-003","coverageMechanism":"A01","type":"single_family","input":{"candidates":[{"candidateId":"c1","factSetRef":"F02"}]},"expected":{"coreMechanism":null,"finalState":"not_supported","profileRefs":["F02"]}},
+    {"id":"CF-004","coverageMechanism":"A01","type":"capacity_failure","input":{"candidates":[{"candidateId":"c1","factSetRef":"F03"}]},"expected":{"coreMechanism":null,"finalState":"candidate","profileRefs":["F03"]}},
+    {"id":"CF-005","coverageMechanism":"A01","type":"counterevidence","input":{"candidates":[{"candidateId":"c1","factSetRef":"F04"}]},"expected":{"coreMechanism":null,"finalState":"conflicted","profileRefs":["F04"]}},
+    {"id":"CF-006","coverageMechanism":"A01","type":"time_stable","input":{"candidates":[{"candidateId":"early","factSetRef":"F01"},{"candidateId":"late","factSetRef":"F01"}]},"expected":{"coreMechanism":"A01","finalState":"established","profileRefs":["F01","F01"]}},
+    {"id":"CF-007","coverageMechanism":"A01","type":"time_changes_core","input":{"candidates":[{"candidateId":"early","factSetRef":"F01"},{"candidateId":"late","factSetRef":"F13"}]},"expected":{"coreMechanism":null,"finalState":"boundary_sensitive","profileRefs":["F01","F13"]}},
+    {"id":"CF-008","coverageMechanism":"A01","type":"answers_reverse","input":{"candidates":[{"candidateId":"c1","factSetRef":"F01"}],"manifestationAnswers":[{"questionId":"M01","answer":"reverse"}]},"expected":{"coreMechanism":"A01","finalState":"established","profileRefs":["F01"],"manifestationVariant":"reverse"}},
+    {"id":"CF-009","coverageMechanism":"A02","type":"positive","input":{"candidates":[{"candidateId":"c1","factSetRef":"F05"}]},"expected":{"coreMechanism":"A02","finalState":"established","profileRefs":["F05"],"manifestationVariant":"unselected"}},
+    {"id":"CF-010","coverageMechanism":"A02","type":"near_neighbor","input":{"candidates":[{"candidateId":"c1","factSetRef":"F13"}]},"expected":{"coreMechanism":"A04","finalState":"established","profileRefs":["F13"],"boundary":"A02_A04_capacity_conversion"}},
+    {"id":"CF-011","coverageMechanism":"A02","type":"single_family","input":{"candidates":[{"candidateId":"c1","factSetRef":"F06"}]},"expected":{"coreMechanism":null,"finalState":"not_supported","profileRefs":["F06"]}},
+    {"id":"CF-012","coverageMechanism":"A02","type":"capacity_failure","input":{"candidates":[{"candidateId":"c1","factSetRef":"F07"}]},"expected":{"coreMechanism":null,"finalState":"candidate","profileRefs":["F07"]}},
+    {"id":"CF-013","coverageMechanism":"A02","type":"counterevidence","input":{"candidates":[{"candidateId":"c1","factSetRef":"F08"}]},"expected":{"coreMechanism":null,"finalState":"conflicted","profileRefs":["F08"]}},
+    {"id":"CF-014","coverageMechanism":"A02","type":"time_stable","input":{"candidates":[{"candidateId":"early","factSetRef":"F05"},{"candidateId":"late","factSetRef":"F05"}]},"expected":{"coreMechanism":"A02","finalState":"established","profileRefs":["F05","F05"]}},
+    {"id":"CF-015","coverageMechanism":"A02","type":"time_changes_core","input":{"candidates":[{"candidateId":"early","factSetRef":"F05"},{"candidateId":"late","factSetRef":"F13"}]},"expected":{"coreMechanism":null,"finalState":"boundary_sensitive","profileRefs":["F05","F13"]}},
+    {"id":"CF-016","coverageMechanism":"A02","type":"answers_reverse","input":{"candidates":[{"candidateId":"c1","factSetRef":"F05"}],"manifestationAnswers":[{"questionId":"M02","answer":"reverse"}]},"expected":{"coreMechanism":"A02","finalState":"established","profileRefs":["F05"],"manifestationVariant":"reverse"}},
+    {"id":"CF-017","coverageMechanism":"A03","type":"positive","input":{"candidates":[{"candidateId":"c1","factSetRef":"F09"}]},"expected":{"coreMechanism":"A03","finalState":"established","profileRefs":["F09"],"manifestationVariant":"unselected"}},
+    {"id":"CF-018","coverageMechanism":"A03","type":"near_neighbor","input":{"candidates":[{"candidateId":"c1","factSetRef":"F13"}]},"expected":{"coreMechanism":"A04","finalState":"established","profileRefs":["F13"],"boundary":"A03_A04_output_mediation_conversion"}},
+    {"id":"CF-019","coverageMechanism":"A03","type":"single_family","input":{"candidates":[{"candidateId":"c1","factSetRef":"F10"}]},"expected":{"coreMechanism":null,"finalState":"not_supported","profileRefs":["F10"]}},
+    {"id":"CF-020","coverageMechanism":"A03","type":"capacity_failure","input":{"candidates":[{"candidateId":"c1","factSetRef":"F11"}]},"expected":{"coreMechanism":null,"finalState":"candidate","profileRefs":["F11"]}},
+    {"id":"CF-021","coverageMechanism":"A03","type":"counterevidence","input":{"candidates":[{"candidateId":"c1","factSetRef":"F12"}]},"expected":{"coreMechanism":null,"finalState":"conflicted","profileRefs":["F12"]}},
+    {"id":"CF-022","coverageMechanism":"A03","type":"time_stable","input":{"candidates":[{"candidateId":"early","factSetRef":"F09"},{"candidateId":"late","factSetRef":"F09"}]},"expected":{"coreMechanism":"A03","finalState":"established","profileRefs":["F09","F09"]}},
+    {"id":"CF-023","coverageMechanism":"A03","type":"time_changes_core","input":{"candidates":[{"candidateId":"early","factSetRef":"F09"},{"candidateId":"late","factSetRef":"F13"}]},"expected":{"coreMechanism":null,"finalState":"boundary_sensitive","profileRefs":["F09","F13"]}},
+    {"id":"CF-024","coverageMechanism":"A03","type":"answers_reverse","input":{"candidates":[{"candidateId":"c1","factSetRef":"F09"}],"manifestationAnswers":[{"questionId":"M03","answer":"reverse"}]},"expected":{"coreMechanism":"A03","finalState":"established","profileRefs":["F09"],"manifestationVariant":"reverse"}},
+    {"id":"CF-025","coverageMechanism":"A04","type":"positive","input":{"candidates":[{"candidateId":"c1","factSetRef":"F13"}]},"expected":{"coreMechanism":"A04","finalState":"established","profileRefs":["F13"],"manifestationVariant":"unselected"}},
+    {"id":"CF-026","coverageMechanism":"A04","type":"near_neighbor","input":{"candidates":[{"candidateId":"c1","factSetRef":"F09"}]},"expected":{"coreMechanism":"A03","finalState":"established","profileRefs":["F09"],"boundary":"A03_A04_output_mediation_conversion"}},
+    {"id":"CF-027","coverageMechanism":"A04","type":"single_family","input":{"candidates":[{"candidateId":"c1","factSetRef":"F14"}]},"expected":{"coreMechanism":null,"finalState":"not_supported","profileRefs":["F14"]}},
+    {"id":"CF-028","coverageMechanism":"A04","type":"capacity_failure","input":{"candidates":[{"candidateId":"c1","factSetRef":"F15"}]},"expected":{"coreMechanism":null,"finalState":"candidate","profileRefs":["F15"]}},
+    {"id":"CF-029","coverageMechanism":"A04","type":"counterevidence","input":{"candidates":[{"candidateId":"c1","factSetRef":"F16"}]},"expected":{"coreMechanism":null,"finalState":"conflicted","profileRefs":["F16"]}},
+    {"id":"CF-030","coverageMechanism":"A04","type":"time_stable","input":{"candidates":[{"candidateId":"early","factSetRef":"F13"},{"candidateId":"late","factSetRef":"F13"}]},"expected":{"coreMechanism":"A04","finalState":"established","profileRefs":["F13","F13"]}},
+    {"id":"CF-031","coverageMechanism":"A04","type":"time_changes_core","input":{"candidates":[{"candidateId":"early","factSetRef":"F13"},{"candidateId":"late","factSetRef":"F09"}]},"expected":{"coreMechanism":null,"finalState":"boundary_sensitive","profileRefs":["F13","F09"]}},
+    {"id":"CF-032","coverageMechanism":"A04","type":"answers_reverse","input":{"candidates":[{"candidateId":"c1","factSetRef":"F13"}],"manifestationAnswers":[{"questionId":"M04","answer":"reverse"}]},"expected":{"coreMechanism":"A04","finalState":"established","profileRefs":["F13"],"manifestationVariant":"reverse"}}
+  ]
+}
