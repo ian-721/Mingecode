@@ -8,7 +8,7 @@
 
 来自 S03 已冻结研究材料的抽象事实是：
 
-- subject 有同类支持和两个独立根，主体容量可判 usable；
+- subject 有同类支持和两个独立根，主体容量可判 usable；这些根保持 peer 角色身份，但按 subject capacity 合同参与日主根分，不复制节点或关系；
 - output 形成稳定、可用的输出通道；
 - constraint 有两个可观察来源；
 - input 不显，必须判 absent，而不是为 A03 补造供能链；

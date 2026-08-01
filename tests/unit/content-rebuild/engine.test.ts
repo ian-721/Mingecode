@@ -844,3 +844,153 @@ function unsupportedContact(): StaticRuleEngineInput {
     ],
   } as unknown as StaticRuleEngineInput;
 }
+
+
+describe("subject capacity peer-root contract", () => {
+  const seasonalStrength: ChartFacts["seasonalStrength"] = {
+    subject: "囚",
+    peer: "囚",
+    input: "死",
+    output: "死",
+    resource: "死",
+    constraint: "死",
+  };
+
+  function subjectCapacityCandidate(
+    occurrences: ChartFacts["occurrences"],
+    missingPositions: readonly string[] = [],
+    subjectStrength: ChartFacts["seasonalStrength"]["subject"] = "囚",
+  ): ChartCandidate {
+    return {
+      candidateId: "subject-capacity",
+      facts: {
+        precision: missingPositions.length > 0 ? "bounded" : "exact",
+        missingPositions,
+        seasonalStrength: { ...seasonalStrength, subject: subjectStrength },
+        occurrences,
+      },
+    };
+  }
+
+  const dayAnchor = {
+    role: "subject" as const,
+    kind: "day_anchor" as const,
+    objectKey: "day-anchor",
+    originClusterKey: "day-anchor:甲",
+    hiddenStemProportion: null,
+    rootOccurrence: false,
+  };
+
+  it("lets independent rooted peer occurrences support subject capacity without changing peer identity", () => {
+    const result = evaluateSingleCandidate(
+      subjectCapacityCandidate([
+        dayAnchor,
+        {
+role: "peer",
+kind: "hidden",
+objectKey: "peer-root-1",
+originClusterKey: "branch:day:寅",
+hiddenStemProportion: 0.6,
+rootOccurrence: true,
+        },
+        {
+role: "peer",
+kind: "hidden",
+objectKey: "peer-root-2",
+originClusterKey: "branch:year:亥",
+hiddenStemProportion: 0.3,
+rootOccurrence: true,
+        },
+      ]),
+    );
+
+    expect(result.nodeAvailability.subject).toBe("usable");
+    expect(result.nodeAvailability.peer).toBe("limited");
+    expect(result.closure.relations.every((relation) =>
+      ["subject", "peer"].includes(relation.sourceRole) &&
+      ["subject", "peer"].includes(relation.targetRole),
+    )).toBe(true);
+  });
+
+  it("deduplicates subject-capacity peer roots by origin cluster", () => {
+    const sameOrigin = evaluateSingleCandidate(
+      subjectCapacityCandidate([
+        dayAnchor,
+        {
+role: "peer",
+kind: "hidden",
+objectKey: "peer-root-a",
+originClusterKey: "branch:month:寅",
+hiddenStemProportion: 0.3,
+rootOccurrence: true,
+        },
+        {
+role: "peer",
+kind: "hidden",
+objectKey: "peer-root-b",
+originClusterKey: "branch:month:寅",
+hiddenStemProportion: 0.3,
+rootOccurrence: true,
+        },
+      ]),
+    );
+    const independentOrigins = evaluateSingleCandidate(
+      subjectCapacityCandidate([
+        dayAnchor,
+        {
+role: "peer",
+kind: "hidden",
+objectKey: "peer-root-c",
+originClusterKey: "branch:month:寅",
+hiddenStemProportion: 0.3,
+rootOccurrence: true,
+        },
+        {
+role: "peer",
+kind: "hidden",
+objectKey: "peer-root-d",
+originClusterKey: "branch:year:亥",
+hiddenStemProportion: 0.3,
+rootOccurrence: true,
+        },
+      ]),
+    );
+
+    expect(sameOrigin.nodeAvailability.subject).toBe("limited");
+    expect(independentOrigins.nodeAvailability.subject).toBe("usable");
+  });
+
+  it("does not let visible or unrooted peers increase subject capacity", () => {
+    const result = evaluateSingleCandidate(
+      subjectCapacityCandidate(
+        [
+dayAnchor,
+{
+  role: "peer",
+  kind: "visible",
+  objectKey: "visible-peer",
+  originClusterKey: "visible:year:乙",
+  hiddenStemProportion: null,
+  rootOccurrence: false,
+},
+        ],
+        [],
+        "休",
+      ),
+    );
+
+    expect(result.nodeAvailability.subject).toBe("limited");
+  });
+
+  it("preserves unknown handling when a missing hour can change capacity", () => {
+    const result = evaluateSingleCandidate(
+      subjectCapacityCandidate(
+        [dayAnchor],
+        ["hour.stem", "hour.branch"],
+        "囚",
+      ),
+    );
+
+    expect(result.nodeAvailability.subject).toBe("unknown");
+  });
+});
