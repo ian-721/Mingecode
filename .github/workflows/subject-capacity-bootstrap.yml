@@ -1,0 +1,274 @@
+name: Subject Capacity Contract Revision
+
+on:
+  push:
+    branches:
+      - fix/subject-capacity-peer-roots-v0.1
+
+permissions:
+  contents: write
+
+jobs:
+  revise:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/subject-capacity-peer-roots-v0.1
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Apply exact contract and engine revision
+        shell: bash
+        run: |
+          python <<'PY'
+          from pathlib import Path
+
+          engine = Path('lib/content-rebuild/engine.ts')
+          text = engine.read_text(encoding='utf-8')
+          old = '''  const occurrences = facts.occurrences.filter(
+              (occurrence) => occurrence.role === role,
+            );
+            const seasonalStrength = facts.seasonalStrength[role];'''
+          new = '''  const occurrences = facts.occurrences.filter(
+              (occurrence) => occurrence.role === role,
+            );
+            const rootOccurrences =
+              role === "subject"
+                ? facts.occurrences.filter(
+                    (occurrence) =>
+                      (occurrence.role === "subject" || occurrence.role === "peer") &&
+                      occurrence.rootOccurrence,
+                  )
+                : occurrences;
+            const seasonalStrength = facts.seasonalStrength[role];'''
+          if text.count(old) != 1:
+              raise SystemExit(f'engine replacement count={text.count(old)}')
+          text = text.replace(old, new)
+          old_loop = '  for (const occurrence of occurrences) {\n    const contribution = rootContribution(occurrence);'
+          new_loop = '  for (const occurrence of rootOccurrences) {\n    const contribution = rootContribution(occurrence);'
+          if text.count(old_loop) != 1:
+              raise SystemExit(f'root loop replacement count={text.count(old_loop)}')
+          engine.write_text(text.replace(old_loop, new_loop), encoding='utf-8')
+
+          vocabulary = Path('research/content-rebuild/v0.4/CHART_FACT_VOCABULARY.md')
+          text = vocabulary.read_text(encoding='utf-8')
+          old = '''2. 根分：每个去重后的 `originClusterKey` 取该簇最高根贡献：
+   - `rootOccurrence=false`：0；
+   - `rootOccurrence=true` 且 `hiddenStemProportion >= 0.50`：2；
+   - `rootOccurrence=true` 且 `0.20 <= hiddenStemProportion < 0.50`：1；
+   - `rootOccurrence=true` 且 `hiddenStemProportion < 0.20`：0。
+   所有独立簇贡献之和封顶为 2，记为 `R`。'''
+          new = '''2. 根分：角色身份与承载根分分开计算，不改写 occurrence 的 `role`。
+   - 对 `subject`：根候选包括 `role=subject` 或 `role=peer` 且 `rootOccurrence=true` 的同元素藏干。`peer` 仍保持 peer 身份，只为日主承载提供根气；不得复制为第二个 subject occurrence。
+   - 对其他角色：根候选仍只读取该角色自己的 occurrences。
+   - 每个去重后的 `originClusterKey` 取该簇最高根贡献：
+     - `rootOccurrence=false`：0；
+     - `rootOccurrence=true` 且 `hiddenStemProportion >= 0.50`：2；
+     - `rootOccurrence=true` 且 `0.20 <= hiddenStemProportion < 0.50`：1；
+     - `rootOccurrence=true` 且 `hiddenStemProportion < 0.20`：0。
+   - 所有独立簇贡献之和封顶为 2，记为 `R`。
+   - `subject` 的可见分仍只读取 day anchor / subject identity；peer 透干不得重复增加 subject 的可见分。'''
+          if text.count(old) != 1:
+              raise SystemExit(f'vocabulary replacement count={text.count(old)}')
+          vocabulary.write_text(text.replace(old, new), encoding='utf-8')
+
+          trace = Path('research/content-rebuild/v0.4/S03_STATIC_TRACE.md')
+          text = trace.read_text(encoding='utf-8')
+          old = '- subject 有同类支持和两个独立根，主体容量可判 usable；'
+          new = '- subject 有同类支持和两个独立根，主体容量可判 usable；这些根保持 peer 角色身份，但按 subject capacity 合同参与日主根分，不复制节点或关系；'
+          if text.count(old) != 1:
+              raise SystemExit(f'S03 trace replacement count={text.count(old)}')
+          trace.write_text(text.replace(old, new), encoding='utf-8')
+
+          test_file = Path('tests/unit/content-rebuild/engine.test.ts')
+          text = test_file.read_text(encoding='utf-8')
+          marker = 'describe("subject capacity peer-root contract"'
+          if marker in text:
+              raise SystemExit('subject capacity tests already present')
+          addition = r'''
+
+describe("subject capacity peer-root contract", () => {
+  const seasonalStrength: ChartFacts["seasonalStrength"] = {
+    subject: "囚",
+    peer: "囚",
+    input: "死",
+    output: "死",
+    resource: "死",
+    constraint: "死",
+  };
+
+  function subjectCapacityCandidate(
+    occurrences: ChartFacts["occurrences"],
+    missingPositions: readonly string[] = [],
+    subjectStrength: ChartFacts["seasonalStrength"]["subject"] = "囚",
+  ): ChartCandidate {
+    return {
+      candidateId: "subject-capacity",
+      facts: {
+        precision: missingPositions.length > 0 ? "bounded" : "exact",
+        missingPositions,
+        seasonalStrength: { ...seasonalStrength, subject: subjectStrength },
+        occurrences,
+      },
+    };
+  }
+
+  const dayAnchor = {
+    role: "subject" as const,
+    kind: "day_anchor" as const,
+    objectKey: "day-anchor",
+    originClusterKey: "day-anchor:甲",
+    hiddenStemProportion: null,
+    rootOccurrence: false,
+  };
+
+  it("lets independent rooted peer occurrences support subject capacity without changing peer identity", () => {
+    const result = evaluateSingleCandidate(
+      subjectCapacityCandidate([
+        dayAnchor,
+        {
+          role: "peer",
+          kind: "hidden",
+          objectKey: "peer-root-1",
+          originClusterKey: "branch:day:寅",
+          hiddenStemProportion: 0.6,
+          rootOccurrence: true,
+        },
+        {
+          role: "peer",
+          kind: "hidden",
+          objectKey: "peer-root-2",
+          originClusterKey: "branch:year:亥",
+          hiddenStemProportion: 0.3,
+          rootOccurrence: true,
+        },
+      ]),
+    );
+
+    expect(result.nodeAvailability.subject).toBe("usable");
+    expect(result.nodeAvailability.peer).toBe("limited");
+    expect(result.closure.relations.every((relation) =>
+      ["subject", "peer"].includes(relation.sourceRole) &&
+      ["subject", "peer"].includes(relation.targetRole),
+    )).toBe(true);
+  });
+
+  it("deduplicates subject-capacity peer roots by origin cluster", () => {
+    const sameOrigin = evaluateSingleCandidate(
+      subjectCapacityCandidate([
+        dayAnchor,
+        {
+          role: "peer",
+          kind: "hidden",
+          objectKey: "peer-root-a",
+          originClusterKey: "branch:month:寅",
+          hiddenStemProportion: 0.3,
+          rootOccurrence: true,
+        },
+        {
+          role: "peer",
+          kind: "hidden",
+          objectKey: "peer-root-b",
+          originClusterKey: "branch:month:寅",
+          hiddenStemProportion: 0.3,
+          rootOccurrence: true,
+        },
+      ]),
+    );
+    const independentOrigins = evaluateSingleCandidate(
+      subjectCapacityCandidate([
+        dayAnchor,
+        {
+          role: "peer",
+          kind: "hidden",
+          objectKey: "peer-root-c",
+          originClusterKey: "branch:month:寅",
+          hiddenStemProportion: 0.3,
+          rootOccurrence: true,
+        },
+        {
+          role: "peer",
+          kind: "hidden",
+          objectKey: "peer-root-d",
+          originClusterKey: "branch:year:亥",
+          hiddenStemProportion: 0.3,
+          rootOccurrence: true,
+        },
+      ]),
+    );
+
+    expect(sameOrigin.nodeAvailability.subject).toBe("limited");
+    expect(independentOrigins.nodeAvailability.subject).toBe("usable");
+  });
+
+  it("does not let visible or unrooted peers increase subject capacity", () => {
+    const result = evaluateSingleCandidate(
+      subjectCapacityCandidate(
+        [
+          dayAnchor,
+          {
+            role: "peer",
+            kind: "visible",
+            objectKey: "visible-peer",
+            originClusterKey: "visible:year:乙",
+            hiddenStemProportion: null,
+            rootOccurrence: false,
+          },
+        ],
+        [],
+        "休",
+      ),
+    );
+
+    expect(result.nodeAvailability.subject).toBe("limited");
+  });
+
+  it("preserves unknown handling when a missing hour can change capacity", () => {
+    const result = evaluateSingleCandidate(
+      subjectCapacityCandidate(
+        [dayAnchor],
+        ["hour.stem", "hour.branch"],
+        "囚",
+      ),
+    );
+
+    expect(result.nodeAvailability.subject).toBe("unknown");
+  });
+});
+'''
+          test_file.write_text(text + addition, encoding='utf-8')
+          PY
+
+      - name: Full repository checks
+        run: npm run check
+
+      - name: Whitespace and scope checks
+        run: |
+          git diff --check
+          changed="$(git diff --name-only HEAD)"
+          printf '%s\n' "$changed"
+          test "$changed" = "lib/content-rebuild/engine.ts
+          research/content-rebuild/v0.4/CHART_FACT_VOCABULARY.md
+          research/content-rebuild/v0.4/S03_STATIC_TRACE.md
+          tests/unit/content-rebuild/engine.test.ts"
+
+      - name: Commit verified revision and remove bootstrap
+        shell: bash
+        run: |
+          git rm .github/workflows/subject-capacity-bootstrap.yml
+          git add lib/content-rebuild/engine.ts \
+            research/content-rebuild/v0.4/CHART_FACT_VOCABULARY.md \
+            research/content-rebuild/v0.4/S03_STATIC_TRACE.md \
+            tests/unit/content-rebuild/engine.test.ts
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "fix: include peer roots in subject capacity"
+          git push origin HEAD:fix/subject-capacity-peer-roots-v0.1
