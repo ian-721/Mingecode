@@ -36,7 +36,10 @@ export function assertRepresentativeContentTraces(): void {
     cityId: "representative-trace",
   };
   const result = evaluateContentRebuild(adaptChartResolution(input, resolution));
-  if (result.candidateResults[0].dimensions.D2 !== "output_visible_asymmetric") {
-    throw new Error("S02 D2 is not output_visible_asymmetric");
+  if (
+    result.candidateResults[0].dimensions.D5 !==
+    "output_constraint_regulating"
+  ) {
+    throw new Error("S02 D5 is not output_constraint_regulating");
   }
 }
