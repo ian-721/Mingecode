@@ -7,4 +7,4 @@ Issue #11 的唯一活跃 32 个夹具及规范位于：
 - `../v0.4/FIXTURE_SPEC.md`
 - `../v0.4/fixtures/archetype-fixtures.v0.2.json`（内部 schema v0.3）
 
-活跃夹具从季节强度、具体 occurrence、根/藏干比例、raw relation 和有限候选盘开始；四机制各覆盖 positive、near_neighbor、single_family、capacity_failure、counterevidence、time_stable、time_changes_core、answers_reverse。旧 JSON 不参与当前 32/32 计数或代码准入。
+活跃夹具从季节强度、具体 occurrence、根/藏干比例和有限候选盘开始；raw relation 必须由 role matrix 对全部 occurrence 对生成，不能由 fixture 输入。四机制各覆盖 positive、near_neighbor、single_family、capacity_failure、counterevidence、time_stable、time_changes_core、answers_reverse。旧 JSON 不参与当前 32/32 计数或代码准入。

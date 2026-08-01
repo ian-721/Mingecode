@@ -30,8 +30,8 @@
 
 ## A03
 
-- 传统结构描述候选：constraint 经 input—subject—output 中介链处理，而非只有直接作用。
-- 成立条件：C04、C01、两维核心门、E4 同源张力、排除未命中、候选稳定。
+- 传统结构描述候选：subject—output 通道调节 constraint，同时保留 constraint 对 subject 的固有控制边；input 不显时不得补造 input 中介。
+- 成立条件：C04、D2 output_supported、两维核心门、E4 output-control feedback、排除未命中、候选稳定。
 - 古籍原文 / 后世评注 / 现代整理：`pending_source`。
 - 现代人格翻译：方法化、内部质检、持续审查、首版延迟，均为 `project_inference` 且需 CalibrationFork。
 - 不得宣称：官杀与食伤必然形成方法、谨慎、可靠或自我审查。

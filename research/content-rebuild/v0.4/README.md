@@ -17,6 +17,7 @@
 ```text
 atomic ChartFacts
   -> nodeAvailability
+  -> complete role-pair relation closure
   -> relationEffectiveness
   -> E1—E6
   -> D1—D6
@@ -28,16 +29,18 @@ atomic ChartFacts
 ## 文件
 
 - `CHART_FACT_VOCABULARY.md`：允许输入的原子事实，以及 `nodeAvailability` 的唯一化公式。
+- `ROLE_RELATION_MATRIX.md`：生成/控制/同类矩阵、全对象对闭包与四项完备性失败门。
 - `EVIDENCE_GRAPH_CONTRACT.md`：关系标准化、`relationEffectiveness` 与 E1—E6。
 - `DIMENSION_STATE_CONTRACT.md`：D1—D6、两维成立门与候选盘聚合。
 - `STRUCTURAL_PREDICATE_CONTRACT.md`：静态核心谓词、显化权限、排除与最近邻。
 - `TRADITIONAL_SOURCE_BOUNDARIES.md`：传统来源层级和当前 `pending_source` 边界。
+- `S03_STATIC_TRACE.md`：冻结 S03 结构事实到 A03 的匿名静态可追溯链。
 - `FIXTURE_SPEC.md`：32 个活跃夹具的输入、推导和断言合同。
 - `fixtures/archetype-fixtures.json`：唯一活跃夹具数据。
 
 ## 代码准入
 
-本目录是研究候选，不是运行时代码授权。只有当两项标准化公式唯一、32/32 夹具通过、P06/P08 不参与核心、四个正例和最近邻均唯一、答案与核心隔离，且未解决项不影响裁决时，v0.3 `CODE_ENTRY_DECISION.md` 才可记录：
+本目录是研究候选，不是运行时代码授权。只有当两项标准化公式唯一、role matrix 完整闭包四项错误均为 0、S03→A03 trace 闭合、32/32 夹具通过、P06/P08 不参与核心、四个正例和最近邻均唯一、答案与核心隔离，且未解决项不影响裁决时，v0.3 `CODE_ENTRY_DECISION.md` 才可记录：
 
 `CONDITIONAL_PASS_FOR_ISOLATED_PURE_FUNCTION_IMPLEMENTATION`
 

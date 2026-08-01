@@ -2,77 +2,79 @@
 
 状态：`research_candidate`
 
-## 1. 推导层级
+## 1. 推导链
 
-唯一活跃夹具 `fixtures/archetype-fixtures.v0.2.json` 从原子 ChartFacts 开始；文件名沿用以避免破坏既有索引，内部 `schemaVersion` 已升为 v0.3：
+唯一活跃文件仍为 `fixtures/archetype-fixtures.v0.2.json`，内部 schema 升为 v0.4：
 
 ```text
-seasonalStrength + occurrences + rawRelations + finite candidates
+seasonalStrength + occurrences + finite candidates
 -> nodeAvailability
+-> complete role-pair relation closure
 -> relationEffectiveness
--> E1—E6
--> D1—D6
--> core tension + exclusion + near-neighbor
+-> E1—E6 / D1—D6
+-> tension + exclusion + near-neighbor
 -> final state
 -> CalibrationFork.manifestation
 ```
 
-`expected` 是测试断言，不是规则输入。实现必须在读取 `expected` 或 `manifestationAnswers` 前完成核心裁决。
+## 2. 输入
 
-## 2. 输入合同
+顶层继承 `civil_time_v1`。factSet 只允许：`precision`、`missingPositions`、`seasonalStrength`、`occurrences`、可选且有具体端点身份的 `branchContactFacts`。fixture input 只允许 `candidates[].candidateId/factSetRef` 与可选 manifestationAnswers。
 
-顶层 `timeConventionVersion=civil_time_v1` 由全部 factSet 继承。每个 `factSet` 只允许：`precision`、`missingPositions`、`seasonalStrength`、`occurrences`、`rawRelations`；`candidateId` 位于 fixture 候选包装层。字段含义完全服从 v0.4 的两个公式。
+输入递归禁止：
 
-fixture `input` 只允许：
+- `rawRelations`、`edges` 或任何手工关系路径；
+- dimensionStates、coreArchetype、目标 archetype、supportRules、规则命中；
+- nodeAvailability、relationEffectiveness、证据家族或预填维度；
+- 人格语义、职业、自述或经历。
 
-- `candidates[].candidateId` 与 `factSetRef`；
-- 可选 `manifestationAnswers`，且其数据路径只能进入 manifestation。
+expected 是测试断言，不是输入。
 
-fixture `input` 递归禁止：`dimensionStates`、`coreArchetype`、目标 `archetype`、`supportRules`、任何规则命中状态、人格语义标签，以及预填的 availability/effectiveness/evidence/dimension 结果。
+## 3. 关系闭包机械门
 
-## 3. 八类夹具
+每个候选 factSet 必须断言：
+
+- raw relation 总数等于 `n * (n - 1) / 2`；
+- `invalidRoleRelationCount=0`；
+- `missingDeterministicRelationCount=0`；
+- `duplicateRelationAfterSourceDedupeCount=0`；
+- `unexpectedManuallySelectedRelationCount=0`；
+- F05 关键三边严格为 subject→output generates、output→constraint controls、constraint→subject controls；
+- F09 关键三边相同，input absent，A03 不读取 input→subject。
+
+## 4. 八类
 
 | 类型 | 必须证明 |
 | --- | --- |
-| `positive` | 从原子事实唯一得到目标核心 established |
-| `near_neighbor` | 实际得到不同机制；不得按 fixture 顺序或固定优先级回落 |
-| `single_family` | 结构表面满足，但同源去重后不足两家族或两来源簇，不授予核心 |
-| `capacity_failure` | 必需节点/边受限导致核心门失败 |
-| `counterevidence` | 支持与明确排除同候选并存，输出 conflicted |
-| `time_stable` | 两个合理候选盘得到相同核心 established |
-| `time_changes_core` | 两个合理候选盘核心不同，输出 boundary_sensitive |
-| `answers_reverse` | 反向答案只改变 manifestation，不改变 positive 的核心 |
+| positive | 完整闭包下目标核心 established |
+| near_neighbor | 完整闭包下得到不同唯一机制，无固定回落 |
+| single_family | 结构表面满足但来源簇不足，不授予核心 |
+| capacity_failure | 关键端点/边 limited，最多 candidate |
+| counterevidence | 通过新增合法 occurrence 自动产生完整反证闭包，输出 conflicted；不得插入/删除边 |
+| time_stable | 两个合理候选同核 |
+| time_changes_core | 两个候选核心不同，boundary_sensitive |
+| answers_reverse | 只改 manifestation，核心与 positive 相同 |
 
-每个 A01—A04 恰有上述八类，共 32 个。
+四机制各八类，共 32。
 
-## 4. 核心判定顺序
+四个 counterevidence profile 只改变原子 occurrence：F04 在 A01 结构加入 constraint；F08 为 A02 加入第二个独立 constraint 对象以触发同对象竞争；F12 为 A03 加入 usable input 使 output/input 两条中介同时成立；F16 为 A04 加入 constraint 形成 mixed 路由。所有新增边均由闭包自动生成，没有手工增删关系。
 
-1. 解引用每个 factSet；验证 `civil_time_v1`。
-2. 按来源簇计算 nodeAvailability。
-3. 从 raw relation 计算 relationEffectiveness 和中介链。
-4. 生成 E1—E6 与 D1—D6。
-5. 要求至少两个结构维度、两个证据家族、两个不同来源簇和一项同源张力。
-6. 应用明确排除与所有成对最近邻边界；不设优先级。
-7. 逐候选盘完成核心，再执行时间聚合。
-8. 冻结 `coreMechanism` 和 `finalState`。
-9. 最后读取最多 3 个问题答案，只选择已批准 manifestation 权限。
+## 5. 核心顺序
 
-## 5. 预期分布
+1. 解引用 factSet，验证 civil_time_v1；
+2. 计算 nodeAvailability；
+3. 枚举全部 occurrence 对并生成矩阵闭包；
+4. 四项闭包计数必须全 0；
+5. 计算全部 relationEffectiveness 与竞争；
+6. 生成 E/D、两维、两家族、两来源簇、同源张力；
+7. 应用排除和全部成对最近邻；
+8. 逐候选聚合并冻结核心；
+9. 最后读取最多 3 个 manifestationAnswers。
 
-每个机制的八类顺序均为：
+## 6. 预期分布
+
+每个机制依序为：
 
 `established / established-neighbor / not_supported / candidate / conflicted / established / boundary_sensitive / established`
 
-四个 `near_neighbor` 分别得到：A01→A04、A02→A04、A03→A04、A04→A03。四个 `answers_reverse` 与本机制 positive 的核心、维度和最终状态完全一致，只有 `manifestationVariant` 不同。
-
-## 6. 机械通过条件
-
-- 标准 JSON 解析成功；
-- 总数 32，每机制/类型分布为 4×8；
-- 禁止输入键递归扫描为 0；
-- 32/32 从原子输入得到唯一预期；
-- single_family 4/4 不授予核心；
-- time_changes_core 4/4 为 boundary_sensitive；
-- answers_reverse 4/4 核心与 positive 相同；
-- near_neighbor 4/4 得到非目标机制，且无固定优先级；
-- positive、反证和容量失败各 4/4 满足预期。
+near_neighbor：A01→A04、A02→A04、A03→A04、A04→A03。answers_reverse 与对应 positive 的 node、closure、relations、dimensions、core 和 finalState 相同。

@@ -1,33 +1,45 @@
-# 代码准入判断 v0.3
+# 代码准入判断 v0.4
 
 ## 结论
 
 **`CONDITIONAL_PASS_FOR_ISOLATED_PURE_FUNCTION_IMPLEMENTATION`**
 
-Issue #11 的静态合同门已由 v0.4 关闭：nodeAvailability 和 relationEffectiveness 有唯一公式；32/32 活跃夹具从非人格原子事实得到唯一预期；P06/P08 与所有现实行为退出核心；四个正例和最近邻可裁决；问题答案不改变核心。
+Owner Review 将上一候选恢复为 `BLOCKED_PENDING_RAW_RELATION_AND_A03_TRACEABILITY`。本修订只有在完整关系闭包、A02 三边、S03→A03 trace 和 32/32 回归全部机械通过后才恢复上述条件结论；相关门现已全部关闭。
 
-这不是实现授权。它只表示后续可另行申请一个隔离、无 I/O、无用户数据、无运行时接线的纯函数方案；当前授权仍禁止修改 `lib/`、`app/`、`components/`、`data/`、题库、页面、依赖、CI、部署或持久化。
+这不是实现授权，只表示后续可另行申请一个隔离、无 I/O、无运行时接线的纯函数方案。当前仍禁止修改 lib/app/components/data、题库、页面、依赖、CI、部署或持久化。
 
-## 已关闭的门
+## 已关闭的复审门
 
-| 门 | 证据 |
+| 门 | 关闭证据 |
 | --- | --- |
-| nodeAvailability 唯一 | v0.4 `CHART_FACT_VOCABULARY.md` 对六类角色统一使用季节、根、藏干比例、可见性、unknown 和来源簇去重 |
-| relationEffectiveness 唯一 | v0.4 `EVIDENCE_GRAPH_CONTRACT.md` 定义端点、方向、中介、竞争、阻断、raw-only 与候选聚合 |
-| E1—E6 / D1—D6 唯一 | v0.4 证据与维度合同只读取上述规范化结果 |
-| 核心不依赖 P06/P08 | v0.4 谓词合同将二者标为 `manifestation_only` |
-| 四正例与最近邻可裁决 | 活跃 JSON 的 A01—A04 positive 为 established；四个 near_neighbor 均得到另一个明确机制 |
-| 32/32 非人格输入 | factSet 只含季节、occurrence、raw relation 和有限候选；禁止键扫描为 0 |
-| 答案不决定核心 | 四个 answers_reverse 与各自 positive 核心、维度、最终状态一致 |
+| role-pair matrix | v0.4 `ROLE_RELATION_MATRIX.md` 冻结生成循环、控制循环、同类与 peer/self 展开 |
+| raw relation 完整闭包 | fixture input 删除 rawRelations；evaluator 对全部 occurrence 对生成 `n(n-1)/2` 条边 |
+| 四项闭包错误 | invalid=0、missing=0、duplicate after source dedupe=0、unexpected manual=0，16/16 profiles |
+| A02 方向与固有直接边 | F05 自动生成 subject→output、output→constraint、constraint→subject；D5 共同比较三边，直接边不自动排除 |
+| A03 与 S03 | `S03_STATIC_TRACE.md` 从 subject/output/constraint usable、input absent 推到 output-mediated D3、D2 output_supported、E4 feedback、A03 |
+| A03 第二维 | D2 output_supported，来自 S03 主体容量和输出通道；不复用 D1，不补 input |
+| 16 profiles / 32 fixtures | 16/16 闭包与 expected profile 一致；32/32 唯一裁决，四机制八类分布完整 |
+| 问题隔离 | answers_reverse 4/4 只改 manifestation，不改核心 |
 
-## 项目假设与未决责任
+## 回归结果
 
-- nodeAvailability 的分值和阈值是 `project_assumption_minimum_v0.4`，不是传统共识；未来须版本化并接受真人验证。
-- A01—A04 的传统来源保持 `pending_source`；“古人误会你了”是 `project_inference / modern_reinterpretation_candidate`。这不影响隔离纯函数的静态裁决，但正式对外前必须关闭。
-- 同一内容块若混有命盘骨架和现实行为，未来组装器必须有句段/批准子块权限过滤；在此之前不得宣称行为由命盘单独证明。
+- positive：4/4 established；
+- near_neighbor：4/4 在完整闭包下得到非目标唯一机制；
+- single_family：4/4 不授予核心；
+- capacity_failure：4/4 candidate；
+- counterevidence：4/4 由合法 occurrence 变化自动产生反证闭包并 conflicted；
+- time_stable：4/4 同核；
+- time_changes_core：4/4 boundary_sensitive；
+- answers_reverse：4/4 核心不变。
 
-以上未决项不改变四个正例、最近邻、时间边界或问题隔离，因此不构成本次代码准入 blocker。
+## 非阻断责任
 
-## 后续申请的硬边界
+- nodeAvailability 阈值仍是 `project_assumption_minimum_v0.4`，不是传统共识，未来需版本化真人验证；
+- A01—A04 来源继续 pending_source，“古人误会你了”是 project inference / modern reinterpretation candidate，正式对外前必须关闭；
+- 母本中静态骨架与现实显化的混合句段，未来组装器必须按批准子块过滤。
 
-后续若申请实现，只能复现已版本化的 v0.4 纯函数和活跃夹具，不得：接真实生日、修改现有 H5、引入人格自由生成、让答题进入核心、增加原型/维度/字段、改变 `civil_time_v1`，或把条件通过解释为 Ready、Merge、部署或真人测试授权。
+这些责任不改变四个正例或最近邻，因此不是本次条件代码准入 blocker。
+
+## 后续边界
+
+后续若申请实现，只能复现已版本化的 nodeAvailability、role relation closure、relationEffectiveness、E/D 与活跃夹具。不得接真实生日、修改现有 H5、让答题进入核心、增加原型/维度、改变 civil_time_v1，或把条件通过解释为 Ready、Merge、部署或真人测试授权。

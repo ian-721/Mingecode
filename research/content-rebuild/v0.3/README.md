@@ -16,6 +16,7 @@
 
 ```text
 稳定命盘事实
+→ 完整 role-pair relation 闭包
 → E1—E6 证据图
 → D1—D6 维度状态
 → 结构张力候选
@@ -38,7 +39,7 @@
 
 ## v0.4 替代说明
 
-`../v0.4/` 承担当前 ChartFacts→EvidenceGraph→Dimensions 合同与新 32 个夹具。v0.3 原 JSON 保留为历史 interface fixture，不得再用来证明真实命盘事实能产生维度或原型。
+`../v0.4/` 承担当前 occurrences→完整关系闭包→EvidenceGraph→Dimensions 合同与新 32 个夹具。v0.3 原 JSON 保留为历史 interface fixture，不得再用来证明真实命盘事实能产生维度或原型。
 
 ## 核心边界
 

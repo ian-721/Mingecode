@@ -16,7 +16,7 @@
 | `missingPositions` | 位置数组 | 候选盘生成器 | 未知时柱等明确列出，不得当作不存在 |
 | `seasonalStrength[role]` | `旺 / 相 / 休 / 囚 / 死 / unknown` | 当前排盘库按月令与五行关系确定性计算 | 若月支未知则为 `unknown` |
 | `occurrences` | 节点出现数组 | 当前排盘库确定性计算 | 未观察且相关位置完整才可判不存在 |
-| `rawRelations` | 原始关系数组 | 当前排盘库确定性计算 | 端点或方向不足时保留 raw，不猜 effectiveness |
+| `branchContactFacts` | 可选的具体干支接触数组 | 当前排盘库在两个端点身份完整时确定性计算 | 身份不足时不生成；不得伪造 |
 
 ### 1.1 occurrence 原子字段
 
@@ -29,7 +29,7 @@
 | `hiddenStemProportion` | `0..1` 或 `null` | `hidden` 必填；其余为 `null`。来自排盘库的固定藏干比例表 |
 | `rootOccurrence` | 布尔值 | 该出现是否构成本角色的根；由当前排盘库确定性计算 |
 
-当前代码已经具备或可直接导出的字段是：干支位置、日主、月令、透藏、五行生克、十神功能映射、合冲刑害端点、`civil_time_v1` 候选盘。`hiddenStemProportion` 与 `originClusterKey` 需要未来在隔离规则层显式标准化，但不需要新历法数据。不存在仍待补公式的 `recoveryCapacity`、`edgeStage` 或 `edgeScope` 字段；三者已被 Owner 排除。
+当前代码已经具备或可直接导出的字段是：干支位置、日主、月令、透藏、五行生克、十神功能映射、合冲刑害端点、`civil_time_v1` 候选盘。`hiddenStemProportion` 与 `originClusterKey` 需要未来在隔离规则层显式标准化，但不需要新历法数据。生克 raw relation 不再是 fixture 可选择的输入字段，必须按 `ROLE_RELATION_MATRIX.md` 从全部 occurrences 生成。不存在仍待补公式的 `recoveryCapacity`、`edgeStage` 或 `edgeScope` 字段；三者已被 Owner 排除。
 
 ### 1.2 来源簇
 
