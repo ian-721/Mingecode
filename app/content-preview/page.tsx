@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
 import { ContentPreviewApp } from "@/components/content-preview/content-preview-app";
-import {
-  assertRepresentativeContentTraces,
-  representativeDiagnostics,
-} from "./contract-self-check";
+import { assertRepresentativeContentTraces } from "./contract-self-check";
 
 assertRepresentativeContentTraces();
 
@@ -13,12 +10,5 @@ export const metadata: Metadata = {
 };
 
 export default function ContentPreviewPage() {
-  return (
-    <>
-      <pre id="representative-diagnostics">
-        {JSON.stringify(representativeDiagnostics, null, 2)}
-      </pre>
-      <ContentPreviewApp />
-    </>
-  );
+  return <ContentPreviewApp />;
 }
