@@ -185,6 +185,14 @@ function calculateRoleAvailability(
   const occurrences = facts.occurrences.filter(
     (occurrence) => occurrence.role === role,
   );
+  const rootOccurrences =
+    role === "subject"
+      ? facts.occurrences.filter(
+          (occurrence) =>
+            (occurrence.role === "subject" || occurrence.role === "peer") &&
+            occurrence.rootOccurrence,
+        )
+      : occurrences;
   const seasonalStrength = facts.seasonalStrength[role];
   const visibleScore = occurrences.some(
     (occurrence) =>
@@ -194,7 +202,7 @@ function calculateRoleAvailability(
     : 0;
   const rootContributionByCluster = new Map<string, number>();
 
-  for (const occurrence of occurrences) {
+  for (const occurrence of rootOccurrences) {
     const contribution = rootContribution(occurrence);
     rootContributionByCluster.set(
       occurrence.originClusterKey,
