@@ -113,16 +113,18 @@ Pull Request 不承担授权或 `STATUS`。若 Issue 与 Pull Request 表述冲�
 5. 所有业务逻辑修复必须先在非部署环境完成定位、实现和完整检查，再形成稳定产品候选。
 6. 文档、治理或 Harness 变更不以 Vercel Preview 作为验收依据，也不得为其主动触发或重试部署。
 
-## 12. `HARNESS_BLOCKED` 状态
+## 12. `BLOCKED — LOCAL_EXECUTION_REQUIRED`
 
-当任务需要仓库级执行，但当前环境缺少本地工作树、`node`、`npm`、浏览器、正式 CI 或必要日志读取能力时：
+当任务需要仓库级执行，但当前环境缺少可写本地工作树、目标分支、`node`、`npm`、私有依赖、浏览器、正式 CI、必要日志或长期进程能力时：
 
-1. 立即停止实现、测试结论和部署动作；
-2. 将任务状态报告为 `HARNESS_BLOCKED`；
-3. 精确列出缺失能力、已完成的只读分析和下一可执行入口；
-4. 不得把静态代码阅读、手工推演、GitHub 文件写入或 Vercel 构建冒充本地/CI 验证；
+1. 立即停止实现、测试结论、Preview 和部署动作；
+2. 将 Objective 状态报告为 `BLOCKED`，阻塞原因统一记为 `LOCAL_EXECUTION_REQUIRED`；
+3. 精确列出缺失能力、实际影响、已完成的只读分析、最小本地交接指令和恢复条件；
+4. 不得把静态代码阅读、手工推演、GitHub 文件写入、Vercel 构建或 Preview 冒充本地/CI 验证；
 5. 不得静默降级到 Vercel 调试、临时 workflow、页面诊断或重复部署；
 6. 恢复条件必须是获得可用的本地仓库执行环境或正式 CI，而不是获得新的 Preview 配额。
+
+本节只统一阻塞术语，不改变第 11 节和第 13 节已经冻结的验证与部署边界。已运行 Objective 继续使用启动时固定的 `project_harness_ref`；除非 Owner 明确批准迁移，本次更新不自动替换其 Harness pin。
 
 ## 13. Vercel 使用门
 
