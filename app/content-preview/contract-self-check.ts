@@ -2,7 +2,11 @@ import type { FourPillars } from "@/lib/types";
 import { evaluateContentRebuild } from "@/lib/content-rebuild";
 import { adaptPillarsToChartFacts } from "@/lib/content-rebuild/adapter";
 
-const TRACES: readonly { readonly id: string; readonly pillars: FourPillars }[] = [
+const REPRESENTATIVE_TRACES: readonly {
+  readonly id: string;
+  readonly pillars: FourPillars;
+  readonly expected: "A01" | "A02" | "A03" | "A04";
+}[] = [
   {
     id: "S01",
     pillars: {
@@ -11,6 +15,7 @@ const TRACES: readonly { readonly id: string; readonly pillars: FourPillars }[] 
       day: { stem: "甲", branch: "寅" },
       hour: { stem: "甲", branch: "子" },
     },
+    expected: "A01",
   },
   {
     id: "S02",
@@ -20,6 +25,7 @@ const TRACES: readonly { readonly id: string; readonly pillars: FourPillars }[] 
       day: { stem: "乙", branch: "丑" },
       hour: { stem: "辛", branch: "巳" },
     },
+    expected: "A02",
   },
   {
     id: "S03",
@@ -29,6 +35,7 @@ const TRACES: readonly { readonly id: string; readonly pillars: FourPillars }[] 
       day: { stem: "己", branch: "丑" },
       hour: { stem: "乙", branch: "丑" },
     },
+    expected: "A03",
   },
   {
     id: "S04",
@@ -38,58 +45,25 @@ const TRACES: readonly { readonly id: string; readonly pillars: FourPillars }[] 
       day: { stem: "丙", branch: "戌" },
       hour: { stem: "辛", branch: "卯" },
     },
+    expected: "A04",
   },
 ];
 
-export const representativeDiagnostics = TRACES.map((trace) => {
-  const facts = adaptPillarsToChartFacts(trace.pillars, "exact", []);
-  const result = evaluateContentRebuild({
-    timeBasisVersion: "civil_time_v1",
-    candidates: [{ candidateId: trace.id, facts }],
-  });
-  const local = result.candidateResults[0];
-
-  return {
-    id: trace.id,
-    seasonalStrength: facts.seasonalStrength,
-    occurrences: facts.occurrences,
-    nodeAvailability: result.nodeAvailability,
-    evidence: result.evidence,
-    dimensions: result.dimensions,
-    roleNodes: local.evidenceGraph.nodes
-      .filter((node) => node.layer === "E1")
-      .map((node) => ({
-        id: node.id,
-        status: node.status,
-        structuralStatus: node.structuralStatus,
-        visible: node.visible,
-        origins: node.originClusterKeys,
-      })),
-    e4Nodes: local.evidenceGraph.nodes
-      .filter((node) => node.layer === "E4")
-      .map((node) => ({
-        id: node.id,
-        status: node.status,
-        structuralStatus: node.structuralStatus,
-        support: node.supportRelationKeys,
-        origins: node.originClusterKeys,
-      })),
-    paths: local.evidenceGraph.paths.map((path) => ({
-      id: path.id,
-      structuralStatus: path.structuralStatus,
-      competesForInterface: path.competesForInterface,
-      roles: path.roleSequence,
-      objects: path.objectPath,
-      origins: path.originPath,
-    })),
-    tensions: local.tensions,
-    mechanismEvaluations: local.mechanismEvaluations,
-    coreCandidates: result.coreCandidates,
-    coreMechanism: result.coreMechanism,
-    finalState: result.finalState,
-  };
-});
-
 export function assertRepresentativeContentTraces(): void {
-  // Temporarily disabled while the exact real-chart contract mismatch is displayed.
+  for (const trace of REPRESENTATIVE_TRACES) {
+    const facts = adaptPillarsToChartFacts(trace.pillars, "exact", []);
+    const result = evaluateContentRebuild({
+      timeBasisVersion: "civil_time_v1",
+      candidates: [{ candidateId: trace.id, facts }],
+    });
+
+    if (
+      result.coreMechanism !== trace.expected ||
+      result.finalState !== "established"
+    ) {
+      throw new Error(
+        `${trace.id} expected ${trace.expected}/established but got ${result.coreMechanism ?? "none"}/${result.finalState}`,
+      );
+    }
+  }
 }
