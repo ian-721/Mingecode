@@ -865,9 +865,15 @@ function feedbackDimension(
     return "shared_endpoint_competition";
   }
   if (
-    subjectOutput === "limited" &&
-    outputConstraint === "effective" &&
-    constraintSubject === "limited"
+    (subjectOutput === "limited" &&
+      outputConstraint === "effective" &&
+      constraintSubject === "limited") ||
+    (availability.subject === "limited" &&
+      availability.output === "usable" &&
+      availability.constraint === "limited" &&
+      subjectOutput === "limited" &&
+      outputConstraint === "limited" &&
+      constraintSubject === "limited")
   ) {
     return "output_constraint_regulating";
   }
