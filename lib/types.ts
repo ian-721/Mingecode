@@ -5,6 +5,9 @@ import type {
   TenRelation,
 } from "@4n6h4x0r/stem-branch";
 
+export const TIME_CONVENTION_VERSION = "civil_time_v1" as const;
+export type TimeConventionVersion = typeof TIME_CONVENTION_VERSION;
+
 export type TimePrecision = "exact" | "approximate" | "unknown";
 
 export type BirthInput = {
@@ -97,6 +100,7 @@ export type ChartCandidate = {
 };
 
 export type ChartResolution = {
+  timeConventionVersion: TimeConventionVersion;
   charts: ChartCandidate[];
   chartPrompt: ChartPrompt;
   timeStability: TimeStability;
@@ -157,6 +161,7 @@ export type VerdictRelation =
 
 export type HybridVerdict = {
   modelVersion: "m1br-hybrid-r2-0.1";
+  timeConventionVersion: TimeConventionVersion;
   chartPrompt: ChartPrompt;
   calibration: {
     questionIds: string[];

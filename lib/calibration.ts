@@ -1,12 +1,14 @@
 import { QUESTIONS } from "@/data/questions";
 import { SIGNATURE_ORDER } from "@/lib/signatures";
-import type {
-  AnswerChoice,
-  AnswerRecord,
-  ChartPrompt,
-  HybridVerdict,
-  QuestionInstance,
-  SignatureId,
+import {
+  TIME_CONVENTION_VERSION,
+  type AnswerChoice,
+  type AnswerRecord,
+  type ChartPrompt,
+  type HybridVerdict,
+  type QuestionInstance,
+  type SignatureId,
+  type TimeConventionVersion,
 } from "@/lib/types";
 
 export function createInitialQuestions(
@@ -150,6 +152,7 @@ export function recordAnswer(
 export function decideVerdict(
   chartPrompt: ChartPrompt,
   answers: AnswerRecord[],
+  timeConventionVersion: TimeConventionVersion = TIME_CONVENTION_VERSION,
 ): HybridVerdict {
   if (answers.length < 4 || answers.length > 6) {
     throw new Error("Hybrid verdict requires four to six answers");
@@ -184,6 +187,7 @@ export function decideVerdict(
 
   return {
     modelVersion: "m1br-hybrid-r2-0.1",
+    timeConventionVersion,
     chartPrompt,
     calibration: {
       questionIds: answers.map((answer) => answer.questionId),
