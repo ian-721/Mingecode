@@ -4,10 +4,13 @@ import {
   STEM_ELEMENT,
   getHiddenStems,
   getStrength,
+  getTenRelation,
   type Element,
+  type FourPillars,
   type Stem,
   type TenRelation,
 } from "@4n6h4x0r/stem-branch";
+import { deriveChartFacts } from "@/lib/signatures";
 import type { BirthInput, ChartResolution } from "@/lib/types";
 import type {
   ChartFacts,
@@ -57,6 +60,10 @@ export function adaptChartResolution(
     birthInput.timePrecision === "exact" &&
     resolution.charts.length === 1 &&
     resolution.charts[0].convention === "civil";
+  const missingPositions =
+    birthInput.timePrecision === "unknown"
+      ? (["hour.stem", "hour.branch"] as const)
+      : [];
 
   const candidates = resolution.charts.map((chart) => {
     if (!chart.key || candidateIds.has(chart.key)) {
@@ -64,81 +71,106 @@ export function adaptChartResolution(
     }
     candidateIds.add(chart.key);
 
-    const facts = chart.facts;
-    const dayStem = facts.pillars.day.stem;
-    const roleElements = deriveRoleElements(dayStem);
-    const seasonalStrength = Object.fromEntries(
-      ROLES.map((role) => [
-        role,
-        getStrength(roleElements[role], facts.pillars.month.branch)
-          .label as SeasonalStrength,
-      ]),
-    ) as Readonly<Record<Role, SeasonalStrength>>;
-
-    const physicalBranchClusters = buildPhysicalBranchClusters(facts);
-    const occurrences: Occurrence[] = [
-      {
-        role: "subject",
-        kind: "day_anchor",
-        objectKey: `day:day_anchor:0:${dayStem}`,
-        originClusterKey: `day-anchor:${dayStem}`,
-        hiddenStemProportion: null,
-        rootOccurrence: false,
-      },
-    ];
-
-    for (const visible of facts.visibleStems) {
-      occurrences.push({
-        role: roleForRelation(visible.relation),
-        kind: "visible",
-        objectKey: `${visible.position}:visible:0:${visible.stem}`,
-        originClusterKey: visibleOriginCluster(
-          visible.position,
-          visible.stem,
-          physicalBranchClusters,
-        ),
-        hiddenStemProportion: null,
-        rootOccurrence: false,
-      });
-    }
-
-    for (const hidden of facts.hiddenStems) {
-      const hiddenList = getHiddenStems(hidden.branch);
-      const hiddenIndex = hiddenList.findIndex(
-        (item) => item.stem === hidden.stem,
-      );
-      const hiddenSource = hiddenList[hiddenIndex];
-      if (!hiddenSource || hiddenIndex < 0) {
-        throw new Error(
-          `Missing hidden-stem source for ${hidden.position}:${hidden.branch}:${hidden.stem}`,
-        );
-      }
-      occurrences.push({
-        role: roleForRelation(hidden.relation),
-        kind: "hidden",
-        objectKey: `${hidden.position}:hidden:${hiddenIndex}:${hidden.stem}`,
-        originClusterKey: `branch:${hidden.position}:${hidden.branch}`,
-        hiddenStemProportion: hiddenSource.proportion,
-        rootOccurrence: true,
-      });
-    }
-
-    const adaptedFacts: ChartFacts = {
-      precision: exact ? "exact" : "bounded",
-      missingPositions:
-        birthInput.timePrecision === "unknown"
-          ? ["hour.stem", "hour.branch"]
-          : [],
-      seasonalStrength,
-      occurrences,
+    return {
+      candidateId: chart.key,
+      facts: adaptResolvedChartFacts(
+        chart.facts,
+        exact ? "exact" : "bounded",
+        missingPositions,
+      ),
     };
-
-    return { candidateId: chart.key, facts: adaptedFacts };
   });
 
   return {
     timeBasisVersion: "civil_time_v1",
     candidates,
+  };
+}
+
+export function adaptPillarsToChartFacts(
+  pillars: FourPillars,
+  precision: ChartFacts["precision"] = "exact",
+  missingPositions: readonly string[] = [],
+): ChartFacts {
+  const resolvedFacts = deriveChartFacts(pillars, true, {
+    getHiddenStems,
+    getTenRelation,
+  });
+  return adaptResolvedChartFacts(
+    resolvedFacts,
+    precision,
+    missingPositions,
+  );
+}
+
+function adaptResolvedChartFacts(
+  facts: ChartResolution["charts"][number]["facts"],
+  precision: ChartFacts["precision"],
+  missingPositions: readonly string[],
+): ChartFacts {
+  const dayStem = facts.pillars.day.stem;
+  const roleElements = deriveRoleElements(dayStem);
+  const seasonalStrength = Object.fromEntries(
+    ROLES.map((role) => [
+      role,
+      getStrength(roleElements[role], facts.pillars.month.branch)
+        .label as SeasonalStrength,
+    ]),
+  ) as Readonly<Record<Role, SeasonalStrength>>;
+
+  const physicalBranchClusters = buildPhysicalBranchClusters(facts);
+  const occurrences: Occurrence[] = [
+    {
+      role: "subject",
+      kind: "day_anchor",
+      objectKey: `day:day_anchor:0:${dayStem}`,
+      originClusterKey: `day-anchor:${dayStem}`,
+      hiddenStemProportion: null,
+      rootOccurrence: false,
+    },
+  ];
+
+  for (const visible of facts.visibleStems) {
+    occurrences.push({
+      role: roleForRelation(visible.relation),
+      kind: "visible",
+      objectKey: `${visible.position}:visible:0:${visible.stem}`,
+      originClusterKey: visibleOriginCluster(
+        visible.position,
+        visible.stem,
+        physicalBranchClusters,
+      ),
+      hiddenStemProportion: null,
+      rootOccurrence: false,
+    });
+  }
+
+  for (const hidden of facts.hiddenStems) {
+    const hiddenList = getHiddenStems(hidden.branch);
+    const hiddenIndex = hiddenList.findIndex(
+      (item) => item.stem === hidden.stem,
+    );
+    const hiddenSource = hiddenList[hiddenIndex];
+    if (!hiddenSource || hiddenIndex < 0) {
+      throw new Error(
+        `Missing hidden-stem source for ${hidden.position}:${hidden.branch}:${hidden.stem}`,
+      );
+    }
+    occurrences.push({
+      role: roleForRelation(hidden.relation),
+      kind: "hidden",
+      objectKey: `${hidden.position}:hidden:${hiddenIndex}:${hidden.stem}`,
+      originClusterKey: `branch:${hidden.position}:${hidden.branch}`,
+      hiddenStemProportion: hiddenSource.proportion,
+      rootOccurrence: true,
+    });
+  }
+
+  return {
+    precision,
+    missingPositions,
+    seasonalStrength,
+    occurrences,
   };
 }
 
