@@ -181,6 +181,7 @@ mixed 成立                          → mixed
 ```ts
 type HybridVerdict = {
   modelVersion: "m1br-hybrid-r2-0.1"
+  timeConventionVersion: "civil_time_v1"
   chartPrompt: {
     primaryRoute: SignatureId
     routeOrder: SignatureId[]
