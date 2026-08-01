@@ -49,16 +49,12 @@
 对每个候选盘、每个功能角色独立执行：
 
 1. 季节分 `S`：`旺=2，相=1，休=0，囚=-1，死=-2`。
-2. 根分：角色身份与承载根分分开计算，不改写 occurrence 的 `role`。
-   - 对 `subject`：根候选包括 `role=subject` 或 `role=peer` 且 `rootOccurrence=true` 的同元素藏干。`peer` 仍保持 peer 身份，只为日主承载提供根气；不得复制为第二个 subject occurrence。
-   - 对其他角色：根候选仍只读取该角色自己的 occurrences。
-   - 每个去重后的 `originClusterKey` 取该簇最高根贡献：
-     - `rootOccurrence=false`：0；
-     - `rootOccurrence=true` 且 `hiddenStemProportion >= 0.50`：2；
-     - `rootOccurrence=true` 且 `0.20 <= hiddenStemProportion < 0.50`：1；
-     - `rootOccurrence=true` 且 `hiddenStemProportion < 0.20`：0。
-   - 所有独立簇贡献之和封顶为 2，记为 `R`。
-   - `subject` 的可见分仍只读取 day anchor / subject identity；peer 透干不得重复增加 subject 的可见分。
+2. 根分：每个去重后的 `originClusterKey` 取该簇最高根贡献：
+   - `rootOccurrence=false`：0；
+   - `rootOccurrence=true` 且 `hiddenStemProportion >= 0.50`：2；
+   - `rootOccurrence=true` 且 `0.20 <= hiddenStemProportion < 0.50`：1；
+   - `rootOccurrence=true` 且 `hiddenStemProportion < 0.20`：0。
+   所有独立簇贡献之和封顶为 2，记为 `R`。
 3. 可见分 `V`：存在 `day_anchor` 或 `visible` 时为 1；仅藏为 0。
 4. `score = S + R + V`。
 
