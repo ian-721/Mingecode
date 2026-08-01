@@ -185,6 +185,10 @@ function answerCurrentQuestion(
     ...state,
     step: "transition",
     answers,
-    verdict: decideVerdict(resolution.chartPrompt, answers),
+    verdict: decideVerdict(
+      resolution.chartPrompt,
+      answers,
+      resolution.timeConventionVersion,
+    ),
   };
 }

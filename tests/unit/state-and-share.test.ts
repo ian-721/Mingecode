@@ -4,6 +4,7 @@ import {
   createSharePayload,
   sharePayloadContainsSensitiveFields,
 } from "@/lib/share";
+import { TIME_CONVENTION_VERSION } from "@/lib/types";
 import type {
   ChartPrompt,
   ChartResolution,
@@ -19,7 +20,7 @@ const chartPrompt: ChartPrompt = {
 };
 
 const resolution: ChartResolution = {
-  timeConventionVersion: "civil_time_v1",
+  timeConventionVersion: TIME_CONVENTION_VERSION,
   charts: [],
   timeStability: "stable",
   notices: [],
@@ -69,6 +70,9 @@ describe("state reset and share whitelist", () => {
 
     expect(state.step).toBe("transition");
     expect(state.verdict?.calibration.questionsUsed).toBe(4);
+    expect(state.verdict?.timeConventionVersion).toBe(
+      resolution.timeConventionVersion,
+    );
   });
 
   it("stops an uncertain path at the six-question cap", () => {
@@ -87,7 +91,11 @@ describe("state reset and share whitelist", () => {
   });
 
   it("R2-S01 share payload uses an explicit public whitelist", () => {
-    const payload = createSharePayload(verdict());
+    const internalVerdict = verdict();
+    expect(internalVerdict.timeConventionVersion).toBe(
+      TIME_CONVENTION_VERSION,
+    );
+    const payload = createSharePayload(internalVerdict);
     expect(Object.keys(payload).sort()).toEqual(
       ["crash", "invitation", "product", "recognition", "resultName"].sort(),
     );
@@ -101,6 +109,7 @@ describe("state reset and share whitelist", () => {
 function verdict(): HybridVerdict {
   return {
     modelVersion: "m1br-hybrid-r2-0.1",
+    timeConventionVersion: TIME_CONVENTION_VERSION,
     chartPrompt,
     calibration: {
       questionIds: ["one", "two", "three", "four"],

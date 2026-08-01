@@ -6,6 +6,7 @@ import {
   shouldAskFifth,
   shouldAskSixth,
 } from "@/lib/calibration";
+import { TIME_CONVENTION_VERSION } from "@/lib/types";
 import type {
   AnswerRecord,
   ChartPrompt,
@@ -39,7 +40,9 @@ describe("R2 calibration and relation fixtures", () => {
     ];
 
     expect(shouldAskFifth(prompt, answers)).toBe(false);
-    expect(decideVerdict(prompt, answers).relationship).toBe("aligned");
+    const verdict = decideVerdict(prompt, answers);
+    expect(verdict.relationship).toBe("aligned");
+    expect(verdict.timeConventionVersion).toBe(TIME_CONVENTION_VERSION);
   });
 
   it("R2-Q02 enters Q5 after a four-way tie", () => {
