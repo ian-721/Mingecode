@@ -1,0 +1,291 @@
+{
+  "schemaVersion": "archetype-fixtures-v0.2",
+  "factsVersion": "normalized-chart-facts-v0.4",
+  "timeConventionVersion": "civil_time_v1",
+  "containsRealPeople": false,
+  "containsBirthData": false,
+  "factSets": {
+    "FS01": {
+      "nodes": [
+        {"role":"subject","availability":"usable","visibility":"structural","originKey":"s01"},
+        {"role":"input","availability":"usable","visibility":"hidden","originKey":"s02"},
+        {"role":"output","availability":"usable","visibility":"hidden","originKey":"s03"},
+        {"role":"resource","availability":"limited","visibility":"hidden","originKey":"s04"},
+        {"role":"constraint","availability":"limited","visibility":"absent","originKey":"s05"},
+        {"role":"pruning","availability":"limited","visibility":"unknown","originKey":"s06"}
+      ],
+      "edges": [
+        {"from":"input","to":"subject","kind":"supports","state":"effective","stage":"input","scope":"internal","originKey":"s02"},
+        {"from":"subject","to":"output","kind":"produces","state":"effective","stage":"generation","scope":"internal","originKey":"s03"},
+        {"from":"output","to":"resource","kind":"exchanges","state":"limited","stage":"completion","scope":"external","originKey":"s04"},
+        {"from":"constraint","to":"subject","kind":"constrains","state":"limited","stage":"generation","scope":"external","originKey":"s05"}
+      ],
+      "relations": [{"kind":"reinforces","endpoints":["input","subject"],"state":"effective","originKey":"s02"}]
+    },
+    "FS02": {
+      "nodes": [
+        {"role":"subject","availability":"usable","visibility":"structural","originKey":"one"},
+        {"role":"input","availability":"usable","visibility":"hidden","originKey":"one"},
+        {"role":"output","availability":"usable","visibility":"hidden","originKey":"one"},
+        {"role":"resource","availability":"limited","visibility":"hidden","originKey":"one"}
+      ],
+      "edges": [
+        {"from":"input","to":"subject","kind":"supports","state":"effective","stage":"input","scope":"internal","originKey":"one"},
+        {"from":"subject","to":"output","kind":"produces","state":"effective","stage":"generation","scope":"internal","originKey":"one"},
+        {"from":"output","to":"resource","kind":"exchanges","state":"limited","stage":"completion","scope":"external","originKey":"one"}
+      ],
+      "relations": []
+    },
+    "FS03": {
+      "nodes": [
+        {"role":"subject","availability":"limited","visibility":"structural","originKey":"s01"},
+        {"role":"input","availability":"usable","visibility":"hidden","originKey":"s02"},
+        {"role":"output","availability":"usable","visibility":"hidden","originKey":"s03"},
+        {"role":"resource","availability":"limited","visibility":"hidden","originKey":"s04"}
+      ],
+      "edges": [
+        {"from":"input","to":"subject","kind":"supports","state":"limited","stage":"input","scope":"internal","originKey":"s02"},
+        {"from":"subject","to":"output","kind":"produces","state":"effective","stage":"generation","scope":"internal","originKey":"s03"},
+        {"from":"output","to":"resource","kind":"exchanges","state":"limited","stage":"completion","scope":"external","originKey":"s04"}
+      ],
+      "relations": []
+    },
+    "FS04": {
+      "nodes": [
+        {"role":"subject","availability":"usable","visibility":"structural","originKey":"s01"},
+        {"role":"input","availability":"usable","visibility":"hidden","originKey":"s02"},
+        {"role":"output","availability":"usable","visibility":"hidden","originKey":"s03"},
+        {"role":"resource","availability":"limited","visibility":"hidden","originKey":"s04"},
+        {"role":"pruning","availability":"usable","visibility":"visible","originKey":"s07"}
+      ],
+      "edges": [
+        {"from":"input","to":"subject","kind":"supports","state":"effective","stage":"input","scope":"internal","originKey":"s02"},
+        {"from":"subject","to":"output","kind":"produces","state":"effective","stage":"generation","scope":"internal","originKey":"s03"},
+        {"from":"pruning","to":"subject","kind":"constrains","state":"effective","stage":"input","scope":"external","originKey":"s07"}
+      ],
+      "relations": [{"kind":"competes","endpoints":["input","pruning"],"state":"effective","originKey":"s08"}]
+    },
+    "FS05": {
+      "nodes": [
+        {"role":"subject","availability":"usable","visibility":"structural","originKey":"r01"},
+        {"role":"output","availability":"usable","visibility":"visible","originKey":"r02"},
+        {"role":"constraint","availability":"usable","visibility":"visible","originKey":"r03"},
+        {"role":"recovery","availability":"limited","visibility":"hidden","originKey":"r04"},
+        {"role":"resource","availability":"limited","visibility":"hidden","originKey":"r05"}
+      ],
+      "edges": [
+        {"from":"subject","to":"output","kind":"produces","state":"effective","stage":"output","scope":"external","originKey":"r02"},
+        {"from":"constraint","to":"subject","kind":"constrains","state":"effective","stage":"generation","scope":"external","originKey":"r03"},
+        {"from":"recovery","to":"subject","kind":"supports","state":"blocked","stage":"input","scope":"internal","originKey":"r04"},
+        {"from":"output","to":"resource","kind":"exchanges","state":"limited","stage":"completion","scope":"external","originKey":"r05"}
+      ],
+      "relations": [{"kind":"competes","endpoints":["output","constraint"],"state":"effective","originKey":"r06"}]
+    },
+    "FS06": {
+      "nodes": [
+        {"role":"subject","availability":"usable","visibility":"structural","originKey":"one"},
+        {"role":"output","availability":"usable","visibility":"visible","originKey":"one"},
+        {"role":"constraint","availability":"usable","visibility":"visible","originKey":"one"},
+        {"role":"recovery","availability":"limited","visibility":"hidden","originKey":"one"}
+      ],
+      "edges": [
+        {"from":"subject","to":"output","kind":"produces","state":"effective","stage":"output","scope":"external","originKey":"one"},
+        {"from":"constraint","to":"subject","kind":"constrains","state":"effective","stage":"generation","scope":"external","originKey":"one"},
+        {"from":"recovery","to":"subject","kind":"supports","state":"blocked","stage":"input","scope":"internal","originKey":"one"}
+      ],
+      "relations": []
+    },
+    "FS07": {
+      "nodes": [
+        {"role":"subject","availability":"limited","visibility":"structural","originKey":"r01"},
+        {"role":"output","availability":"usable","visibility":"visible","originKey":"r02"},
+        {"role":"constraint","availability":"usable","visibility":"visible","originKey":"r03"},
+        {"role":"recovery","availability":"limited","visibility":"hidden","originKey":"r04"}
+      ],
+      "edges": [
+        {"from":"subject","to":"output","kind":"produces","state":"limited","stage":"output","scope":"external","originKey":"r02"},
+        {"from":"constraint","to":"subject","kind":"constrains","state":"effective","stage":"generation","scope":"external","originKey":"r03"},
+        {"from":"recovery","to":"subject","kind":"supports","state":"blocked","stage":"input","scope":"internal","originKey":"r04"}
+      ],
+      "relations": []
+    },
+    "FS08": {
+      "nodes": [
+        {"role":"subject","availability":"usable","visibility":"structural","originKey":"r01"},
+        {"role":"output","availability":"usable","visibility":"visible","originKey":"r02"},
+        {"role":"constraint","availability":"usable","visibility":"visible","originKey":"r03"},
+        {"role":"recovery","availability":"usable","visibility":"hidden","originKey":"r07"}
+      ],
+      "edges": [
+        {"from":"subject","to":"output","kind":"produces","state":"effective","stage":"output","scope":"external","originKey":"r02"},
+        {"from":"constraint","to":"subject","kind":"constrains","state":"effective","stage":"generation","scope":"external","originKey":"r03"},
+        {"from":"recovery","to":"subject","kind":"supports","state":"effective","stage":"input","scope":"internal","originKey":"r07"}
+      ],
+      "relations": [{"kind":"competes","endpoints":["output","constraint"],"state":"effective","originKey":"r06"}]
+    },
+    "FS09": {
+      "nodes": [
+        {"role":"subject","availability":"usable","visibility":"structural","originKey":"m01"},
+        {"role":"constraint","availability":"usable","visibility":"visible","originKey":"m02"},
+        {"role":"input","availability":"usable","visibility":"hidden","originKey":"m03"},
+        {"role":"output","availability":"usable","visibility":"visible","originKey":"m04"},
+        {"role":"resource","availability":"usable","visibility":"hidden","originKey":"m05"}
+      ],
+      "edges": [
+        {"from":"constraint","to":"input","kind":"supports","state":"effective","stage":"input","scope":"external","originKey":"m02"},
+        {"from":"input","to":"subject","kind":"supports","state":"effective","stage":"input","scope":"internal","originKey":"m03"},
+        {"from":"subject","to":"output","kind":"produces","state":"effective","stage":"generation","scope":"internal","originKey":"m04"},
+        {"from":"output","to":"constraint","kind":"constrains","state":"effective","stage":"output","scope":"internal","originKey":"m06"},
+        {"from":"output","to":"resource","kind":"exchanges","state":"effective","stage":"completion","scope":"external","originKey":"m05"},
+        {"from":"constraint","to":"output","kind":"checks","state":"effective","stage":"generation","scope":"internal","originKey":"m07"}
+      ],
+      "relations": [{"kind":"clashes","endpoints":["constraint","output"],"state":"effective","originKey":"m08"}]
+    },
+    "FS10": {
+      "nodes": [
+        {"role":"subject","availability":"usable","visibility":"structural","originKey":"one"},
+        {"role":"constraint","availability":"usable","visibility":"visible","originKey":"one"},
+        {"role":"input","availability":"usable","visibility":"hidden","originKey":"one"},
+        {"role":"output","availability":"usable","visibility":"visible","originKey":"one"}
+      ],
+      "edges": [
+        {"from":"constraint","to":"input","kind":"supports","state":"effective","stage":"input","scope":"external","originKey":"one"},
+        {"from":"input","to":"subject","kind":"supports","state":"effective","stage":"input","scope":"internal","originKey":"one"},
+        {"from":"subject","to":"output","kind":"produces","state":"effective","stage":"generation","scope":"internal","originKey":"one"},
+        {"from":"output","to":"constraint","kind":"constrains","state":"effective","stage":"output","scope":"internal","originKey":"one"}
+      ],
+      "relations": []
+    },
+    "FS11": {
+      "nodes": [
+        {"role":"subject","availability":"limited","visibility":"structural","originKey":"m01"},
+        {"role":"constraint","availability":"usable","visibility":"visible","originKey":"m02"},
+        {"role":"input","availability":"usable","visibility":"hidden","originKey":"m03"},
+        {"role":"output","availability":"usable","visibility":"visible","originKey":"m04"}
+      ],
+      "edges": [
+        {"from":"constraint","to":"input","kind":"supports","state":"effective","stage":"input","scope":"external","originKey":"m02"},
+        {"from":"input","to":"subject","kind":"supports","state":"limited","stage":"input","scope":"internal","originKey":"m03"},
+        {"from":"subject","to":"output","kind":"produces","state":"limited","stage":"generation","scope":"internal","originKey":"m04"},
+        {"from":"output","to":"constraint","kind":"constrains","state":"effective","stage":"output","scope":"internal","originKey":"m06"}
+      ],
+      "relations": []
+    },
+    "FS12": {
+      "nodes": [
+        {"role":"subject","availability":"usable","visibility":"structural","originKey":"m01"},
+        {"role":"constraint","availability":"usable","visibility":"visible","originKey":"m02"},
+        {"role":"input","availability":"usable","visibility":"hidden","originKey":"m03"},
+        {"role":"output","availability":"usable","visibility":"visible","originKey":"m04"},
+        {"role":"resource","availability":"usable","visibility":"hidden","originKey":"m05"}
+      ],
+      "edges": [
+        {"from":"constraint","to":"input","kind":"supports","state":"effective","stage":"input","scope":"external","originKey":"m02"},
+        {"from":"input","to":"subject","kind":"supports","state":"effective","stage":"input","scope":"internal","originKey":"m03"},
+        {"from":"subject","to":"output","kind":"produces","state":"effective","stage":"generation","scope":"internal","originKey":"m04"},
+        {"from":"output","to":"constraint","kind":"constrains","state":"effective","stage":"output","scope":"internal","originKey":"m06"},
+        {"from":"constraint","to":"subject","kind":"constrains","state":"effective","stage":"generation","scope":"external","originKey":"m09"}
+      ],
+      "relations": [{"kind":"competes","endpoints":["input","constraint"],"state":"effective","originKey":"m10"}]
+    },
+    "FS13": {
+      "nodes": [
+        {"role":"subject","availability":"usable","visibility":"structural","originKey":"v01"},
+        {"role":"input","availability":"usable","visibility":"visible","originKey":"v02"},
+        {"role":"output","availability":"usable","visibility":"visible","originKey":"v03"},
+        {"role":"resource","availability":"usable","visibility":"visible","originKey":"v04"},
+        {"role":"constraint","availability":"usable","visibility":"hidden","originKey":"v05"}
+      ],
+      "edges": [
+        {"from":"input","to":"subject","kind":"supports","state":"effective","stage":"input","scope":"internal","originKey":"v02"},
+        {"from":"subject","to":"output","kind":"produces","state":"effective","stage":"generation","scope":"internal","originKey":"v03"},
+        {"from":"output","to":"resource","kind":"exchanges","state":"effective","stage":"completion","scope":"external","originKey":"v04"},
+        {"from":"resource","to":"output","kind":"checks","state":"effective","stage":"generation","scope":"external","originKey":"v06"}
+      ],
+      "relations": [{"kind":"competes","endpoints":["input","resource"],"state":"effective","originKey":"v07"}]
+    },
+    "FS14": {
+      "nodes": [
+        {"role":"subject","availability":"usable","visibility":"structural","originKey":"one"},
+        {"role":"input","availability":"usable","visibility":"visible","originKey":"one"},
+        {"role":"output","availability":"usable","visibility":"visible","originKey":"one"},
+        {"role":"resource","availability":"usable","visibility":"visible","originKey":"one"}
+      ],
+      "edges": [
+        {"from":"input","to":"subject","kind":"supports","state":"effective","stage":"input","scope":"internal","originKey":"one"},
+        {"from":"subject","to":"output","kind":"produces","state":"effective","stage":"generation","scope":"internal","originKey":"one"},
+        {"from":"output","to":"resource","kind":"exchanges","state":"effective","stage":"completion","scope":"external","originKey":"one"},
+        {"from":"resource","to":"output","kind":"checks","state":"effective","stage":"generation","scope":"external","originKey":"one"}
+      ],
+      "relations": []
+    },
+    "FS15": {
+      "nodes": [
+        {"role":"subject","availability":"limited","visibility":"structural","originKey":"v01"},
+        {"role":"input","availability":"usable","visibility":"visible","originKey":"v02"},
+        {"role":"output","availability":"usable","visibility":"visible","originKey":"v03"},
+        {"role":"resource","availability":"usable","visibility":"visible","originKey":"v04"}
+      ],
+      "edges": [
+        {"from":"input","to":"subject","kind":"supports","state":"limited","stage":"input","scope":"internal","originKey":"v02"},
+        {"from":"subject","to":"output","kind":"produces","state":"limited","stage":"generation","scope":"internal","originKey":"v03"},
+        {"from":"output","to":"resource","kind":"exchanges","state":"effective","stage":"completion","scope":"external","originKey":"v04"},
+        {"from":"resource","to":"output","kind":"checks","state":"effective","stage":"generation","scope":"external","originKey":"v06"}
+      ],
+      "relations": []
+    },
+    "FS16": {
+      "nodes": [
+        {"role":"subject","availability":"usable","visibility":"structural","originKey":"v01"},
+        {"role":"input","availability":"usable","visibility":"visible","originKey":"v02"},
+        {"role":"output","availability":"usable","visibility":"visible","originKey":"v03"},
+        {"role":"resource","availability":"usable","visibility":"visible","originKey":"v04"}
+      ],
+      "edges": [
+        {"from":"input","to":"subject","kind":"supports","state":"effective","stage":"input","scope":"internal","originKey":"v02"},
+        {"from":"subject","to":"output","kind":"produces","state":"effective","stage":"generation","scope":"internal","originKey":"v03"},
+        {"from":"output","to":"resource","kind":"exchanges","state":"effective","stage":"completion","scope":"external","originKey":"v04"},
+        {"from":"resource","to":"output","kind":"checks","state":"effective","stage":"generation","scope":"external","originKey":"v06"},
+        {"from":"resource","to":"output","kind":"checks","state":"effective","stage":"completion","scope":"external","originKey":"v08"}
+      ],
+      "relations": [{"kind":"competes","endpoints":["input","resource"],"state":"effective","originKey":"v07"}]
+    }
+  },
+  "fixtures": [
+    {"id":"CF-001","fixtureType":"positive","input":{"candidates":[{"candidateId":"c1","factSet":"FS01"}],"manifestationAnswers":[]},"expected":{"status":"established","mechanism":"A01","coreGranted":true,"dimensions":["D1:internally_generated","D4:conversion_gap","D6:closure_gap"],"families":["E1","E3","E4","E5","E6"],"contentKeys":["A01.core.coordinate","A01.tension.expansion","A01.crash.rewrite"],"blockers":[]}},
+    {"id":"CF-002","fixtureType":"near_neighbor","input":{"candidates":[{"candidateId":"c1","factSet":"FS13"}],"manifestationAnswers":[]},"expected":{"status":"candidate","mechanism":"A04","coreGranted":false,"dimensions":["D4:meaning_value_editor","D6:premature_gatekeeping"],"families":["E1","E3","E4","E5","E6"],"contentKeys":[],"blockers":["third_core_dimension"]}},
+    {"id":"CF-003","fixtureType":"single_family","input":{"candidates":[{"candidateId":"c1","factSet":"FS02"}],"manifestationAnswers":[]},"expected":{"status":"structure_only","mechanism":null,"coreGranted":false,"dimensions":[],"families":["E1"],"contentKeys":[],"blockers":["single_origin_cluster"]}},
+    {"id":"CF-004","fixtureType":"capacity_failure","input":{"candidates":[{"candidateId":"c1","factSet":"FS03"}],"manifestationAnswers":[]},"expected":{"status":"candidate","mechanism":"A01","coreGranted":false,"dimensions":["D6:closure_gap"],"families":["E1","E3","E4"],"contentKeys":[],"blockers":["subject_capacity_limited"]}},
+    {"id":"CF-005","fixtureType":"counterevidence","input":{"candidates":[{"candidateId":"c1","factSet":"FS04"}],"manifestationAnswers":[]},"expected":{"status":"conflicted","mechanism":"A01","coreGranted":false,"dimensions":["D1:dual_reference","D6:expansive"],"families":["E1","E3","E4","E5","E6"],"contentKeys":[],"blockers":["external_pruning_counterevidence"]}},
+    {"id":"CF-006","fixtureType":"time_stable","input":{"candidates":[{"candidateId":"c1","factSet":"FS01"},{"candidateId":"c2","factSet":"FS01"}],"manifestationAnswers":[]},"expected":{"status":"established","mechanism":"A01","coreGranted":true,"dimensions":["D1:internally_generated","D4:conversion_gap","D6:closure_gap"],"families":["E1","E3","E4","E5","E6"],"contentKeys":["A01.core.coordinate","A01.tension.expansion","A01.crash.rewrite"],"blockers":[]}},
+    {"id":"CF-007","fixtureType":"time_changes_core","input":{"candidates":[{"candidateId":"c1","factSet":"FS01"},{"candidateId":"c2","factSet":"FS13"}],"manifestationAnswers":[]},"expected":{"status":"boundary_sensitive","mechanism":null,"coreGranted":false,"dimensions":[],"families":["E6"],"contentKeys":[],"blockers":["candidate_mechanism_changed"]}},
+    {"id":"CF-008","fixtureType":"answers_reverse","input":{"candidates":[{"candidateId":"c1","factSet":"FS01"}],"manifestationAnswers":[{"forkId":"manifestation-01","answer":"opposes_typical"}]},"expected":{"status":"established","mechanism":"A01","coreGranted":true,"dimensions":["D1:internally_generated","D4:conversion_gap","D6:closure_gap"],"families":["E1","E3","E4","E5","E6"],"contentKeys":["A01.core.coordinate","A01.tension.expansion","A01.crash.rewrite"],"blockers":[],"manifestation":"compensated"}},
+
+    {"id":"CF-009","fixtureType":"positive","input":{"candidates":[{"candidateId":"c1","factSet":"FS05"}],"manifestationAnswers":[]},"expected":{"status":"established","mechanism":"A02","coreGranted":true,"dimensions":["D2:high_response_overheat","D5:high_permeability","D6:closure_gap"],"families":["E1","E2","E3","E4","E5","E6"],"contentKeys":["A02.core.response","A02.tension.overheat","A02.crash.feedback_as_power"],"blockers":[]}},
+    {"id":"CF-010","fixtureType":"near_neighbor","input":{"candidates":[{"candidateId":"c1","factSet":"FS13"}],"manifestationAnswers":[]},"expected":{"status":"candidate","mechanism":"A04","coreGranted":false,"dimensions":["D4:meaning_value_editor","D6:premature_gatekeeping"],"families":["E1","E3","E4","E5","E6"],"contentKeys":[],"blockers":["third_core_dimension"]}},
+    {"id":"CF-011","fixtureType":"single_family","input":{"candidates":[{"candidateId":"c1","factSet":"FS06"}],"manifestationAnswers":[]},"expected":{"status":"structure_only","mechanism":null,"coreGranted":false,"dimensions":[],"families":["E1"],"contentKeys":[],"blockers":["single_origin_cluster"]}},
+    {"id":"CF-012","fixtureType":"capacity_failure","input":{"candidates":[{"candidateId":"c1","factSet":"FS07"}],"manifestationAnswers":[]},"expected":{"status":"candidate","mechanism":"A02","coreGranted":false,"dimensions":["D5:high_permeability"],"families":["E1","E2","E3","E4"],"contentKeys":[],"blockers":["subject_capacity_limited"]}},
+    {"id":"CF-013","fixtureType":"counterevidence","input":{"candidates":[{"candidateId":"c1","factSet":"FS08"}],"manifestationAnswers":[]},"expected":{"status":"conflicted","mechanism":"A02","coreGranted":false,"dimensions":["D2:balanced_cycle","D5:high_permeability"],"families":["E1","E2","E3","E4","E5","E6"],"contentKeys":[],"blockers":["recovery_counterevidence"]}},
+    {"id":"CF-014","fixtureType":"time_stable","input":{"candidates":[{"candidateId":"c1","factSet":"FS05"},{"candidateId":"c2","factSet":"FS05"}],"manifestationAnswers":[]},"expected":{"status":"established","mechanism":"A02","coreGranted":true,"dimensions":["D2:high_response_overheat","D5:high_permeability","D6:closure_gap"],"families":["E1","E2","E3","E4","E5","E6"],"contentKeys":["A02.core.response","A02.tension.overheat","A02.crash.feedback_as_power"],"blockers":[]}},
+    {"id":"CF-015","fixtureType":"time_changes_core","input":{"candidates":[{"candidateId":"c1","factSet":"FS05"},{"candidateId":"c2","factSet":"FS13"}],"manifestationAnswers":[]},"expected":{"status":"boundary_sensitive","mechanism":null,"coreGranted":false,"dimensions":[],"families":["E6"],"contentKeys":[],"blockers":["candidate_mechanism_changed"]}},
+    {"id":"CF-016","fixtureType":"answers_reverse","input":{"candidates":[{"candidateId":"c1","factSet":"FS05"}],"manifestationAnswers":[{"forkId":"manifestation-02","answer":"opposes_typical"}]},"expected":{"status":"established","mechanism":"A02","coreGranted":true,"dimensions":["D2:high_response_overheat","D5:high_permeability","D6:closure_gap"],"families":["E1","E2","E3","E4","E5","E6"],"contentKeys":["A02.core.response","A02.tension.overheat","A02.crash.feedback_as_power"],"blockers":[],"manifestation":"compensated"}},
+
+    {"id":"CF-017","fixtureType":"positive","input":{"candidates":[{"candidateId":"c1","factSet":"FS09"}],"manifestationAnswers":[]},"expected":{"status":"candidate","mechanism":"A03","coreGranted":false,"dimensions":["D3:methodize_pressure","D6:sustained_builder"],"families":["E1","E2","E3","E4","E5","E6"],"contentKeys":[],"blockers":["third_core_dimension"]}},
+    {"id":"CF-018","fixtureType":"near_neighbor","input":{"candidates":[{"candidateId":"c1","factSet":"FS13"}],"manifestationAnswers":[]},"expected":{"status":"candidate","mechanism":"A04","coreGranted":false,"dimensions":["D4:meaning_value_editor","D6:premature_gatekeeping"],"families":["E1","E3","E4","E5","E6"],"contentKeys":[],"blockers":["third_core_dimension"]}},
+    {"id":"CF-019","fixtureType":"single_family","input":{"candidates":[{"candidateId":"c1","factSet":"FS10"}],"manifestationAnswers":[]},"expected":{"status":"structure_only","mechanism":null,"coreGranted":false,"dimensions":[],"families":["E1"],"contentKeys":[],"blockers":["single_origin_cluster"]}},
+    {"id":"CF-020","fixtureType":"capacity_failure","input":{"candidates":[{"candidateId":"c1","factSet":"FS11"}],"manifestationAnswers":[]},"expected":{"status":"candidate","mechanism":"A03","coreGranted":false,"dimensions":["D3:methodize_pressure"],"families":["E1","E3","E4"],"contentKeys":[],"blockers":["subject_capacity_limited","third_core_dimension"]}},
+    {"id":"CF-021","fixtureType":"counterevidence","input":{"candidates":[{"candidateId":"c1","factSet":"FS12"}],"manifestationAnswers":[]},"expected":{"status":"conflicted","mechanism":"A03","coreGranted":false,"dimensions":["D3:context_switching","D6:sustained_builder"],"families":["E1","E2","E3","E4","E5","E6"],"contentKeys":[],"blockers":["direct_constraint_counterevidence","third_core_dimension"]}},
+    {"id":"CF-022","fixtureType":"time_stable","input":{"candidates":[{"candidateId":"c1","factSet":"FS09"},{"candidateId":"c2","factSet":"FS09"}],"manifestationAnswers":[]},"expected":{"status":"candidate","mechanism":"A03","coreGranted":false,"dimensions":["D3:methodize_pressure","D6:sustained_builder"],"families":["E1","E2","E3","E4","E5","E6"],"contentKeys":[],"blockers":["third_core_dimension"]}},
+    {"id":"CF-023","fixtureType":"time_changes_core","input":{"candidates":[{"candidateId":"c1","factSet":"FS09"},{"candidateId":"c2","factSet":"FS13"}],"manifestationAnswers":[]},"expected":{"status":"boundary_sensitive","mechanism":null,"coreGranted":false,"dimensions":[],"families":["E6"],"contentKeys":[],"blockers":["candidate_mechanism_changed"]}},
+    {"id":"CF-024","fixtureType":"answers_reverse","input":{"candidates":[{"candidateId":"c1","factSet":"FS09"}],"manifestationAnswers":[{"forkId":"manifestation-03","answer":"opposes_typical"}]},"expected":{"status":"candidate","mechanism":"A03","coreGranted":false,"dimensions":["D3:methodize_pressure","D6:sustained_builder"],"families":["E1","E2","E3","E4","E5","E6"],"contentKeys":[],"blockers":["third_core_dimension"],"manifestation":"compensated"}},
+
+    {"id":"CF-025","fixtureType":"positive","input":{"candidates":[{"candidateId":"c1","factSet":"FS13"}],"manifestationAnswers":[]},"expected":{"status":"candidate","mechanism":"A04","coreGranted":false,"dimensions":["D4:meaning_value_editor","D6:premature_gatekeeping"],"families":["E1","E3","E4","E5","E6"],"contentKeys":[],"blockers":["third_core_dimension"]}},
+    {"id":"CF-026","fixtureType":"near_neighbor","input":{"candidates":[{"candidateId":"c1","factSet":"FS09"}],"manifestationAnswers":[]},"expected":{"status":"candidate","mechanism":"A03","coreGranted":false,"dimensions":["D3:methodize_pressure","D6:sustained_builder"],"families":["E1","E2","E3","E4","E5","E6"],"contentKeys":[],"blockers":["third_core_dimension"]}},
+    {"id":"CF-027","fixtureType":"single_family","input":{"candidates":[{"candidateId":"c1","factSet":"FS14"}],"manifestationAnswers":[]},"expected":{"status":"structure_only","mechanism":null,"coreGranted":false,"dimensions":[],"families":["E1"],"contentKeys":[],"blockers":["single_origin_cluster"]}},
+    {"id":"CF-028","fixtureType":"capacity_failure","input":{"candidates":[{"candidateId":"c1","factSet":"FS15"}],"manifestationAnswers":[]},"expected":{"status":"candidate","mechanism":"A04","coreGranted":false,"dimensions":["D6:premature_gatekeeping"],"families":["E1","E3","E4"],"contentKeys":[],"blockers":["subject_capacity_limited","third_core_dimension"]}},
+    {"id":"CF-029","fixtureType":"counterevidence","input":{"candidates":[{"candidateId":"c1","factSet":"FS16"}],"manifestationAnswers":[]},"expected":{"status":"conflicted","mechanism":"A04","coreGranted":false,"dimensions":["D4:meaning_value_editor","D6:unresolved"],"families":["E1","E3","E4","E5","E6"],"contentKeys":[],"blockers":["gate_stage_counterevidence","third_core_dimension"]}},
+    {"id":"CF-030","fixtureType":"time_stable","input":{"candidates":[{"candidateId":"c1","factSet":"FS13"},{"candidateId":"c2","factSet":"FS13"}],"manifestationAnswers":[]},"expected":{"status":"candidate","mechanism":"A04","coreGranted":false,"dimensions":["D4:meaning_value_editor","D6:premature_gatekeeping"],"families":["E1","E3","E4","E5","E6"],"contentKeys":[],"blockers":["third_core_dimension"]}},
+    {"id":"CF-031","fixtureType":"time_changes_core","input":{"candidates":[{"candidateId":"c1","factSet":"FS13"},{"candidateId":"c2","factSet":"FS09"}],"manifestationAnswers":[]},"expected":{"status":"boundary_sensitive","mechanism":null,"coreGranted":false,"dimensions":[],"families":["E6"],"contentKeys":[],"blockers":["candidate_mechanism_changed"]}},
+    {"id":"CF-032","fixtureType":"answers_reverse","input":{"candidates":[{"candidateId":"c1","factSet":"FS13"}],"manifestationAnswers":[{"forkId":"manifestation-04","answer":"opposes_typical"}]},"expected":{"status":"candidate","mechanism":"A04","coreGranted":false,"dimensions":["D4:meaning_value_editor","D6:premature_gatekeeping"],"families":["E1","E3","E4","E5","E6"],"contentKeys":[],"blockers":["third_core_dimension"],"manifestation":"compensated"}}
+  ]
+}

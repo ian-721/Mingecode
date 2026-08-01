@@ -1,8 +1,10 @@
 # 原型夹具规范 v0.1
 
+> **历史状态：interface fixture / superseded for Issue #11。** 本文件与 `fixtures/archetype-fixtures.v0.1.json` 直接预填维度、证据家族和规则预期，只能验证裁决接口，不能验证 ChartFacts 规则有效性。当前 32 个规范化图层夹具见 `../v0.4/FIXTURE_SPEC.md` 与 `../v0.4/fixtures/archetype-fixtures.v0.2.json`。
+
 ## 数量与边界
 
-共 32 个抽象夹具：4 个原型 × 8 类。夹具只使用结构标记，不含生日、地点、四柱或人物经历。
+共 32 个历史抽象夹具：4 个原型 × 8 类。它们不含生日、地点、四柱或人物经历，但包含预填接口答案，因此不再承担当前通过门。
 
 | 类型 | 目的 | 预期 |
 |---|---|---|
@@ -64,8 +66,9 @@
 | `A04-F07` | A04 | `time_changes_core` | `boundary_sensitive` |
 | `A04-F08` | A04 | `answers_reverse` | `established` |
 
-## 通过门
+## 历史通过门
 
+- 以下只记录 v0.3 当时的接口预期，不是 Issue #11 的通过证据；
 - 32/32 均具有唯一预期；
 - 四个 `answers_reverse` 夹具的核心原型保持不变；
 - 四个 `time_changes_core` 必须全部输出 `boundary_sensitive`；

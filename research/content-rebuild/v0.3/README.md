@@ -6,6 +6,7 @@
 - `Not Human-Tested`
 - `Docs only`
 - 不授权修改现有 H5、题库、结果页、依赖或部署
+- Issue #11 后，本版的规则输入与夹具已被 v0.4 审查为未闭合；代码准入结论为 `BLOCKED_PENDING_FACT_AND_PREDICATE_CONTRACT`
 
 ## 本阶段目的
 
@@ -34,6 +35,10 @@
 - `fixtures/archetype-fixtures.v0.1.json`：无人物、无生日的机器可读夹具；
 - `EXPECTED_CONTENT_SNAPSHOTS.md`：四份预期用户内容快照；
 - `CODE_ENTRY_DECISION.md`：下一步是否具备窄范围代码方案准入条件。
+
+## v0.4 替代说明
+
+`../v0.4/` 承担当前 ChartFacts→EvidenceGraph→Dimensions 合同与新 32 个夹具。v0.3 原 JSON 保留为历史 interface fixture，不得再用来证明真实命盘事实能产生维度或原型。
 
 ## 核心边界
 
