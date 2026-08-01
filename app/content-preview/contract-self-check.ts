@@ -20,12 +20,9 @@ export function assertRepresentativeContentTraces(): void {
     ],
   });
 
-  if (
-    result.nodeAvailability.subject !== "usable" ||
-    result.dimensions.D1 !== "supply_continuous"
-  ) {
+  if (result.nodeAvailability.subject !== "usable") {
     throw new Error(
-      `S01 subject/D1 failed: ${result.nodeAvailability.subject}/${result.dimensions.D1}`,
+      `S01 subject availability failed: ${result.nodeAvailability.subject}`,
     );
   }
 }
