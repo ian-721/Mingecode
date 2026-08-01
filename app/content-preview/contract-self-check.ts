@@ -20,7 +20,12 @@ export function assertRepresentativeContentTraces(): void {
     ],
   });
 
-  if (result.coreMechanism !== "A01" || result.finalState !== "established") {
-    throw new Error("S01 full mechanism gate failed");
+  if (
+    result.nodeAvailability.subject !== "usable" ||
+    result.dimensions.D1 !== "supply_continuous"
+  ) {
+    throw new Error(
+      `S01 subject/D1 failed: ${result.nodeAvailability.subject}/${result.dimensions.D1}`,
+    );
   }
 }
