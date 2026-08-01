@@ -7,12 +7,23 @@ import {
   type ChartCandidate,
   type ChartFacts,
   type EvidenceStates,
+  type EvidencePath,
+  type EvidencePathId,
+  type EvidenceFamily,
   type FinalState,
   type MechanismId,
   type NodeAvailabilityByRole,
   type RelationEffectiveness,
   type StaticRuleEngineInput,
 } from "@/lib/content-rebuild";
+import {
+  evaluatePairBoundaries,
+  evaluateProvenanceGate,
+} from "@/lib/content-rebuild/decision";
+import {
+  calculateDimensionsFromEvidence,
+  findE4Witness,
+} from "@/lib/content-rebuild/evidence";
 
 interface ExpectedProfile {
   readonly nodeAvailability: NodeAvailabilityByRole;
@@ -64,55 +75,64 @@ interface FixtureDocument {
 const fixtureDocument = fixtureJson as unknown as FixtureDocument;
 
 describe("content-rebuild v0.4 frozen fact profiles", () => {
-  it("reproduces the complete 16/16 profile chain without reading expected as input", () => {
+  it("reproduces the complete 16/16 forward chain without expected as input", () => {
     const profileIds = Object.keys(fixtureDocument.factSets).sort();
     expect(profileIds).toHaveLength(16);
 
     for (const profileId of profileIds) {
       const expected = fixtureDocument.expectedProfiles[profileId];
-      const result = evaluateSingleCandidate({
+      const candidate: ChartCandidate = {
         candidateId: profileId,
         facts: fixtureDocument.factSets[profileId],
+      };
+      const local = evaluateSingleCandidate(candidate);
+      const aggregate = evaluateContentRebuild({
+        timeBasisVersion: "civil_time_v1",
+        candidates: [candidate],
       });
       const criticalRelationStates = Object.fromEntries(
         Object.keys(expected.criticalRelationStates).map((relationKey) => [
           relationKey,
-          result.closure.relations.find(
+          local.closure.relations.find(
             (relation) => relation.canonicalRelationKey === relationKey,
           )?.effectiveness,
         ]),
       );
 
-      expect(result.nodeAvailability, profileId).toEqual(
+      expect(local.nodeAvailability, profileId).toEqual(
         expected.nodeAvailability,
       );
-      expect(result.closure.rawRelationCount, profileId).toBe(
+      expect(local.closure.rawRelationCount, profileId).toBe(
         expected.rawRelationCount,
       );
-      expect(result.closure.relationEffectivenessCounts, profileId).toEqual(
+      expect(local.closure.relationEffectivenessCounts, profileId).toEqual(
         expected.relationEffectivenessCounts,
       );
       expect(criticalRelationStates, profileId).toEqual(
         expected.criticalRelationStates,
       );
-      expect(result.closure.diagnostics, profileId).toEqual({
+      expect(local.closure.diagnostics, profileId).toEqual({
         invalidRoleRelationCount: 0,
         missingDeterministicRelationCount: 0,
         duplicateRelationAfterSourceDedupeCount: 0,
         unexpectedManuallySelectedRelationCount: 0,
       });
-      expect(result.evidence, profileId).toEqual(expected.evidence);
-      expect(result.dimensions, profileId).toEqual(expected.dimensions);
-      expect(result.evidenceFamilies, profileId).toEqual(
+      expect(local.evidence, profileId).toEqual(withoutE6(expected.evidence));
+      expect(aggregate.evidence, profileId).toEqual(expected.evidence);
+      expect(local.dimensions, profileId).toEqual(expected.dimensions);
+      expect(local.evidenceFamilies, profileId).toEqual(
         expected.evidenceFamilies,
       );
-      expect(result.originClusterKeys, profileId).toEqual(
+      expect(local.originClusterKeys, profileId).toEqual(
         expected.originClusterKeys,
       );
-      expect(result.tension, profileId).toBe(expected.tension);
-      expect(result.exclusion, profileId).toBe(expected.exclusion);
-      expect(result.coreMechanism, profileId).toBe(expected.coreMechanism);
-      expect(result.finalState, profileId).toBe(expected.finalState);
+      expect(local.tension, profileId).toBe(expected.tension);
+      expect(local.exclusion, profileId).toBe(expected.exclusion);
+      expect(aggregate.coreMechanism, profileId).toBe(expected.coreMechanism);
+      expect(aggregate.finalState, profileId).toBe(expected.finalState);
+      expect(local.evidenceGraph.nodes.some((node) => node.layer === "E4"))
+        .toBe(true);
+      expect(Object.keys(local.evidence)).not.toContain("E6");
     }
   });
 
@@ -138,6 +158,39 @@ describe("content-rebuild v0.4 frozen fact profiles", () => {
       ).toBe(expectedCount);
     }
   });
+
+  it("materializes provenance on every executable node and path", () => {
+    const result = profile("F09");
+    const sources = [...result.evidenceGraph.nodes, ...result.evidenceGraph.paths];
+
+    expect(result.evidenceGraph.paths.some((path) => path.id === "output_mediated"))
+      .toBe(true);
+    for (const source of sources) {
+      expect(source.evidenceFamily).toBeTypeOf("string");
+      expect(Array.isArray(source.originClusterKeys)).toBe(true);
+      expect(Array.isArray(source.involvedObjectKeys)).toBe(true);
+      expect(Array.isArray(source.supportRelationKeys)).toBe(true);
+      expect(Array.isArray(source.counterRelationKeys)).toBe(true);
+      expect(source.status).toBeTypeOf("string");
+    }
+  });
+
+  it("computes D1-D6 solely from executable EvidenceGraph paths", () => {
+    const result = profile("F13");
+    const changedGraph = {
+      ...result.evidenceGraph,
+      paths: result.evidenceGraph.paths.map((path) =>
+        path.id === "conversion"
+          ? { ...path, structuralStatus: "limited" as const }
+          : path,
+      ),
+    };
+
+    expect(result.dimensions.D4).toBe("conversion_continuous");
+    expect(calculateDimensionsFromEvidence(changedGraph).states.D4).toBe(
+      "conversion_limited",
+    );
+  });
 });
 
 describe("content-rebuild v0.4 frozen fixtures", () => {
@@ -146,7 +199,6 @@ describe("content-rebuild v0.4 frozen fixtures", () => {
 
     for (const fixture of fixtureDocument.fixtures) {
       const result = evaluateContentRebuild(inputForFixture(fixture));
-
       expect(result.coreMechanism, fixture.id).toBe(
         fixture.expected.coreMechanism,
       );
@@ -159,7 +211,7 @@ describe("content-rebuild v0.4 frozen fixtures", () => {
     }
   });
 
-  it("keeps all answers_reverse core layers identical to their positive case", () => {
+  it("keeps all answers_reverse core layers identical to positive", () => {
     for (const mechanism of ["A01", "A02", "A03", "A04"] as const) {
       const positive = fixtureDocument.fixtures.find(
         (fixture) =>
@@ -185,24 +237,278 @@ describe("content-rebuild v0.4 frozen fixtures", () => {
     }
   });
 
-  it("aggregates same-core candidates without extra votes and marks changed cores boundary-sensitive", () => {
-    const stable = fixtureById("CF-006");
-    const changing = fixtureById("CF-007");
-
-    const stableResult = evaluateContentRebuild(inputForFixture(stable));
-    const changingResult = evaluateContentRebuild(inputForFixture(changing));
+  it("creates E6 only at candidate aggregation and detects changed cores", () => {
+    const stableResult = evaluateContentRebuild(inputForFixture(fixtureById("CF-006")));
+    const changingResult = evaluateContentRebuild(
+      inputForFixture(fixtureById("CF-007")),
+    );
 
     expect(stableResult.coreMechanism).toBe("A01");
     expect(stableResult.finalState).toBe("established");
-    expect(stableResult.candidateResults).toHaveLength(2);
+    expect(stableResult.evidence.E6).toBe("established");
+    expect(stableResult.candidateStabilityEvidence).toMatchObject({
+      evidenceFamily: "candidate_stability",
+      status: "established",
+    });
+    expect(stableResult.candidateResults.every((result) => !("E6" in result.evidence)))
+      .toBe(true);
     expect(changingResult.coreMechanism).toBeNull();
     expect(changingResult.finalState).toBe("boundary_sensitive");
     expect(changingResult.evidence.E6).toBe("boundary_sensitive");
+    expect(changingResult.finalState).toBe(
+      changingResult.candidateStabilityEvidence.status,
+    );
   });
 });
 
-describe("relation closure and failure gates", () => {
-  it("dedupes root and relation sources by origin cluster before competition", () => {
+describe("executable E4 and independent-family gates", () => {
+  it("does not establish with two origins but one actual evidence family", () => {
+    const gate = evaluateProvenanceGate(
+      [
+        evidenceSource("complete_relation_closure", ["origin-1"]),
+        evidenceSource("complete_relation_closure", ["origin-2"]),
+      ],
+      ["D1", "D6"],
+    );
+
+    expect(gate.originClusterKeys).toEqual(["origin-1", "origin-2"]);
+    expect(gate.evidenceFamilies).toEqual(["complete_relation_closure"]);
+    expect(gate.failures).toContain("fewer_than_two_evidence_families");
+  });
+
+  it("does not count a not-supported decoy family as actual support", () => {
+    const gate = evaluateProvenanceGate(
+      [
+        evidenceSource("node_availability", ["origin-1", "origin-2"]),
+        {
+          ...evidenceSource("same_origin_tension", ["fake-origin"]),
+          status: "not_supported",
+        },
+      ],
+      ["D1", "D6"],
+    );
+
+    expect(gate.evidenceFamilies).toEqual(["node_availability"]);
+    expect(gate.originClusterKeys).toEqual(["origin-1", "origin-2"]);
+    expect(gate.failures).toContain("fewer_than_two_evidence_families");
+  });
+
+  it("rejects dimension-like edges whose E4 paths lack a shared endpoint", () => {
+    const relations = [
+      path("subject_output", "subject", "output", "s", "o-left", "os", "ol", "effective"),
+      path("output_resource", "output", "resource", "o-right", "r", "or", "rr", "effective"),
+    ];
+
+    expect(findE4Witness("A04", relations)).toBeNull();
+  });
+
+  it("rejects an E4 join that shares object text but not origin cluster", () => {
+    const relations = [
+      path("subject_output", "subject", "output", "s", "o", "os", "left-origin", "effective"),
+      path("output_resource", "output", "resource", "o", "r", "right-origin", "rr", "effective"),
+    ];
+
+    expect(findE4Witness("A04", relations)).toBeNull();
+  });
+
+  it("accepts only the concrete shared endpoint and matching origin witness", () => {
+    const relations = [
+      path("subject_output", "subject", "output", "s", "o", "os", "shared", "effective"),
+      path("output_resource", "output", "resource", "o", "r", "shared", "rr", "effective"),
+    ];
+
+    expect(findE4Witness("A04", relations)).toMatchObject({
+      status: "established",
+      involvedObjectKeys: ["o", "r", "s"],
+      originClusterKeys: ["os", "rr", "shared"].sort(),
+    });
+  });
+
+  it("keeps frozen A01 E4 strict when D1 is merely limited", () => {
+    const local = profile("F15");
+    const e4 = local.evidenceGraph.nodes.find((node) => node.id === "e4:A01");
+
+    expect(e4?.status).toBe("established");
+    expect(e4?.supportRelationKeys).toEqual([
+      "generates:f15-o>f15-r",
+      "generates:f15-s>f15-o",
+    ]);
+    expect(local.evidenceGraph.layers.E4).toBe("established");
+    expect(local.evidence.E4).toBe("candidate");
+    expect(local.dimensions.D1).toBe("supply_limited");
+    expect(local.tensions.A01).toBe("candidate");
+    expect(local.mechanismEvaluations.A01.supportState).toBe("candidate");
+  });
+
+  it.each([
+    ["hardcoded evidence families", { evidenceFamilies: ["same_origin_tension"] }],
+    ["target-derived mechanism", { targetMechanism: "A01" }],
+  ])("fails schema validation for %s", (_label, injected) => {
+    const facts = { ...fixtureDocument.factSets.F01, ...injected };
+    const input = {
+      ...baseInput(),
+      candidates: [{ candidateId: "c1", facts }],
+    } as unknown as StaticRuleEngineInput;
+    expect(() => evaluateContentRebuild(input)).toThrow(/unsupported field/);
+  });
+});
+
+describe("six frozen pair boundaries", () => {
+  it.each([
+    ["A01_A04", "F01", "left"],
+    ["A01_A04", "F13", "right"],
+    ["A02_A04", "F05", "left"],
+    ["A02_A04", "F13", "right"],
+    ["A03_A04", "F09", "left"],
+    ["A03_A04", "F13", "right"],
+    ["A01_A03", "F01", "left"],
+    ["A01_A03", "F09", "right"],
+    ["A02_A03", "F05", "left"],
+    ["A02_A03", "F09", "right"],
+    ["A01_A02", "F01", "left"],
+    ["A01_A02", "F05", "right"],
+  ] as const)("directs %s with %s to %s", (pair, profileId, expected) => {
+    const comparison = profile(profileId).nearestNeighbor.comparisons.find(
+      (item) => item.pair === pair,
+    );
+    expect(comparison?.result).toBe(expected);
+    expect(
+      expected === "left"
+        ? comparison?.leftMatched
+        : comparison?.rightMatched,
+    ).toBe(true);
+    expect(
+      expected === "left"
+        ? comparison?.leftSupport
+        : comparison?.rightSupport,
+    ).toBe("strong");
+  });
+
+  it("preserves a genuine unresolved A02/A03 dual candidate", () => {
+    const local = profile("F07");
+    const comparison = local.nearestNeighbor.comparisons.find(
+      (item) => item.pair === "A02_A03",
+    );
+
+    expect(comparison).toMatchObject({
+      result: "unresolved",
+      leftSupport: "weak",
+      rightSupport: "weak",
+    });
+    expect(local.nearestNeighbor.status).toBe("ambiguous");
+    expect(local.nearestNeighbor.passingMechanisms).toEqual(["A02", "A03"]);
+    expect(local.coreCandidates).toEqual(["A02", "A03"]);
+    expect(local.candidateState).toBe("candidate");
+  });
+
+  it("is invariant when the occurrence input order is reversed", () => {
+    const facts = fixtureDocument.factSets.F07;
+    const forward = evaluateSingleCandidate({ candidateId: "same", facts });
+    const reverse = evaluateSingleCandidate({
+      candidateId: "same",
+      facts: { ...facts, occurrences: [...facts.occurrences].reverse() },
+    });
+
+    expect(reverse).toEqual(forward);
+    expect(JSON.stringify(reverse)).toBe(JSON.stringify(forward));
+  });
+
+  it("resolves a boundary even when provenance prevents establishment", () => {
+    const local = profile("F02");
+    const comparison = local.nearestNeighbor.comparisons.find(
+      (item) => item.pair === "A01_A04",
+    );
+
+    expect(local.mechanismEvaluations.A01.supportState).toBe("not_supported");
+    expect(local.mechanismEvaluations.A01.gateFailures).toContain(
+      "fewer_than_two_origin_clusters",
+    );
+    expect(comparison?.result).toBe("left");
+    expect(local.nearestNeighbor.uniqueMechanism).toBe("A01");
+    expect(local.candidateState).toBe("not_supported");
+  });
+
+  it("requires the frozen executable path even when D and E4 remain exact", () => {
+    const local = profile("F13");
+    const graph = {
+      ...local.evidenceGraph,
+      paths: local.evidenceGraph.paths.map((item) =>
+        item.id === "conversion"
+          ? { ...item, structuralStatus: "limited" as const }
+          : item,
+      ),
+    };
+    const result = evaluatePairBoundaries(
+      graph,
+      local.dimensions,
+      noExclusions(),
+    );
+    const comparison = result.comparisons.find(
+      (item) => item.pair === "A03_A04",
+    );
+
+    expect(local.dimensions.D4).toBe("conversion_continuous");
+    expect(local.evidenceGraph.nodes.find((node) => node.id === "e4:A04")?.status)
+      .toBe("established");
+    expect(comparison).toMatchObject({
+      result: "unresolved",
+      rightMatched: false,
+      rightSupport: "weak",
+    });
+  });
+
+  it("distinguishes proved no-mediation from unresolved mediation", () => {
+    const local = profile("F01");
+    const directOnly = evaluatePairBoundaries(
+      local.evidenceGraph,
+      { ...local.dimensions, D3: "direct_only" },
+      noExclusions(),
+    );
+    const unresolved = evaluatePairBoundaries(
+      local.evidenceGraph,
+      { ...local.dimensions, D3: "unresolved" },
+      noExclusions(),
+    );
+
+    expect(
+      directOnly.comparisons.find((item) => item.pair === "A01_A03")?.result,
+    ).toBe("left");
+    expect(
+      unresolved.comparisons.find((item) => item.pair === "A01_A03")?.result,
+    ).toBe("unresolved");
+  });
+
+  it("keeps single-sided weak support unresolved", () => {
+    const local = profile("F15");
+    const comparison = local.nearestNeighbor.comparisons.find(
+      (item) => item.pair === "A01_A03",
+    );
+
+    expect(comparison).toMatchObject({
+      leftSupport: "weak",
+      rightSupport: "none",
+      result: "unresolved",
+    });
+  });
+
+  it("records pair D/path provenance as exclusion-boundary evidence", () => {
+    const node = profile("F01").decisionEvidence.find(
+      (item) => item.id === "e5:boundary:A01_A04",
+    );
+
+    expect(node?.evidenceFamily).toBe("exclusion_boundary");
+    expect(node?.supportRelationKeys).toEqual(
+      expect.arrayContaining([
+        "generates:f01-i>f01-s",
+        "generates:f01-s>f01-o",
+        "generates:f01-o>f01-r",
+      ]),
+    );
+  });
+});
+
+describe("relation closure, failures, and deterministic output", () => {
+  it("dedupes same-origin source aliases before competition", () => {
     const base = fixtureDocument.factSets.F13;
     const facts: ChartFacts = {
       ...base,
@@ -219,134 +525,138 @@ describe("relation closure and failure gates", () => {
       ],
     };
     const result = evaluateSingleCandidate({ candidateId: "dedupe", facts });
-    const inputSubjectRelations = result.closure.relations.filter(
+    const all = result.closure.relations.filter(
       (relation) =>
         relation.kind === "generates" &&
         relation.sourceRole === "input" &&
         relation.targetRole === "subject",
     );
-    const dedupedInputSubjectRelations =
-      result.closure.sourceDedupedRelations.filter(
-        (relation) =>
-          relation.kind === "generates" &&
-          relation.sourceRole === "input" &&
-          relation.targetRole === "subject",
-      );
-
-    expect(result.nodeAvailability.input).toBe("usable");
-    expect(inputSubjectRelations).toHaveLength(2);
-    expect(dedupedInputSubjectRelations).toHaveLength(1);
-    expect(
-      inputSubjectRelations.every(
-        (relation) => !relation.limitedByCompetition,
-      ),
-    ).toBe(true);
-  });
-
-  it("downgrades both shared-object interfaces under competition", () => {
-    const result = evaluateSingleCandidate({
-      candidateId: "competition",
-      facts: fixtureDocument.factSets.F08,
-    });
-    const competed = result.closure.relations.filter(
-      (relation) => relation.limitedByCompetition,
+    const deduped = result.closure.sourceDedupedRelations.filter(
+      (relation) =>
+        relation.kind === "generates" &&
+        relation.sourceRole === "input" &&
+        relation.targetRole === "subject",
     );
 
-    expect(competed.map((relation) => relation.canonicalRelationKey)).toEqual([
-      "controls:f08-o>f08-c1",
-      "controls:f08-o>f08-c2",
-    ]);
+    expect(result.nodeAvailability.input).toBe("usable");
+    expect(all).toHaveLength(2);
+    expect(deduped).toHaveLength(1);
+    expect(all.every((relation) => !relation.limitedByCompetition)).toBe(true);
+  });
+
+  it("represents competition, blocked paths, and unknown paths explicitly", () => {
+    const competition = profile("F08");
     expect(
-      result.closure.relations
-        .filter(
-          (relation) =>
-            relation.kind === "controls" &&
-            relation.sourceRole === "constraint" &&
-            relation.targetRole === "subject",
-        )
-        .every((relation) => relation.effectiveness === "limited"),
-    ).toBe(true);
-    expect(result.dimensions.D5).toBe("shared_endpoint_competition");
-    expect(result.finalState).toBe("conflicted");
-  });
+      competition.closure.relations
+        .filter((relation) => relation.limitedByCompetition)
+        .map((relation) => relation.canonicalRelationKey),
+    ).toEqual(["controls:f08-o>f08-c1", "controls:f08-o>f08-c2"]);
+    expect(competition.dimensions.D5).toBe("shared_endpoint_competition");
+    expect(competition.candidateState).toBe("conflicted");
 
-  it("represents absent structural paths as blocked", () => {
-    const a02 = evaluateSingleCandidate({
-      candidateId: "blocked-a02",
-      facts: fixtureDocument.factSets.F05,
-    });
-    const a03 = evaluateSingleCandidate({
-      candidateId: "blocked-a03",
-      facts: fixtureDocument.factSets.F09,
-    });
+    expect(profile("F05").dimensions.D1).toBe("supply_blocked");
+    expect(profile("F09").dimensions.D4).toBe("conversion_blocked");
 
-    expect(a02.dimensions.D1).toBe("supply_blocked");
-    expect(a02.dimensions.D6).toBe("resource_interface_blocked");
-    expect(a03.dimensions.D4).toBe("conversion_blocked");
-  });
-
-  it("propagates unresolved positions as unknown without guessing", () => {
     const base = fixtureDocument.factSets.F01;
-    const facts: ChartFacts = {
-      ...base,
-      missingPositions: ["hour"],
-      seasonalStrength: { ...base.seasonalStrength, resource: "unknown" },
-    };
-    const result = evaluateSingleCandidate({ candidateId: "unknown", facts });
+    const unknown = evaluateSingleCandidate({
+      candidateId: "unknown",
+      facts: {
+        ...base,
+        missingPositions: ["hour"],
+        seasonalStrength: { ...base.seasonalStrength, resource: "unknown" },
+      },
+    });
+    expect(unknown.nodeAvailability.resource).toBe("unknown");
+    expect(unknown.dimensions.D6).toBe("unresolved");
+  });
 
-    expect(result.nodeAvailability.subject).toBe("usable");
-    expect(result.nodeAvailability.resource).toBe("unknown");
-    expect(result.nodeAvailability.constraint).toBe("unknown");
+  it("propagates unknown same-role evidence as boundary-sensitive E3", () => {
+    const base = fixtureDocument.factSets.F08;
+    const local = evaluateSingleCandidate({
+      candidateId: "unknown-same-role",
+      facts: {
+        ...base,
+        seasonalStrength: {
+          ...base.seasonalStrength,
+          constraint: "unknown",
+        },
+      },
+    });
+
     expect(
-      result.closure.relations.some(
-        (relation) => relation.effectiveness === "unknown",
-      ),
-    ).toBe(true);
-    expect(result.dimensions.D6).toBe("unresolved");
+      local.evidenceGraph.nodes
+        .filter((node) => node.layer === "E3")
+        .map((node) => node.status),
+    ).toContain("boundary_sensitive");
+    expect(local.evidenceGraph.layers.E3).toBe("boundary_sensitive");
+  });
+
+  it("does not fabricate an E4 relation path for an absent resource", () => {
+    const base = fixtureDocument.factSets.F01;
+    const local = evaluateSingleCandidate({
+      candidateId: "absent-resource",
+      facts: {
+        ...base,
+        occurrences: base.occurrences.filter(
+          (occurrence) => occurrence.role !== "resource",
+        ),
+      },
+    });
+
+    expect(local.nodeAvailability.resource).toBe("absent");
+    expect(local.dimensions.D6).toBe("resource_interface_blocked");
+    expect(
+      local.evidenceGraph.paths.some((path) => path.id === "output_resource"),
+    ).toBe(false);
+    expect(local.evidenceGraph.nodes.find((node) => node.id === "e4:A01")?.status)
+      .toBe("not_supported");
+    expect(local.candidateState).toBe("not_supported");
   });
 
   it.each([
     ["invalid time basis", invalidTimeBasis()],
     ["missing seasonal role", missingSeasonalRole()],
     ["duplicate occurrence", duplicateOccurrence()],
+    ["duplicate candidate", duplicateCandidate()],
     ["manually injected relation", manuallyInjectedRelation()],
     ["unsupported contact", unsupportedContact()],
   ])("fails explicitly for %s", (_label, input) => {
     expect(() => evaluateContentRebuild(input)).toThrow();
   });
-});
 
-describe("decision boundaries and determinism", () => {
-  it("applies exclusions generated by legal occurrences for F04/F08/F12/F16", () => {
+  it("applies exclusions generated by legal F04/F08/F12/F16 occurrences", () => {
     for (const profileId of ["F04", "F08", "F12", "F16"]) {
-      const result = evaluateSingleCandidate({
-        candidateId: profileId,
-        facts: fixtureDocument.factSets[profileId],
-      });
+      const result = profile(profileId);
       expect(result.exclusion, profileId).toBe(true);
-      expect(result.finalState, profileId).toBe("conflicted");
+      expect(result.candidateState, profileId).toBe("conflicted");
+      expect(result.decisionEvidence.some((node) => node.id.startsWith("e5:exclusion:")))
+        .toBe(true);
     }
   });
 
-  it("runs all six pairwise nearest-neighbor comparisons with a unique positive", () => {
-    for (const [profileId, mechanism] of [
-      ["F01", "A01"],
-      ["F05", "A02"],
-      ["F09", "A03"],
-      ["F13", "A04"],
-    ] as const) {
-      const result = evaluateSingleCandidate({
-        candidateId: profileId,
-        facts: fixtureDocument.factSets[profileId],
-      });
+  it("records actual D3 counterpaths on A01/A04 exclusion evidence", () => {
+    const A01 = profile("F04").decisionEvidence.find(
+      (node) => node.id === "e5:exclusion:A01",
+    );
+    const A04 = profile("F16").decisionEvidence.find(
+      (node) => node.id === "e5:exclusion:A04",
+    );
 
-      expect(result.nearestNeighbor.comparisons, profileId).toHaveLength(6);
-      expect(result.nearestNeighbor.status, profileId).toBe("unique");
-      expect(result.nearestNeighbor.uniqueMechanism, profileId).toBe(mechanism);
-    }
+    expect(A01?.counterRelationKeys).toEqual(
+      expect.arrayContaining([
+        "controls:f04-o>f04-c",
+        "generates:f04-c>f04-i",
+      ]),
+    );
+    expect(A04?.counterRelationKeys).toEqual(
+      expect.arrayContaining([
+        "controls:f16-o>f16-c",
+        "generates:f16-c>f16-i",
+      ]),
+    );
   });
 
-  it("does not mutate input, freezes output, and repeats byte-equivalent structure", () => {
+  it("does not mutate input, freezes output, and repeats byte-equivalent output", () => {
     const input = inputForFixture(fixtureById("CF-025"));
     const before = structuredClone(input);
     const first = evaluateContentRebuild(input);
@@ -357,11 +667,81 @@ describe("decision boundaries and determinism", () => {
     expect(JSON.stringify(first)).toBe(JSON.stringify(second));
     expect(Object.isFrozen(first)).toBe(true);
     expect(Object.isFrozen(first.candidateResults[0])).toBe(true);
-    expect(
-      Object.isFrozen(first.candidateResults[0].closure.relations[0]),
-    ).toBe(true);
+    expect(Object.isFrozen(first.candidateResults[0].evidenceGraph.paths[0]))
+      .toBe(true);
   });
 });
+
+function profile(profileId: string): CandidateEvaluation {
+  return evaluateSingleCandidate({
+    candidateId: profileId,
+    facts: fixtureDocument.factSets[profileId],
+  });
+}
+
+function withoutE6(evidence: EvidenceStates): CandidateEvaluation["evidence"] {
+  return {
+    E1: evidence.E1,
+    E2: evidence.E2,
+    E3: evidence.E3,
+    E4: evidence.E4,
+    E5: evidence.E5,
+  };
+}
+
+function evidenceSource(
+  evidenceFamily: EvidenceFamily,
+  originClusterKeys: readonly string[],
+) {
+  return {
+    evidenceFamily,
+    originClusterKeys,
+    involvedObjectKeys: ["object"],
+    supportRelationKeys: ["relation"],
+    counterRelationKeys: [],
+    status: "established" as const,
+  };
+}
+
+function noExclusions(): Readonly<Record<MechanismId, boolean>> {
+  return { A01: false, A02: false, A03: false, A04: false };
+}
+
+function path(
+  id: EvidencePathId,
+  sourceRole: EvidencePath["roleSequence"][number],
+  targetRole: EvidencePath["roleSequence"][number],
+  sourceObjectKey: string,
+  targetObjectKey: string,
+  sourceOriginClusterKey: string,
+  targetOriginClusterKey: string,
+  effectiveness: RelationEffectiveness,
+): EvidencePath {
+  const relationKey = `${id}:${sourceObjectKey}>${targetObjectKey}`;
+  return {
+    key: `path:${relationKey}`,
+    id,
+    evidenceFamily: "complete_relation_closure",
+    originClusterKeys: [sourceOriginClusterKey, targetOriginClusterKey].sort(),
+    involvedObjectKeys: [sourceObjectKey, targetObjectKey].sort(),
+    supportRelationKeys: [relationKey],
+    counterRelationKeys: [],
+    status:
+      effectiveness === "effective"
+        ? "established"
+        : effectiveness === "limited"
+          ? "candidate"
+          : effectiveness === "blocked"
+            ? "not_supported"
+            : "boundary_sensitive",
+    structuralStatus: effectiveness,
+    roleSequence: [sourceRole, targetRole],
+    objectPath: [sourceObjectKey, targetObjectKey],
+    originPath: [sourceOriginClusterKey, targetOriginClusterKey],
+    competesForInterface: false,
+    limitedByCompetition: false,
+  };
+}
 
 function inputForFixture(fixture: FixtureCase): StaticRuleEngineInput {
   return {
@@ -387,9 +767,7 @@ function fixtureById(id: string): FixtureCase {
 function baseInput(): StaticRuleEngineInput {
   return {
     timeBasisVersion: "civil_time_v1",
-    candidates: [
-      { candidateId: "c1", facts: fixtureDocument.factSets.F01 },
-    ],
+    candidates: [{ candidateId: "c1", facts: fixtureDocument.factSets.F01 }],
   };
 }
 
@@ -411,10 +789,7 @@ function missingSeasonalRole(): StaticRuleEngineInput {
     candidates: [
       {
         candidateId: "c1",
-        facts: {
-          ...fixtureDocument.factSets.F01,
-          seasonalStrength: incomplete,
-        },
+        facts: { ...fixtureDocument.factSets.F01, seasonalStrength: incomplete },
       },
     ],
   } as unknown as StaticRuleEngineInput;
@@ -427,11 +802,18 @@ function duplicateOccurrence(): StaticRuleEngineInput {
     candidates: [
       {
         candidateId: "c1",
-        facts: {
-          ...facts,
-          occurrences: [...facts.occurrences, facts.occurrences[0]],
-        },
+        facts: { ...facts, occurrences: [...facts.occurrences, facts.occurrences[0]] },
       },
+    ],
+  };
+}
+
+function duplicateCandidate(): StaticRuleEngineInput {
+  return {
+    ...baseInput(),
+    candidates: [
+      { candidateId: "same", facts: fixtureDocument.factSets.F01 },
+      { candidateId: "same", facts: fixtureDocument.factSets.F01 },
     ],
   };
 }
@@ -442,10 +824,7 @@ function manuallyInjectedRelation(): StaticRuleEngineInput {
     candidates: [
       {
         candidateId: "c1",
-        facts: {
-          ...fixtureDocument.factSets.F01,
-          rawRelations: [],
-        },
+        facts: { ...fixtureDocument.factSets.F01, rawRelations: [] },
       },
     ],
   } as unknown as StaticRuleEngineInput;

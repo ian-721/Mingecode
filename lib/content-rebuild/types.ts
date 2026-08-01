@@ -7,7 +7,20 @@ export const ROLES = [
   "constraint",
 ] as const;
 
+export const MECHANISMS = ["A01", "A02", "A03", "A04"] as const;
+
+export const EVIDENCE_FAMILY_ORDER = [
+  "node_availability",
+  "complete_relation_closure",
+  "branch_contact",
+  "same_origin_tension",
+  "exclusion_boundary",
+  "candidate_stability",
+] as const;
+
 export type Role = (typeof ROLES)[number];
+export type MechanismId = (typeof MECHANISMS)[number];
+export type EvidenceFamily = (typeof EVIDENCE_FAMILY_ORDER)[number];
 export type Precision = "exact" | "bounded";
 export type SeasonalStrength = "旺" | "相" | "休" | "囚" | "死" | "unknown";
 export type OccurrenceKind = "day_anchor" | "visible" | "hidden";
@@ -25,13 +38,15 @@ export type EvidenceState =
   | "conflicted"
   | "not_supported"
   | "boundary_sensitive";
-export type MechanismId = "A01" | "A02" | "A03" | "A04";
 export type FinalState = EvidenceState;
 export type TensionState =
   | "established"
   | "candidate"
   | "conflicted"
   | "not_supported";
+export type CandidateEvidenceKey = "E1" | "E2" | "E3" | "E4" | "E5";
+export type EvidenceKey = CandidateEvidenceKey | "E6";
+export type DimensionKey = "D1" | "D2" | "D3" | "D4" | "D5" | "D6";
 
 export interface Occurrence {
   readonly role: Role;
@@ -74,11 +89,14 @@ export interface NormalizedRelation {
   readonly targetObjectKey: string;
   readonly sourceRole: Role;
   readonly targetRole: Role;
+  readonly sourceOriginClusterKey: string;
+  readonly targetOriginClusterKey: string;
   readonly direction: RelationDirection;
   readonly canonicalRelationKey: string;
   readonly originClusterKeys: readonly string[];
   readonly sourceDedupeKey: string;
   readonly effectiveness: RelationEffectiveness;
+  readonly competesForInterface: boolean;
   readonly limitedByCompetition: boolean;
 }
 
@@ -98,6 +116,54 @@ export interface RelationClosure {
     Record<RelationEffectiveness, number>
   >;
   readonly diagnostics: ClosureDiagnostics;
+}
+
+export interface EvidenceSourceData {
+  readonly evidenceFamily: EvidenceFamily;
+  readonly originClusterKeys: readonly string[];
+  readonly involvedObjectKeys: readonly string[];
+  readonly supportRelationKeys: readonly string[];
+  readonly counterRelationKeys: readonly string[];
+  readonly status: EvidenceState;
+}
+
+export interface EvidenceNode extends EvidenceSourceData {
+  readonly id: string;
+  readonly layer: "E1" | "E2" | "E3" | "E4" | "E5";
+  readonly mechanism: MechanismId | null;
+  readonly structuralStatus: RelationEffectiveness | null;
+  readonly visible: boolean | null;
+}
+
+export type EvidencePathId =
+  | "input_subject"
+  | "subject_output"
+  | "output_resource"
+  | "output_constraint"
+  | "constraint_subject"
+  | "constraint_input"
+  | "output_mediated"
+  | "input_mediated"
+  | "conversion";
+
+export interface EvidencePath extends EvidenceSourceData {
+  readonly key: string;
+  readonly id: EvidencePathId;
+  readonly status: EvidenceState;
+  readonly structuralStatus: RelationEffectiveness;
+  readonly roleSequence: readonly Role[];
+  readonly objectPath: readonly string[];
+  readonly originPath: readonly string[];
+  readonly competesForInterface: boolean;
+  readonly limitedByCompetition: boolean;
+}
+
+export interface EvidenceGraph {
+  readonly nodes: readonly EvidenceNode[];
+  readonly paths: readonly EvidencePath[];
+  readonly layers: Readonly<Record<"E1" | "E2" | "E3" | "E4", EvidenceState>>;
+  readonly roleNodeIds: Readonly<Record<Role, string>>;
+  readonly e4NodeIds: Readonly<Record<MechanismId, string>>;
 }
 
 export interface DimensionStates {
@@ -136,23 +202,53 @@ export interface DimensionStates {
     | "unresolved";
 }
 
-export type EvidenceStates = Readonly<
-  Record<"E1" | "E2" | "E3" | "E4" | "E5" | "E6", EvidenceState>
->;
-
-export interface MechanismEvaluation {
-  readonly state: "established" | "candidate" | "not_supported";
-  readonly excluded: boolean;
+export interface DimensionEvaluation {
+  readonly states: DimensionStates;
+  readonly supportingEvidenceIds: Readonly<
+    Record<DimensionKey, readonly string[]>
+  >;
 }
 
+export type CandidateEvidenceStates = Readonly<
+  Record<CandidateEvidenceKey, EvidenceState>
+>;
+
+export type EvidenceStates = Readonly<Record<EvidenceKey, EvidenceState>>;
+
+export interface MechanismEvaluation {
+  readonly supportState: "established" | "candidate" | "not_supported";
+  readonly excluded: boolean;
+  readonly requiredDimensions: readonly DimensionKey[];
+  readonly supportEvidenceIds: readonly string[];
+  readonly evidenceFamilies: readonly EvidenceFamily[];
+  readonly originClusterKeys: readonly string[];
+  readonly gateFailures: readonly string[];
+}
+
+export type BoundaryPair =
+  | "A01_A04"
+  | "A02_A04"
+  | "A03_A04"
+  | "A01_A03"
+  | "A02_A03"
+  | "A01_A02";
+
 export interface NeighborComparison {
-  readonly pair: string;
+  readonly pair: BoundaryPair;
+  readonly left: MechanismId;
+  readonly right: MechanismId;
+  readonly leftMatched: boolean;
+  readonly rightMatched: boolean;
+  readonly leftSupport: "strong" | "weak" | "none" | "conflicted";
+  readonly rightSupport: "strong" | "weak" | "none" | "conflicted";
   readonly result: "left" | "right" | "unresolved" | "not_applicable";
+  readonly basis: string;
 }
 
 export interface NearestNeighborResult {
   readonly comparisons: readonly NeighborComparison[];
   readonly passingMechanisms: readonly MechanismId[];
+  readonly candidateMechanisms: readonly MechanismId[];
   readonly status: "unique" | "ambiguous" | "none";
   readonly uniqueMechanism: MechanismId | null;
 }
@@ -161,9 +257,12 @@ export interface CandidateEvaluation {
   readonly candidateId: string;
   readonly nodeAvailability: NodeAvailabilityByRole;
   readonly closure: RelationClosure;
-  readonly evidence: EvidenceStates;
+  readonly evidenceGraph: EvidenceGraph;
+  readonly evidence: CandidateEvidenceStates;
   readonly dimensions: DimensionStates;
-  readonly evidenceFamilies: readonly string[];
+  readonly dimensionEvidence: Readonly<Record<DimensionKey, readonly string[]>>;
+  readonly decisionEvidence: readonly EvidenceNode[];
+  readonly evidenceFamilies: readonly EvidenceFamily[];
   readonly originClusterKeys: readonly string[];
   readonly tensions: Readonly<Record<MechanismId, TensionState>>;
   readonly tension: TensionState;
@@ -174,7 +273,7 @@ export interface CandidateEvaluation {
   readonly nearestNeighbor: NearestNeighborResult;
   readonly coreCandidates: readonly MechanismId[];
   readonly coreMechanism: MechanismId | null;
-  readonly finalState: FinalState;
+  readonly candidateState: EvidenceState;
 }
 
 export interface StaticRuleEngineResult {
@@ -182,6 +281,7 @@ export interface StaticRuleEngineResult {
   readonly candidateResults: readonly CandidateEvaluation[];
   readonly nodeAvailability: NodeAvailabilityByRole;
   readonly evidence: EvidenceStates;
+  readonly candidateStabilityEvidence: EvidenceSourceData;
   readonly dimensions: DimensionStates;
   readonly coreCandidates: readonly MechanismId[];
   readonly coreMechanism: MechanismId | null;
