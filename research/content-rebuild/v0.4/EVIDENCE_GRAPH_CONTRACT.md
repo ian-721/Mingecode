@@ -1,135 +1,130 @@
-# ChartFacts → EvidenceGraph 合同 v0.4
+# EvidenceGraph 合同：relationEffectiveness 与 E1—E6
 
-## 1. 计算顺序
+状态：`research_candidate`
 
-每个候选盘必须独立执行：
+## 1. 关系输入与标准化
 
-```text
-原子 ChartFacts
-→ 校验 known/unknown 与来源
-→ 建立功能节点
-→ 建立原始关系边
-→ 应用有效性公式
-→ 按 originClusterKey 去重
-→ 生成 E1—E6
-→ 候选盘聚合
-```
+`rawRelations` 只记录当前排盘库可确定的结构关系：
 
-禁止跨候选盘拼出一张不存在的“最佳盘”，也禁止先选择原型再回填证据。
+| 字段 | 类型 / 枚举 | 约束 |
+| --- | --- | --- |
+| `relationId` | 非空字符串 | 候选盘内唯一 |
+| `kind` | `generates / controls / same_role / combines / clashes / punishes / harms` | 五行生克、同类或合冲刑害原始关系 |
+| `sourceObjectKey` | occurrence 的 `objectKey` | 必须指向具体端点 |
+| `targetObjectKey` | occurrence 的 `objectKey` | 必须指向具体端点 |
+| `direction` | `forward / undirected / unknown` | 生、克为 `forward`；同类及合冲刑害为 `undirected`；方向不充分时为 `unknown` |
+| `originClusterKey` | 非空字符串 | 该关系的同源去重键 |
 
-## 2. 规范化图对象
+十神只把具体端点映射为 `input / peer / output / resource / constraint` 功能角色，不增加第二条证据。合冲刑害只证明两个端点存在结构接触；本合同不推断合化成功、吉凶、内部/外部范围、生成/完成阶段或人格行为。
 
-```text
-FunctionalRole = subject | input | peer | output | resource | constraint | recovery | pruning
-Availability   = usable | limited | absent | unknown
-Visibility     = visible | hidden | absent | unknown
-EdgeState      = effective | limited | blocked | unknown
-EdgeKind       = supports | produces | exchanges | constrains | checks | combines | clashes | punishes | harms | competes
-Stage          = input | generation | output | completion | unknown
-Scope          = internal | external | mixed | unknown
-```
+## 2. relationEffectiveness 唯一化公式
 
-`recovery` 与 `pruning` 是待批准的规范化代理，不是新的十神或原子人格事实；它们的 ChartFacts 生成公式仍为 blocker。每个 node/edge 必须保留 `sourceKey[]` 与 `originClusterKey[]`。规范化图不包含人格含义。v0.4 夹具允许直接输入该图，是因为 Issue #11 明确允许规范化关系节点与边；这不等于当前运行时已能从四柱生成它。
+输出仅允许：`effective / limited / blocked / unknown`。
 
-## 3. 通用状态公式
+### 2.1 端点与方向
 
-对任一 E、D 或谓词 `X`：
+对每条关系先读取两个端点的 `nodeAvailability`：
 
-- `established`：所有必需字段 known；公式在每个合理候选盘为 true；反证公式均为 false；独立性门通过；
-- `candidate`：方向公式为 true，但有必需字段 unknown、容量仅 limited、缺一个独立家族，或现代翻译仍待来源；
-- `conflicted`：同一候选盘内支持公式与关键反证公式同时为 true；
-- `not_supported`：所有候选盘中支持公式均为 false，且没有可能改变结果的 unknown；
-- `boundary_sensitive`：不同候选盘对同一核心公式给出不同状态、不同维度或不同最近邻优先结果。
+1. 任一端点为 `unknown`，或 `direction=unknown`：输出 `unknown`，只保留 raw relation。
+2. 任一端点为 `absent`：输出 `blocked`。
+3. 两端均为 `usable`：进入同对象竞争检查；无竞争则为 `effective`。
+4. 两端均已观察、至少一端为 `limited` 且没有 `absent/unknown`：输出 `limited`。
 
-状态优先级是：`boundary_sensitive > conflicted > candidate > established/not_supported`；它不是人格强度。
+`blocked` 表示关系端点在该候选盘内确定不可成立；`unknown` 表示端点或方向资料不足。不能把 raw relation 的存在直接写成 `effective`。
 
-## 4. 去重键
+### 2.2 同对象竞争
 
-规范键：
+同一具体 `objectKey` 在同一方向上同时连接两个或更多不同对端，且这些关系争用同一个作用对象时，形成：
 
-```text
-candidateId + originClusterKey + mechanismPurpose
-```
+`competitionKey = candidateId + sharedObjectKey + direction + relationClass`
 
-`sourceKey` 用于追踪原子来源，`originClusterKey` 用于独立性。以下必须共享一个 `originClusterKey`：
+其中 `relationClass` 仅为 `generate / control / peer_contact / branch_contact`。竞争组内原本可为 `effective` 的边统一降为 `limited`；不选择胜者、不设原型优先级。仅共享抽象角色但不共享具体 `objectKey` 的边不构成竞争。
 
-- 月支本身；
-- 该月支的主气/余气藏干；
-- 仅因这条月令链被识别为相关的透干；
-- 从上述对象直接派生的 seasonal、root、visibility 或 relation 事实。
+### 2.3 中介链
 
-它们可共同加强一个节点，但不得被包装成 E1、E2、E3 三个独立家族来通过核心门。非月令事实若来自同一柱同一藏干，也只计一簇。
+一条有向路径的状态按最弱环节确定：
 
-## 5. E1—E6 定义
+- 所有节点为 `usable` 且所有边为 `effective`：`effective`；
+- 没有 `blocked/unknown`，但至少一个节点或边为 `limited`：`limited`；
+- 任一节点或边为 `blocked`：`blocked`；
+- 没有 `blocked`，但任一节点或边为 `unknown`：`unknown`。
 
-### E1｜容量与季节
+中介路径和其中的单边共享相同来源簇时，只形成一组结构证据，不能重复计票。
 
-- **输入：** `monthBranch`、元素、`seasonalStrength`、`rootOccurrence`、藏干比例、候选盘 unknown。
-- **步骤：** 按批准的容量公式得到各功能节点 `Availability`；当前公式尚缺，禁止用十神数量替代。
-- **输出：** `CapacityNode(role, availability, sources, clusters)`。
-- **去重：** 月令链一簇；相同根位置一簇。
-- **未知/反证：** 未知时柱为 unknown；`limited/absent` 是相关功能的反证，不是相反人格证据。
-- **候选聚合：** 全盘同值才稳定；usable 与 limited/absent 跨盘变化为 `boundary_sensitive`。
-- **当前闭合度：** 原始输入可算，`nodeAvailability` 组合公式 `definition_pending`。
+### 2.4 raw-only 条件
 
-### E2｜显隐与可见接口
+下列情况只能保留 raw relation，不能声明 `effective`：
 
-- **输入：** `visibleStems`、`hiddenStems`、功能角色、候选盘。
-- **步骤：** 同角色任一非日主天干透出为 visible；无透出但有藏干为 hidden；完整四柱均无为 absent；未知时柱且三柱未见为 unknown。
-- **输出：** `VisibilityNode(role, visibility, sources, clusters)`。
-- **去重：** 同一干或藏干只计一次；月令链仍为一簇。
-- **未知/反证：** hidden 不是 absent；unknown 不可作为反证。
-- **候选聚合：** 全 visible/hidden/absent 才稳定；不同为 `boundary_sensitive`。
-- **当前闭合度：** 可由现有代码唯一计算，但只说明显隐，不说明环境响应。
+- 端点、方向或候选位置未知；
+- 合关系缺少项目尚未定义的合化条件；此时只记录 `combines` 接触，不记录合化结果；
+- 只有十神名称而没有具体 occurrence 端点；
+- 关系是从人格、自述、职业或问题答案反推而来。
 
-### E3｜功能关系
+冲、刑、害可按端点可用性判定“接触是否有效”，但该状态不等于吉凶或人格效应。
 
-- **输入：** 功能节点、原始生克/同类/合冲刑害边、`relationEffectiveness`。
-- **步骤：** 先枚举原始边，再由批准条件将边定为 effective/limited/blocked/unknown；禁止“同时出现两个十神”直接生成有效关系。
-- **输出：** `FunctionalEdge(from, to, kind, state, stage, scope, sources, clusters)`。
-- **去重：** 同一端点、同一作用、同一来源簇只保留一边。
-- **未知/反证：** blocked 是该关系反证；unknown 只能降级。
-- **候选聚合：** 关键边跨盘变化为 `boundary_sensitive`。
-- **当前闭合度：** 原始边可算；有效性、阶段与作用域 `definition_pending`。
+### 2.5 同源去重与候选聚合
 
-### E4｜链路连续性
+- 同一 `originClusterKey` 派生的 raw edge、角色别名和中介子路径只算一个来源簇。
+- 每个候选盘独立计算；所有候选同态才聚合为该态。
+- 候选状态不同或任一候选为 `unknown` 时聚合为 `unknown`，并由 E6 标记 `boundary_sensitive`。
 
-- **输入：** E1 节点、E3 effective 边。
-- **步骤：** 只沿 effective 边求有向可达；任一必需节点 limited/unknown 或边 limited/unknown 时路径最多 candidate；blocked/absent 使路径不成立。
-- **输出：** `PathNode(pathId, orderedRoles, state, bottleneck, sources, clusters)`。
-- **去重：** 共享同一边或同一来源簇的多条路径不能充当独立家族。
-- **未知/反证：** 首个 blocked/absent 为反证；unknown 为显式 bottleneck。
-- **候选聚合：** 核心路径在候选盘间改变即 `boundary_sensitive`。
-- **当前闭合度：** 算法已唯一；输入边有效性未闭合，所以当前不能 established。
+## 3. E1—E6
 
-### E5｜结构关系
+每个证据节点输出：`established / candidate / conflicted / not_supported / boundary_sensitive`，并携带 `originClusterKeys`、支持边、反证边和候选盘状态。
 
-- **输入：** raw stem/branch relations、端点、`relationEffectiveness`、竞争关系。
-- **步骤：** 枚举关系后检查适用条件；只输出生效或受限关系，不从“出现合冲刑害”直接推出张力。
-- **输出：** `StructuralRelation(kind, endpoints, state, stage, sources, clusters)`。
-- **去重：** 同一端点组合、关系种类和来源簇一次。
-- **未知/反证：** 适用条件 unknown 时 candidate；blocked 为不支持。
-- **候选聚合：** 关键关系生效与否跨盘变化为 `boundary_sensitive`。
-- **当前闭合度：** 原始出现可算；实际生效条件 `definition_pending`。
+### E1：节点可用性证据
 
-### E6｜反证与时间稳定
+- 输入：所有 occurrence、`seasonalStrength`、`missingPositions`。
+- 计算：执行 `nodeAvailability`；按角色和来源簇去重。
+- 输出：`role -> availability` 节点。
+- 反证：完整位置下角色 `absent`；未知：聚合 `unknown`。
+- 状态：所有候选同一已知态为 `established`；仅有限态可支撑但不足核心阈值为 `candidate`；同时存在相反已知态为 `boundary_sensitive`；同一候选内支持与阻断事实并存为 `conflicted`；确定缺失为 `not_supported`。
 
-- **输入：** E1—E5 的支持、blocked/absent/unknown、全部候选盘结果。
-- **步骤：** 对每个目标公式生成支持集合、关键反证集合和 unknown 集合；再按通用状态公式聚合。
-- **输出：** `EvidenceAssessment(targetId, status, supportRefs, counterRefs, unknownRefs, candidateResults)`。
-- **去重：** 反证与支持使用相同 `originClusterKey` 时记录为同源冲突，不增加独立家族。
-- **未知/反证：** unknown 不得变成 absent；答题结果不得进入 E6。
-- **候选聚合：** 先逐盘裁决，再聚合；不得只比较旧 `ChartCue`。
-- **当前闭合度：** 聚合算法已唯一；上游关键字段缺失时只能返回 candidate/conflicted/boundary_sensitive。
+### E2：有向生克链证据
 
-## 6. 独立家族计数
+- 输入：`generates / controls` raw relations、端点 E1。
+- 计算：执行单边与中介链公式。
+- 输出：有向边与规范化路径。
+- 去重：同一具体端点对、方向、`originClusterKey` 为一组。
+- 反证：端点 `absent`、边 `blocked` 或只有相反方向有效。
+- 状态：所需路径 `effective` 为 `established`；仅 `limited` 为 `candidate`；有效与阻断竞争为 `conflicted`；路径确定不存在为 `not_supported`；候选盘结果不同为 `boundary_sensitive`。
 
-核心门先得到满足公式的家族集合，再应用来源簇约束：
+### E3：同类与合冲刑害接触证据
 
-1. 至少两个家族 ID；
-2. 至少两个不同 `originClusterKey`；
-3. 至少一个家族为 E1、E3 或 E4；
-4. E6 只记录稳定与反证，不能单独充当第二个正向家族；
-5. E2 的显隐不能把同一月令链变成额外票。
+- 输入：`same_role / combines / clashes / punishes / harms` raw relations、端点 E1。
+- 计算：只判定接触的 relationEffectiveness，不推断现代行为或合化结果。
+- 输出：无向接触边。
+- 去重：同一端点对排序后加 `kind + originClusterKey`。
+- 反证：端点 `absent`；未知：端点或方向未决。
+- 状态条件与 E2 相同。
 
-不满足时最多为 `candidate`；只剩一个来源簇时输出结构特质，不授予核心。
+### E4：结构张力证据
+
+- 输入：两条共享一个具体端点来源簇的规范化路径，且两条路径承担不同结构功能。允许的张力形态只有：`effective support + limited/blocked interface`，或同一端点同时承接两种方向/功能的 `effective functional handoff`。
+- 计算：A01 使用连续供能与受限收束；A02 使用主体生成与约束作用在同一 output 端点的功能对置；A03 使用 constraint→input 与 input→subject 的同源中介交接；A04 使用 subject→output 与 output→resource 的同源转换交接。不得把两个独立现象拼成心理矛盾。
+- 输出：`pathA + pathB + sharedEndpointObjectKey + sharedOriginClusterKey + tensionKind`。
+- 去重：`sharedEndpointObjectKey + sharedOriginClusterKey + tensionKind`。
+- 反证：路径来源完全独立、没有共享具体端点，或所需路径 blocked/unknown。
+- 状态：两条所需路径达到该形态规定状态为 `established`；任一仅 limited 为 `candidate`；支持与排除同时成立为 `conflicted`；无共享端点来源簇为 `not_supported`；候选变化为 `boundary_sensitive`。
+
+### E5：排除与最近邻证据
+
+- 输入：E1—E4 及谓词合同中的明确排除/边界条件。
+- 计算：逐原型执行排除，再执行成对最近邻边界；不使用固定优先级。
+- 输出：排除边和 `candidateMechanisms` 集合。
+- 去重：同一排除事实或边界路径按其 `originClusterKey` 只计一次。
+- 反证：排除条件命中；未知：边界所需路径为 unknown。
+- 状态：唯一机制且排除未命中为 `established`；多机制仍有未决边界为 `candidate`；支持与排除同候选并存为 `conflicted`；无机制达门为 `not_supported`；候选盘核心不同为 `boundary_sensitive`。
+
+### E6：候选盘稳定性证据
+
+- 输入：每个有限候选盘的 E1—E5 完整结果。
+- 计算：比较核心机制、排除和最近邻结果，不做多数票。
+- 输出：聚合最终状态与每候选轨迹。
+- 去重：相同 `candidateId` 只保留一次；相同事实来源不因候选复制增加家族数。
+- 反证：任两个合理候选核心不同。
+- 状态：所有候选唯一同核为 `established`；候选尚缺事实为 `candidate`；同候选支持与排除并存为 `conflicted`；均不成立为 `not_supported`；任两个合理候选核心不同为 `boundary_sensitive`。
+
+## 4. 独立家族
+
+核心计数只允许以下家族：`node_availability`、`directed_relation`、`branch_contact`、`same_origin_tension`、`exclusion_boundary`、`candidate_stability`。同一 `originClusterKey` 在多个家族产生的派生表达，核心成立门仍只贡献一个 origin cluster；问题答案与 manifestation 永远不属于证据家族。

@@ -1,117 +1,117 @@
-# E1—E6 → D1—D6 合同 v0.4
+# D1—D6 静态结构维度合同
 
-## 1. 记号与共同门
+状态：`research_candidate`
 
-以下公式只读取 E1—E6 规范化节点，不读取人格标签。
+维度只组织静态结构，不表达人格、行为、恢复能力、内外范围或生成/完成阶段。每个维度必须由规范化 E1—E6 推出，不能作为输入预填。
 
-```text
-U(role)       = E1 中 role availability = usable
-L(role)       = E1 中 role availability = limited
-A(role)       = E1 中 role availability = absent
-V(role)       = E2 中 role visibility = visible
-P(a..z)       = E4 中有一条 orderedRoles=a..z 且 state=established
-R(kind, ends) = E5 中对应关系 state=established
-X(a,b)        = E3 中 a→b effective
-```
+## 1. 通用状态与门槛
 
-共同门：
+每个维度输出本节列出的枚举值，并携带：`evidenceFamilies`、`originClusterKeys`、`supportPaths`、`counterPaths` 和逐候选结果。
 
-1. 每个状态先按单候选盘计算，再按 E6 聚合；
-2. `established` 至少需要表中家族数和两个不同 `originClusterKey`；
-3. 必需容量节点不是 `usable` 时不得 established；
-4. 关键边 unknown/limited 时降为 candidate，blocked 时不支持；
-5. 支持与排除同时成立为 conflicted；
-6. 候选盘改变状态为 boundary_sensitive；
-7. 问题答案不得进入任何 D 状态。
+核心机制成立必须同时满足：
 
-## 2. D1｜定标来源
+1. 至少两个不可重复的结构维度达到该机制要求；
+2. 至少两个独立证据家族；
+3. 至少两个不同 `originClusterKey`；
+4. 一项 E4 同源核心张力；
+5. 排除规则未命中；
+6. 最近邻存在本文件第 4 节定义的可执行边界；
+7. 所有合理候选盘保持同一核心。
 
-| 状态 | 必需证据与公式 | 最少独立家族 | 容量/关系条件 | 排除与降级 |
-|---|---|---:|---|---|
-| `internally_generated` | U(subject), U(input), P(input..subject)；外部接口到 subject 不成立 | 2，须含 E1+E4 | subject/input usable；内部 scope | X(constraint,subject) 或 X(resource,subject) 为主且内部路径 limited 时排除；scope unknown 降级 |
-| `externally_calibrated` | 外部 scope 的 X(constraint,subject) 或 X(resource,subject)；内部路径不主导 | 2，须含 E3/E4 | 外部端点 usable | P(input..subject) 同强时转 dual；外部 scope unknown 降级 |
-| `dual_reference` | 内部路径与至少一条外部接口路径同时 established | 3，须含 E1+E3+E4 | 两侧容量均 usable | 任一侧 limited 降为 candidate；同源簇只计一次 |
-| `unresolved` | 以上均不唯一，或关键 scope/edge unknown | 0 | 无 | 不允许用行为自述补齐 |
+不满足任一项都不得授予核心。问题答案不得补足维度、家族、来源簇或张力。
 
-时间规则：所有候选盘同一状态才稳定；`internally_generated` 与 `externally_calibrated/dual_reference` 跨盘变化即 `boundary_sensitive`。
+## 2. 维度定义
 
-## 3. D2｜输入—表达—恢复
+### D1 供能链连续性
 
-| 状态 | 必需证据与公式 | 最少独立家族 | 容量/关系条件 | 排除与降级 |
-|---|---|---:|---|---|
-| `deep_processing` | P(input..subject)，output hidden/limited，恢复节点 usable | 2，E1+E4 | input/subject usable | output visible 且持续路径 established 时排除；恢复 unknown 降级 |
-| `high_expression` | U(output), V(output), P(subject..output)；无过热反证 | 2，须含 E2+E4 | subject/output usable | 恢复 limited 或外部响应边同强时转 overheat candidate |
-| `high_response_overheat` | U(output), V(output), P(subject..output), 外部 X(constraint,subject)，且 L(recovery) 或恢复路径 blocked | 3，须含 E1/E2/E4 | output usable；recovery limited | recovery usable 且恢复路径 effective 为排除；recovery 未定义只能 candidate |
-| `blocked_expression` | P(input..subject) 且 output absent 或 subject→output blocked | 2，E1+E4 | input/subject usable | 仅 hidden 不等于 blocked；未知时柱降级 |
-| `balanced_cycle` | P(input..subject..output)，output/recovery usable，恢复路径 effective | 3，E1+E3+E4 | 全部 usable | 任一 bottleneck limited 转 candidate |
-| `unresolved` | 无唯一公式或 recovery 未定义且会改变状态 | 0 | 无 | 不允许把“外向/内向”作为输入 |
+输出：`supply_continuous / supply_limited / supply_blocked / unresolved`
 
-时间规则：表达状态或恢复门跨盘变化即 `boundary_sensitive`；只改变 visible/hidden 而不改变核心路径时，对外显声明降级但不自动改核心。
+- 必需证据：E1 中 `input`、`subject`；E2 中 `input -> subject`。
+- `supply_continuous`：两节点 usable 且路径 effective。
+- `supply_limited`：无 blocked/unknown，至少一节点或边 limited。
+- `supply_blocked`：任一必需节点 absent 或路径 blocked。
+- 排除：只有角色名、无具体端点；或同月令链被重复计票。
+- 降级/冲突：同候选出现有效与阻断路径为 `unresolved` 并由证据标 `conflicted`。
+- 时间：候选不一致则 `unresolved`，E6=`boundary_sensitive`。
 
-## 4. D3｜约束加工方式
+### D2 输出—主体容量关系
 
-| 状态 | 必需证据与公式 | 最少独立家族 | 容量/关系条件 | 排除与降级 |
-|---|---|---:|---|---|
-| `self_rewrite` | P(input..subject..output)，外部 constraint 路径 blocked/limited，存在内部替代路径 | 3，E1+E3+E4 | subject/input/output usable | constraint 直接主导时排除；scope unknown 降级 |
-| `methodize_pressure` | P05：constraint→input→subject→output 连续，且 output→constraint 为 effective 调节边 | 2，E3+E4，且两簇 | constraint/input/output usable | 仅见官杀+食伤不得成立；直接服从链同强为 conflicted |
-| `internalize_standard` | P(constraint..input..subject) established，标准边 scope 从 external 进入 internal | 3，E1+E3+E4 | constraint/input/subject usable | scope 缺失只能 candidate；不得直接推出自我批评 |
-| `direct_compliance` | X(constraint,subject) effective，且不存在有效中介路径 | 2，E3+E4 | constraint/subject usable | 存在 methodize 路径时为 conflicted/context_switching |
-| `context_switching` | 同一候选盘存在两条不同 scope 的加工路径，或候选盘间路径变化但不改变核心 | 3 | 各路径容量有效 | 若跨盘改变核心则不用本状态，改 `boundary_sensitive` |
-| `unresolved` | 路径、scope 或关系有效性不足 | 0 | 无 | 不允许由“认真/谨慎”补齐 |
+输出：`output_visible_asymmetric / output_supported / output_limited / unresolved`
 
-时间规则：加工路径在候选盘间从 methodize 变 direct/blocked 时 `boundary_sensitive`；仅外显位置变化时降级显化声明。
+- 必需证据：输出存在 `visible` occurrence；E1 中 `output`、`subject`；E2 中 `subject -> output`。
+- `output_visible_asymmetric`：output usable、subject limited、关系 limited，且限制原因来自 subject 端点。
+- `output_supported`：output 与 subject usable，关系 effective。
+- `output_limited`：输出可见但 output limited，或关系 limited 且不满足不对称条件。
+- 排除：输出仅 hidden；端点 absent；把环境敏感或恢复体验当容量事实。
+- 冲突/时间：支持与阻断并存，或候选不一致，输出 `unresolved`。
 
-## 5. D4｜意义—价值转换
+### D3 约束路由
 
-`input/output/resource` 是功能角色；“意义/价值”是项目现代翻译，不是事实字段。
+输出：`constraint_mediated / constraint_direct_only / constraint_blocked / mixed / unresolved`
 
-| 状态 | 必需证据与公式 | 最少独立家族 | 容量/关系条件 | 排除与降级 |
-|---|---|---:|---|---|
-| `meaning_first` | P(input..subject..output)，resource limited/absent | 2，E1+E4 | input/subject/output usable | 完整 exchange 路径成立时排除 |
-| `value_first` | U(resource), X(output,resource) effective，input 路径 limited | 2，E3+E4 | output/resource usable | input 路径同强时转 editor candidate |
-| `meaning_value_editor` | P(input..subject..output..resource) 全链 established | 3，须含 E1/E3/E4 | 四节点 usable | 任一接口 absent/blocked 排除；现代翻译来源 pending 时最多 candidate |
-| `conversion_gap` | input/output 路径 established，output→resource blocked/absent | 2，E1+E4 | 上游 usable | 不能仅凭“财不显”成立；unknown 降级 |
-| `unresolved` | 链路或现代翻译不唯一 | 0 | 无 | 不允许读取职业、收入或审美自述 |
+- 必需证据：constraint、input、subject、output 节点，以及 E2 有向路径。
+- `constraint_mediated`：`constraint -> input -> subject -> output` 为 effective，且直接 `constraint -> subject` 不是唯一有效路径。
+- `constraint_direct_only`：直接 `constraint -> subject` effective，而中介链 limited/blocked/not_supported。
+- `constraint_blocked`：constraint absent，或所有作用路径 blocked。
+- `mixed`：直接与中介路径均 effective；它不是 A03 核心通过态。
+- 排除：方法化、内部质检或首版延迟等行为描述。
+- 时间：候选不一致则 `unresolved`。
 
-时间规则：完整链与 conversion gap 跨盘变化即 `boundary_sensitive`。
+### D4 输入—输出—资源转换
 
-## 6. D5｜边界与连接
+输出：`conversion_continuous / conversion_limited / conversion_blocked / unresolved`
 
-D5 只能描述结构接口；婚姻、亲密模式、信任方式和回应质量不是 ChartFacts。
+- 必需证据：input、subject、output、resource 节点及 `input -> subject -> output -> resource` 路径。
+- `conversion_continuous`：全部节点 usable、全部边 effective。
+- `conversion_limited`：无 blocked/unknown，但至少一个节点或边 limited。
+- `conversion_blocked`：任一必需节点 absent 或路径边 blocked。
+- 排除：意义价值验收、灵感淘汰或完成度行为。
+- 冲突/时间：有效与阻断路径并存或候选不一致，输出 `unresolved`。
 
-| 状态 | 必需证据与公式 | 最少独立家族 | 容量/关系条件 | 排除与降级 |
-|---|---|---:|---|---|
-| `autonomy_protective` | internal P(input..subject) established；外部到 subject 路径 limited | 2，E3+E4 | subject usable | 外部路径同强转 mixed；不得推出关系行为 |
-| `high_permeability` | 外部 scope 的 X(constraint/resource,subject) effective | 2，E3+E4 | 两端 usable | 只有可见 constraint 不成立；scope unknown 降级 |
-| `reciprocity_sensitive` | subject→output→resource 与 resource→subject 双向交换 effective | 3，E1+E3+E4 | 三节点 usable | 单向资源路径不成立；用户“在意回应”不得作为证据 |
-| `role_defined` | constraint→subject effective 且 stage/scope 明确 | 2，E3+E4 | constraint/subject usable | methodize 路径同强转 mixed；不得推出可靠性人格 |
-| `mixed` | 两个以上 D5 公式同强且不同来源簇 | 3 | 各自容量有效 | 同源重复不够 |
-| `unresolved` | scope、双向边或容量未知 | 0 | 无 | 保留 unknown |
+### D5 输出—约束接口
 
-时间规则：结构接口跨盘变化为 `boundary_sensitive`。Owner 已冻结 A03/A04 的关系声明为辅助候选；D5 即使结构成立，也不得自动充当这两个原型的第三核心维度。
+输出：`output_constraint_coupled / shared_endpoint_competition / uncoupled / unresolved`
 
-## 7. D6｜扩张—承载—收束
+- 必需证据：output、constraint 节点及二者之间的 E2 或 E3 关系。
+- `output_constraint_coupled`：两节点 usable，具体端点接触 effective。
+- `shared_endpoint_competition`：命中 relationEffectiveness 的同对象竞争，相关边降为 limited。
+- `uncoupled`：端点完整但关系确定不存在或 blocked。
+- 排除：将反馈、气氛或环境响应作为关系输入。
+- 时间：候选不一致则 `unresolved`。
 
-| 状态 | 必需证据与公式 | 最少独立家族 | 容量/关系条件 | 排除与降级 |
-|---|---|---:|---|---|
-| `expansive` | P(input..subject..output) established；pruning/constraint/resource 收束边 limited | 3，E1+E3/E4 | 生成链 usable | 完成链同强转 balanced；不得推出“创意多” |
-| `sustained_builder` | subject/output/resource usable；生成与完成路径均 established | 3，E1+E3+E4 | 各阶段容量 usable | 内部审查不是本状态自动结果 |
-| `premature_gatekeeping` | P08：generation stage 已存在 effective completion/check edge | 3，E1+E4+E5 | 生成节点 usable | edgeStage unknown 时 blocked；delayed gate 为反证 |
-| `closure_gap` | 生成路径 established；output→resource/constraint 完成路径 limited/blocked | 2，E1+E4 | 上游 usable | 完成路径 effective 时排除 |
-| `balanced_delivery` | 生成与完成路径 established，gate stage=completion，恢复/承载 usable | 3，E1+E3+E4 | 全链 usable | 任一 stage unknown 降级 |
-| `unresolved` | stage、完成边或容量不唯一 | 0 | 无 | 不允许用交付经历补齐 |
+### D6 资源收束接口
 
-时间规则：生成/完成主状态跨盘变化为 `boundary_sensitive`；仅可见性变化不改变 D6。
+输出：`resource_interface_effective / resource_interface_limited / resource_interface_blocked / unresolved`
 
-## 8. 原型门的当前结构矛盾
+- 必需证据：output、resource 节点及 `output -> resource`。
+- `resource_interface_effective`：两节点 usable 且边 effective。
+- `resource_interface_limited`：无 blocked/unknown，至少一节点或边 limited。
+- `resource_interface_blocked`：resource absent 或边 blocked。
+- 排除：恢复、裁剪倾向、完成阶段等未批准字段。
+- 时间：候选不一致则 `unresolved`。
 
-v0.3 要求核心原型至少三个维度。当前核心规则覆盖：
+## 3. 四机制的两维门
 
-| 原型 | 核心规则明确覆盖 | 可安全计入的核心维度 | 结果 |
-|---|---|---|---|
-| A01 | D1/D4/D6 | 3 | 图层可通过，仍受上游事实 blocker |
-| A02 | D2/D5/D6 | 3 | 图层可通过，D5 现代翻译仍待定义 |
-| A03 | D3/D6；D5 仅辅助关系声明 | 2 | 不得 established |
-| A04 | D4/D6；D5 仅辅助关系声明 | 2 | 不得 established |
+| 机制 | 必需维度 1 | 必需维度 2 | 必需同源张力 | 排除 |
+| --- | --- | --- | --- | --- |
+| A01 | D1=`supply_continuous` | D6=`resource_interface_limited` 或 `resource_interface_blocked` | 连续供能链与受限收束接口共享来源簇 | D6 effective；D3 mediated 由最近邻干净排除；direct_only/mixed 与支持并存时为 conflicted |
+| A02 | D2=`output_visible_asymmetric` | D5=`output_constraint_coupled` | 可见输出与主体限制共享来源簇 | D4 continuous，或输出并非 visible |
+| A03 | D3=`constraint_mediated` | D1=`supply_continuous` | 约束链与供能/输出中介链共享来源簇 | D3 direct_only、mixed 或 blocked |
+| A04 | D4=`conversion_continuous` | D6=`resource_interface_effective` | 连续转换与资源接口共享来源簇 | D6 limited/blocked，或关键约束直接阻断主体 |
 
-不得通过固定优先级、复用辅助关系文案或新增第五原型绕过该矛盾。需要 Owner 决定：为 A03/A04 批准一个新的第三核心结构维度，或修改“三维度”核心门；两者都会改变当前规则合同，不能由本研究代理代选。
+这里没有为了 A03/A04 凑第三维度的要求，也没有 D7。辅助关系只能支持路径说明，不能被抬高为第三个核心维度。
+
+## 4. 最近邻边界
+
+边界逐对执行，不设固定优先级：
+
+| 候选对 | 可执行边界 |
+| --- | --- |
+| A01 / A04 | D6 limited/blocked 指向 A01；D4 continuous 且 D6 effective 指向 A04 |
+| A02 / A04 | D2 asymmetric 且 D4 非 continuous 指向 A02；D4 continuous、D6 effective 且 subject usable 指向 A04 |
+| A03 / A04 | D3 mediated 且 A04 转换链不完整指向 A03；D4 continuous/D6 effective 且 D3 非 mediated 指向 A04 |
+| A01 / A03 | D6 limited/blocked 且 D3 非 mediated 指向 A01；D3 mediated 且 D6 非受限张力指向 A03 |
+| A02 / A03 | D2 asymmetric 且 D3 非 mediated 指向 A02；D3 mediated 且 D2 非 asymmetric 指向 A03 |
+| A01 / A02 | D1 continuous/D6 limited 且 D2 非 asymmetric 指向 A01；D2 asymmetric/D5 coupled 且 D1 非 continuous 指向 A02 |
+
+若两个候选都完整过门且成对边界无法唯一分开，输出 `candidate` 或 `conflicted`，不得按 A01—A04 编号回落。若合理候选盘得出不同核心，最终必须为 `boundary_sensitive`。

@@ -1,60 +1,33 @@
-# 代码准入判断 v0.2
+# 代码准入判断 v0.3
 
 ## 结论
 
-**`BLOCKED_PENDING_FACT_AND_PREDICATE_CONTRACT`**
+**`CONDITIONAL_PASS_FOR_ISOLATED_PURE_FUNCTION_IMPLEMENTATION`**
 
-Issue #11 证明 v0.3 的 `CONDITIONAL PASS` 过早。当前不允许申请独立纯函数实现，不允许修改现有 H5，也不允许把 v0.4 规范化图夹具当作真实 ChartFacts 规则已验证。
+Issue #11 的静态合同门已由 v0.4 关闭：nodeAvailability 和 relationEffectiveness 有唯一公式；32/32 活跃夹具从非人格原子事实得到唯一预期；P06/P08 与所有现实行为退出核心；四个正例和最近邻可裁决；问题答案不改变核心。
 
-## 已完成的修订
+这不是实现授权。它只表示后续可另行申请一个隔离、无 I/O、无用户数据、无运行时接线的纯函数方案；当前授权仍禁止修改 `lib/`、`app/`、`components/`、`data/`、题库、页面、依赖、CI、部署或持久化。
 
-- v0.4 列出当前代码已具备、锁定依赖可计算和未来缺失的原子事实；
-- E1—E6、D1—D6 的计算顺序、unknown、反证、去重和候选盘聚合已规范化；
-- 八个关键结构谓词已写出规范化图层公式、内容权限与禁止结论；
-- 新 32 个夹具不再在 input 预填维度、目标原型、证据家族或规则命中；
-- v0.3 原 32 个 JSON 被明确归类为历史 interface fixtures；
-- A01—A04 的传统来源层级已记录，缺失处统一 `pending_source`。
+## 已关闭的门
 
-## 精确 blocker
+| 门 | 证据 |
+| --- | --- |
+| nodeAvailability 唯一 | v0.4 `CHART_FACT_VOCABULARY.md` 对六类角色统一使用季节、根、藏干比例、可见性、unknown 和来源簇去重 |
+| relationEffectiveness 唯一 | v0.4 `EVIDENCE_GRAPH_CONTRACT.md` 定义端点、方向、中介、竞争、阻断、raw-only 与候选聚合 |
+| E1—E6 / D1—D6 唯一 | v0.4 证据与维度合同只读取上述规范化结果 |
+| 核心不依赖 P06/P08 | v0.4 谓词合同将二者标为 `manifestation_only` |
+| 四正例与最近邻可裁决 | 活跃 JSON 的 A01—A04 positive 为 established；四个 near_neighbor 均得到另一个明确机制 |
+| 32/32 非人格输入 | factSet 只含季节、occurrence、raw relation 和有限候选；禁止键扫描为 0 |
+| 答案不决定核心 | 四个 answers_reverse 与各自 positive 核心、维度、最终状态一致 |
 
-### B01｜容量与恢复事实缺失
+## 项目假设与未决责任
 
-当前 `ChartFacts` 没有 `nodeAvailability` 或 `recoveryCapacity`。库的 `旺/相/休/囚/死`、藏干比例和根出现可计算，但如何组合成 usable/limited/absent 未获批准。影响 E1、D2、D6、P01、P02、P04、P06 及 A01/A02/A03 正例。
+- nodeAvailability 的分值和阈值是 `project_assumption_minimum_v0.4`，不是传统共识；未来须版本化并接受真人验证。
+- A01—A04 的传统来源保持 `pending_source`；“古人误会你了”是 `project_inference / modern_reinterpretation_candidate`。这不影响隔离纯函数的静态裁决，但正式对外前必须关闭。
+- 同一内容块若混有命盘骨架和现实行为，未来组装器必须有句段/批准子块权限过滤；在此之前不得宣称行为由命盘单独证明。
 
-### B02｜关系有效性缺失
+以上未决项不改变四个正例、最近邻、时间边界或问题隔离，因此不构成本次代码准入 blocker。
 
-当前依赖能枚举十神、合、冲、刑、害等原始关系，但没有本项目批准的成化、阻断、竞争与有效方向公式。影响 E3—E5、全部关键路径和四个原型最近邻。
+## 后续申请的硬边界
 
-### B03｜阶段与作用域缺失
-
-当前事实没有 `edgeStage` 与 `edgeScope`，不能区分内部/外部、生成/完成，也不能计算“内部审查”或“过早”。影响 P01、P03、P06、P08；P08 不能用静态共现代替顺序。
-
-### B04｜现代人格翻译未闭合
-
-环境响应、恢复、方法化、内部审查、意义和价值不是原子事实。从传统结构代理到这些项目用语的映射尚无批准来源或验证，影响 P03—P08 及核心内容键权限。
-
-### B05｜A03/A04 三维度门矛盾
-
-当前 A03 核心规则只覆盖 D3/D6，A04 只覆盖 D4/D6。Owner Review 又要求 A03/A04 关系声明继续为辅助候选，不能用 D5 补核心。两者无法满足 v0.3 的“三个维度”核心门，因此其 positive、time_stable 和 answers_reverse 夹具只能得到 candidate。
-
-### B06｜传统来源未关闭
-
-A01—A04 的古籍原文、后世评注与现代整理层均缺可核验来源。现代内容方向可保持冻结，但“古人误会你了”不得宣称传统共识。
-
-## 重新申请代码准入的硬门
-
-只有以下全部满足，结论才可重新评估：
-
-1. 当前原始 ChartFacts 通过批准公式唯一生成 E1—E6；
-2. E1—E6 唯一生成 D1—D6；
-3. P01—P08 不依赖人工预标，且影响核心的部分均可执行；
-4. 32 个夹具从运行时可产出的事实开始，不只从规范化关系图开始；
-5. A03/A04 的第三核心维度或三维度门获得明确 Owner 决定；
-6. 四个 positive、near_neighbor、time_stable、answers_reverse 均不受 unresolved 项影响；
-7. 所有来源不足的传统声明保持 `pending_source` 或完成可核验校勘。
-
-## 当前允许与禁止
-
-允许继续：只在研究文档中收集来源、提出最小 Owner 决策并修订抽象合同。
-
-继续禁止：TypeScript 规则层、真实生日接入、UI/题库/结果页修改、新依赖、第五原型、答题决定核心、Ready、Merge、部署或真人测试。
+后续若申请实现，只能复现已版本化的 v0.4 纯函数和活跃夹具，不得：接真实生日、修改现有 H5、引入人格自由生成、让答题进入核心、增加原型/维度/字段、改变 `civil_time_v1`，或把条件通过解释为 Ready、Merge、部署或真人测试授权。

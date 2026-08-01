@@ -1,88 +1,81 @@
-# ChartFacts 最小事实词表 v0.4
+# ChartFacts 最小事实词表与 nodeAvailability
 
-## 1. 词表边界
+状态：`research_candidate`
 
-`ChartFacts` 只保存可追溯到排盘输入、锁定依赖或确定性规范化步骤的原子事实。它不得包含人格形容词、`DimensionState`、A01—A04、规则命中、职业、自述经历或答题结果。
+## 1. 输入边界
 
-每个字段都必须带候选盘作用域。禁止先把多个候选盘压成一个“看起来最像”的盘。
+规则层只消费本文件列出的原子事实。事实不得包含人格形容词、`DimensionState`、原型 ID、规则命中、职业、自述、经历或问题答案。
 
-## 2. 通用值与候选表达
+所有夹具与未来实现必须记录：
 
-```text
-Known<T>   = { state: "known", value: T, sourceKey, originClusterKey }
-Unknown    = { state: "unknown", reason, sourceKey?, originClusterKey? }
-FactValue  = Known<T> | Unknown
+| 字段 | 类型 | 来源 | 缺失与候选表达 |
+| --- | --- | --- | --- |
+| `timeBasisVersion` | 固定字符串 `civil_time_v1` | 当前时间合同 | 不允许缺失 |
+| `candidateId` | 非空字符串 | 候选盘生成器 | 每个合理候选盘一个 ID |
+| `precision` | `exact / bounded` | 出生时间输入合同 | `bounded` 必须配有限候选盘 |
+| `missingPositions` | 位置数组 | 候选盘生成器 | 未知时柱等明确列出，不得当作不存在 |
+| `seasonalStrength[role]` | `旺 / 相 / 休 / 囚 / 死 / unknown` | 当前排盘库按月令与五行关系确定性计算 | 若月支未知则为 `unknown` |
+| `occurrences` | 节点出现数组 | 当前排盘库确定性计算 | 未观察且相关位置完整才可判不存在 |
+| `rawRelations` | 原始关系数组 | 当前排盘库确定性计算 | 端点或方向不足时保留 raw，不猜 effectiveness |
 
-CandidateFactSet = {
-  candidateId,
-  convention,
-  timeConventionVersion: "civil_time_v1",
-  facts
-}
+### 1.1 occurrence 原子字段
 
-ChartFactSet = {
-  candidates: CandidateFactSet[1..16],
-  precision: "exact" | "approximate" | "unknown"
-}
-```
+| 字段 | 类型 / 枚举 | 来源与约束 |
+| --- | --- | --- |
+| `role` | `subject / input / peer / output / resource / constraint` | 由日主与五行生克映射；对六类角色使用同一可用性公式 |
+| `kind` | `day_anchor / visible / hidden` | 日干、天干、藏干位置 |
+| `objectKey` | 非空字符串 | 指向一个具体干或藏干出现，不得复用于两个物理对象 |
+| `originClusterKey` | 非空字符串 | 同源去重键；见 1.2 |
+| `hiddenStemProportion` | `0..1` 或 `null` | `hidden` 必填；其余为 `null`。来自排盘库的固定藏干比例表 |
+| `rootOccurrence` | 布尔值 | 该出现是否构成本角色的根；由当前排盘库确定性计算 |
 
-允许的 `Unknown.reason`：`unknown_hour`、`boundary_variant`、`not_computed`、`definition_pending`、`source_pending`。未知不等于缺席；候选盘之间不同也不等于任一值错误。
+当前代码已经具备或可直接导出的字段是：干支位置、日主、月令、透藏、五行生克、十神功能映射、合冲刑害端点、`civil_time_v1` 候选盘。`hiddenStemProportion` 与 `originClusterKey` 需要未来在隔离规则层显式标准化，但不需要新历法数据。不存在仍待补公式的 `recoveryCapacity`、`edgeStage` 或 `edgeScope` 字段；三者已被 Owner 排除。
 
-## 3. 当前代码已经具备
+### 1.2 来源簇
 
-| 字段 | 来源 | 类型/枚举 | 缺失表达 | 时间候选表达 |
-|---|---|---|---|---|
-| `timeConventionVersion` | `lib/types.ts` | 固定 `civil_time_v1` | 不允许缺失 | 整组固定 |
-| `candidateId` / `key` | `lib/astro.ts` 四柱去重键 | string | 不允许缺失 | 每候选一项 |
-| `convention` | `lib/types.ts` | `civil/zi_hour_day_rollover/hour_boundary/solar_term_boundary/approximate_time/unknown_time` | 不允许缺失 | 每候选一项 |
-| `pillars.year/month/day` | `computeFourPillars` | `{stem, branch}` | 不允许缺失 | 每候选独立 |
-| `pillars.hour` | `computeFourPillars` + time precision | `{stem, branch} | null` | unknown time 为 `null` | 每候选独立 |
-| `dayMaster` | `pillars.day.stem` 的无损别名 | 十天干 | 日柱有效时不缺失 | 每候选独立 |
-| `monthBranch` | `pillars.month.branch` 的无损别名 | 十二地支 | 月柱有效时不缺失 | 每候选独立 |
-| `visibleStems[]` | `deriveChartFacts` | `{position: year/month/hour, stem, tenRelation}` | 未知时柱不生成 hour 项 | 每候选独立 |
-| `hiddenStems[]` | `deriveChartFacts` | `{position, branch, stem, tenRelation, isMain}` | 未知时柱不生成 hour 项 | 每候选独立 |
-| `candidateCount` | `lib/astro.ts` | integer 1..16 | 0 为 calculation failure | 整组统计 |
-| `inputPrecision` | `BirthInput.timePrecision` | `exact/approximate/unknown` | 不允许缺失 | 整组固定 |
+- 月支、该月支藏干、以及仅以该月支为根的相关透干共享一个 `originClusterKey`。
+- 同一具体干支对象派生出的角色节点、十神别名和关系端点共享该对象的来源簇。
+- 同一来源簇在一个角色的可用性中只取最高贡献，不相加；在证据家族与核心门中也只能计一次。
+- 不同柱上的独立根或独立透干使用不同来源簇。
 
-当前 `ChartResolution.timeStability` 是旧 H5 cue 是否跨盘变化的汇总，不能直接当作本内容模型的核心稳定性。v0.4 必须在每个候选盘完成 E/D/谓词裁决后再聚合。
+该规则明确阻止“月令 + 月令藏干 + 相关透干”被重复当作三票。
 
-## 4. 当前依赖可确定性计算、但当前 `ChartFacts` 未保存
+## 2. nodeAvailability 唯一化公式
 
-锁定依赖 `@4n6h4x0r/stem-branch@0.8.0` 已提供下列纯计算。把它们加入未来事实层仍需独立实现授权，但不需要新依赖。
+输出仅允许：`usable / limited / absent / unknown`。
 
-| 字段 | 依赖函数/常量 | 类型/枚举 | 缺失规则 |
-|---|---|---|---|
-| `stemElement` / `branchElement` | `STEM_ELEMENT` / `BRANCH_ELEMENT` | 金木水火土 | 原对象 unknown 时 unknown |
-| `stemPolarity` / `branchPolarity` | 同名函数 | 阴/阳 | 原对象 unknown 时 unknown |
-| `hiddenStemProportion` | `getHiddenStems` | 0..1 rational | 未知支为 unknown；不得自行补时柱 |
-| `seasonalStrength` | `getStrength(element, monthBranch)` | 旺/相/休/囚/死 | 月支 unknown 时 unknown |
-| `tenRelation` | `getTenRelation` | 比肩/劫财/食神/伤官/偏财/正财/七杀/正官/偏印/正印 | 任一干 unknown 时 unknown |
-| `rawBranchRelation` | `isHarmony/isClash/isPunishment/isHarm/isDestruction/isThreeHarmony/isSeasonalUnion` | 关系种类 + endpoints | 任一端 unknown 时 unknown |
-| `rawStemRelation` | `isStemCombination/isStemClash` | 关系种类 + endpoints | 任一端 unknown 时 unknown |
-| `rootOccurrence` | 日主五行与各藏干五行的等值匹配 | `{position, hiddenIndex, proportion}` | 未知支只标 unknown |
+### 2.1 分值
 
-这里的 `raw*Relation` 只表示组合在枚举表中出现，不表示合化成功、冲刑实际生效、功能变强或人格结论。`seasonalStrength` 也只是库定义的五级关系，不能自动等同整体容量。
+对每个候选盘、每个功能角色独立执行：
 
-## 5. 未来扩展且尚未实现
+1. 季节分 `S`：`旺=2，相=1，休=0，囚=-1，死=-2`。
+2. 根分：每个去重后的 `originClusterKey` 取该簇最高根贡献：
+   - `rootOccurrence=false`：0；
+   - `rootOccurrence=true` 且 `hiddenStemProportion >= 0.50`：2；
+   - `rootOccurrence=true` 且 `0.20 <= hiddenStemProportion < 0.50`：1；
+   - `rootOccurrence=true` 且 `hiddenStemProportion < 0.20`：0。
+   所有独立簇贡献之和封顶为 2，记为 `R`。
+3. 可见分 `V`：存在 `day_anchor` 或 `visible` 时为 1；仅藏为 0。
+4. `score = S + R + V`。
 
-| 字段 | 所需来源/定义 | 类型 | 当前状态 | 缺失时处理 |
-|---|---|---|---|---|
-| `sourceKey` | 每个原子事实的候选内唯一地址 | string | 未实现 | 对应证据不得计数 |
-| `originClusterKey` | 同源链去重；月令、月令藏干及由其直接派生的透干归一簇 | string | 未实现 | G01 失败 |
-| `nodeAvailability` | 季节、根、透藏、负荷的批准组合规则 | `usable/limited/absent/unknown` | `definition_pending` | 相关 E1/D/谓词最多 candidate |
-| `relationEffectiveness` | 原始关系的适用、成化、阻断和竞争规则 | `effective/limited/blocked/unknown` | `definition_pending` | E3—E5 不得 established |
-| `edgeStage` | 关系作用于输入、生成、输出或完成阶段的规则 | `input/generation/output/completion/unknown` | `definition_pending` | P06/P08 blocked |
-| `edgeScope` | 内部链还是外部接口的结构定义 | `internal/external/mixed/unknown` | `definition_pending` | P01/P03/P06 blocked |
-| `recoveryCapacity` | 只能由批准的结构代理计算，不能由生活自述填入 | `usable/limited/unknown` | `definition_pending` | P04 blocked |
-| `counterFact` | 与某结构公式相反的原子节点/边，不是人格反例 | typed relation fact | 部分可枚举、未规范化 | 无反证记录不得 established |
+### 2.2 状态判定
 
-`nodeAvailability`、`relationEffectiveness` 和 `recoveryCapacity` 是规范化事实，不得由人工针对 A01—A04 预标；未来实现必须从上节原始字段通过同一公开公式产生。
+按以下顺序判定，不允许原型专用阈值：
 
-## 6. 明确禁止进入事实词表
+1. 若 `seasonalStrength=unknown`，或 `missingPositions` 中的未决位置可能新增该角色的首次出现或把其 `score` 跨过 2，则输出 `unknown`；但现有完整事实已经达到 `score >= 2` 时，新增事实不会降低状态，仍为 `usable`。
+2. 若至少观察到一个该角色 occurrence 且 `score >= 2`，输出 `usable`。
+3. 若至少观察到一个该角色 occurrence 且 `score < 2`，输出 `limited`。
+4. 若相关位置完整且没有观察到该角色 occurrence，输出 `absent`。
 
-- 内部定标、表达过热、方法化压力、内部审查、意义价值验收、过早验收；
-- D1—D6 任一状态；
-- A01—A04 或旧 `SignatureId`；
-- `supportRules`、规则命中或内容键；
-- 职业、关系经历、自我评价、题目选择；
-- 纳音、神煞、紫微斗数、奇门、六爻、星盘或未经 ADR 批准的新体系。
+`unknown` 表示资料不足以稳定判定；`absent` 表示有限候选盘中的相关位置已完整且没有该节点。两者不得互换。
+
+### 2.3 候选盘聚合
+
+- 先对每个 `candidateId` 单独计算。
+- 所有合理候选给出同一已知状态时，聚合为该状态。
+- 已知状态不同，或任一候选仍为 `unknown` 时，聚合为 `unknown`。
+- 候选间已知状态不同必须同时在 E6 标记 `boundary_sensitive`；不得用多数票、固定优先级或问题答案消除边界。
+
+## 3. 研究责任
+
+上述权重、0.20 / 0.50 与 `score >= 2` 是 `project_assumption_minimum_v0.4`：它们是为了得到一致、可回归、对所有角色相同的最小确定性研究候选，不宣称是古籍原文或传统共识。未来纯函数实现仍须保持版本化；正式真人验证可提出新阈值，但不得用结果倒推 A01—A04，且任何修改都需新合同与完整回归。

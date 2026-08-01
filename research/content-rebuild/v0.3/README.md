@@ -6,7 +6,7 @@
 - `Not Human-Tested`
 - `Docs only`
 - 不授权修改现有 H5、题库、结果页、依赖或部署
-- Issue #11 后，本版的规则输入与夹具已被 v0.4 审查为未闭合；代码准入结论为 `BLOCKED_PENDING_FACT_AND_PREDICATE_CONTRACT`
+- Issue #11 最新 Owner 决策后，v0.4 已关闭静态事实与谓词合同；代码准入结论为 `CONDITIONAL_PASS_FOR_ISOLATED_PURE_FUNCTION_IMPLEMENTATION`
 
 ## 本阶段目的
 
@@ -44,8 +44,9 @@
 
 1. 命盘负责核心人格；问题只校准显化。
 2. 核心原型至少命中两条原型支持规则、核心张力规则和全部共享守门。
-3. 同一事实不得跨证据家族重复计票。
+3. 同一事实不得跨证据家族重复计票；核心至少需要两个不同来源簇。
 4. 任一关键反证足以把 `established` 降为 `candidate/conflicted`。
 5. 四个原型不是全集；未通过门时必须允许不贴标签。
 6. 运行时不得用大模型自由解释命盘。
 7. 本阶段不使用真实出生资料，不把四份母本直接变成硬编码正例。
+8. P06/P08 与现实行为只属于问题校准，不进入核心裁决。

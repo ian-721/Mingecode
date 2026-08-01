@@ -1,86 +1,78 @@
 # 原型夹具规范 v0.4
 
-## 1. 作用层级
+状态：`research_candidate`
 
-当前夹具位于允许的“规范化关系节点与边”层：
+## 1. 推导层级
+
+唯一活跃夹具 `fixtures/archetype-fixtures.v0.2.json` 从原子 ChartFacts 开始；文件名沿用以避免破坏既有索引，内部 `schemaVersion` 已升为 v0.3：
 
 ```text
-resolved factSet
-→ E1—E6
-→ D1—D6
-→ P01—P08
-→ decision/content keys
+seasonalStrength + occurrences + rawRelations + finite candidates
+-> nodeAvailability
+-> relationEffectiveness
+-> E1—E6
+-> D1—D6
+-> core tension + exclusion + near-neighbor
+-> final state
+-> CalibrationFork.manifestation
 ```
 
-它们不预填维度、原型、规则结果或证据家族。`input.candidates[].factSet` 必须先解引用到同文件 `factSets` 中的中性 node/edge/relation 原子图。这个层级能验证去重、容量失败、反证、候选盘聚合和答题隔离，但不能证明当前运行时能从四柱产生 `availability/effective/stage/scope`；该缺口继续是 code-entry blocker。
+`expected` 是测试断言，不是规则输入。实现必须在读取 `expected` 或 `manifestationAnswers` 前完成核心裁决。
 
-为保持抽象 JSON 紧凑，`factSets.*.*.originKey` 表示一个合成原子来源，同时充当该夹具的 `originClusterKey`；真实实现必须分别保存 `sourceKey` 与 `originClusterKey`，不得复用该简写。
+## 2. 输入合同
 
-## 2. 禁止输入
+顶层 `timeConventionVersion=civil_time_v1` 由全部 factSet 继承。每个 `factSet` 只允许：`precision`、`missingPositions`、`seasonalStrength`、`occurrences`、`rawRelations`；`candidateId` 位于 fixture 候选包装层。字段含义完全服从 v0.4 的两个公式。
 
-任一 fixture 的 `input` 递归对象不得出现：
+fixture `input` 只允许：
 
-- `dimensionStates`；
-- `coreArchetype`；
-- `archetype` 或目标机制提示；
-- `supportRules`；
-- 规则命中状态；
-- 人格语义标签。
+- `candidates[].candidateId` 与 `factSetRef`；
+- 可选 `manifestationAnswers`，且其数据路径只能进入 manifestation。
 
-允许 `manifestationAnswers`，但核心裁决器必须在读取答案前完成。答案只进入 content manifestation 阶段。
+fixture `input` 递归禁止：`dimensionStates`、`coreArchetype`、目标 `archetype`、`supportRules`、任何规则命中状态、人格语义标签，以及预填的 availability/effectiveness/evidence/dimension 结果。
 
-## 3. 八类夹具与本版真实预期
+## 3. 八类夹具
 
-| 类型 | 规范化图层预期 |
-|---|---|
-| `positive` | 图公式完整；A01/A02 可 established；A03/A04 因第三核心维度缺失只能 candidate |
-| `near_neighbor` | 输入实际支持另一个机制；不得按 fixture 顺序或固定优先级回落 |
-| `single_family` | 同源去重后只剩一个 `originKey`，输出 structure_only |
-| `capacity_failure` | 必需节点 limited，最多 candidate |
-| `counterevidence` | 支持链与关键反证同时成立，输出 conflicted |
-| `time_stable` | 两候选盘同一决策；A03/A04 仍保持 candidate |
-| `time_changes_core` | 候选盘机制不同，输出 boundary_sensitive |
-| `answers_reverse` | 与相应 positive 的核心/候选状态完全一致，只记录 manifestation 补偿 |
+| 类型 | 必须证明 |
+| --- | --- |
+| `positive` | 从原子事实唯一得到目标核心 established |
+| `near_neighbor` | 实际得到不同机制；不得按 fixture 顺序或固定优先级回落 |
+| `single_family` | 结构表面满足，但同源去重后不足两家族或两来源簇，不授予核心 |
+| `capacity_failure` | 必需节点/边受限导致核心门失败 |
+| `counterevidence` | 支持与明确排除同候选并存，输出 conflicted |
+| `time_stable` | 两个合理候选盘得到相同核心 established |
+| `time_changes_core` | 两个合理候选盘核心不同，输出 boundary_sensitive |
+| `answers_reverse` | 反向答案只改变 manifestation，不改变 positive 的核心 |
 
-## 4. 32 个索引
+每个 A01—A04 恰有上述八类，共 32 个。
 
-| ID | 覆盖机制 | 类型 | 预期 |
-|---|---|---|---|
-| CF-001..CF-008 | A01 | 顺序为八类 | established / A04 candidate / structure_only / candidate / conflicted / established / boundary_sensitive / established |
-| CF-009..CF-016 | A02 | 顺序为八类 | established / A04 candidate / structure_only / candidate / conflicted / established / boundary_sensitive / established |
-| CF-017..CF-024 | A03 | 顺序为八类 | candidate / A04 candidate / structure_only / candidate / conflicted / candidate / boundary_sensitive / candidate |
-| CF-025..CF-032 | A04 | 顺序为八类 | candidate / A03 candidate / structure_only / candidate / conflicted / candidate / boundary_sensitive / candidate |
+## 4. 核心判定顺序
 
-这里的 A03/A04 positive 未获核心不是降低测试门，而是夹具把当前三维度矛盾如实暴露。把预期改成 established 会重新把 Owner 已降级的关系声明计入核心。
+1. 解引用每个 factSet；验证 `civil_time_v1`。
+2. 按来源簇计算 nodeAvailability。
+3. 从 raw relation 计算 relationEffectiveness 和中介链。
+4. 生成 E1—E6 与 D1—D6。
+5. 要求至少两个结构维度、两个证据家族、两个不同来源簇和一项同源张力。
+6. 应用明确排除与所有成对最近邻边界；不设优先级。
+7. 逐候选盘完成核心，再执行时间聚合。
+8. 冻结 `coreMechanism` 和 `finalState`。
+9. 最后读取最多 3 个问题答案，只选择已批准 manifestation 权限。
 
-## 5. 唯一裁决顺序
+## 5. 预期分布
 
-1. 解引用 factSet；
-2. 验证 time convention 与候选数；
-3. G01 按 `originKey` 去重；
-4. 每候选独立生成 E/D/P；
-5. 应用排除与反证；
-6. 检查至少两家族、两来源簇、三个可计核心维度；
-7. 多候选盘聚合；
-8. 最近邻无唯一优胜时双候选，不使用固定顺序；
-9. 冻结核心结果；
-10. 最后读取 `manifestationAnswers`，只添加 `manifestation_compensated`。
+每个机制的八类顺序均为：
 
-## 6. 通过与阻断
+`established / established-neighbor / not_supported / candidate / conflicted / established / boundary_sensitive / established`
 
-机器可验证：
+四个 `near_neighbor` 分别得到：A01→A04、A02→A04、A03→A04、A04→A03。四个 `answers_reverse` 与本机制 positive 的核心、维度和最终状态完全一致，只有 `manifestationVariant` 不同。
 
-- JSON 标准解析；
-- 数量 32；
-- 每个覆盖机制恰有八类；
-- 禁用输入键和人格语义为 0；
-- `single_family` 4/4 无核心；
-- `time_changes_core` 4/4 为 boundary_sensitive；
-- `answers_reverse` 4/4 与 positive 的决策一致；
-- `near_neighbor` 4/4 不回落至其覆盖机制。
+## 6. 机械通过条件
 
-仍未通过 Issue #11 完整验收：
-
-- 夹具从规范化图开始，不是从当前运行时四柱字段开始；
-- A03/A04 positive 无法通过三维度核心门；
-- P01—P08 的关键规范化字段尚无批准的 ChartFacts 生成公式。
+- 标准 JSON 解析成功；
+- 总数 32，每机制/类型分布为 4×8；
+- 禁止输入键递归扫描为 0；
+- 32/32 从原子输入得到唯一预期；
+- single_family 4/4 不授予核心；
+- time_changes_core 4/4 为 boundary_sensitive；
+- answers_reverse 4/4 核心与 positive 相同；
+- near_neighbor 4/4 得到非目标机制，且无固定优先级；
+- positive、反证和容量失败各 4/4 满足预期。

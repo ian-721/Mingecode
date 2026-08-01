@@ -27,6 +27,7 @@ ADR-0011 已窄范围授权非生产 H5 Demo，将现有研究转成真实可操
 - [M1-BR 混合译码模型](m1br/v0.1/README.md)
 - [M1-BR 前台体验与传播骨架](m1br/v0.2/README.md)
 - [M1-BR H5 Demo 实施基线](m1br/v0.3/README.md)
+- [内容重建静态结构合同 v0.4](content-rebuild/v0.4/README.md)
 - [候选人格治理](personas/README.md)
 - [候选规则治理](rules/README.md)
 - [传统判词翻译](traditional-phrases/README.md)
