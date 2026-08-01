@@ -1,4 +1,4 @@
-import type { FourPillars } from "@/lib/types";
+import type { FourPillars } from "@4n6h4x0r/stem-branch";
 import { evaluateContentRebuild } from "@/lib/content-rebuild";
 import { adaptPillarsToChartFacts } from "@/lib/content-rebuild/adapter";
 
