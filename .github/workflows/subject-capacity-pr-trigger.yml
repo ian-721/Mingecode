@@ -1,0 +1,70 @@
+name: Run Subject Capacity Revision
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - synchronize
+
+permissions:
+  contents: write
+
+jobs:
+  revise:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Extract and execute approved revision
+        shell: bash
+        run: |
+          awk '
+            /python <<'\''PY'\''/ { capture=1; next }
+            capture && /^          PY$/ { capture=0; exit }
+            capture { sub(/^          /, ""); print }
+          ' .github/workflows/subject-capacity-bootstrap.yml > /tmp/subject-capacity-revision.py
+          test -s /tmp/subject-capacity-revision.py
+          python /tmp/subject-capacity-revision.py
+
+      - name: Full repository checks
+        run: npm run check
+
+      - name: Whitespace and final scope checks
+        shell: bash
+        run: |
+          git diff --check
+          git rm .github/workflows/subject-capacity-bootstrap.yml
+          git rm .github/workflows/subject-capacity-pr-trigger.yml
+          changed="$(git diff --name-only HEAD | grep -v '^.github/workflows/' || true)"
+          printf '%s\n' "$changed"
+          test "$changed" = "lib/content-rebuild/engine.ts
+          research/content-rebuild/v0.4/CHART_FACT_VOCABULARY.md
+          research/content-rebuild/v0.4/S03_STATIC_TRACE.md
+          tests/unit/content-rebuild/engine.test.ts"
+
+      - name: Commit verified revision
+        shell: bash
+        run: |
+          git add lib/content-rebuild/engine.ts \
+            research/content-rebuild/v0.4/CHART_FACT_VOCABULARY.md \
+            research/content-rebuild/v0.4/S03_STATIC_TRACE.md \
+            tests/unit/content-rebuild/engine.test.ts \
+            .github/workflows/subject-capacity-bootstrap.yml \
+            .github/workflows/subject-capacity-pr-trigger.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "fix: include peer roots in subject capacity"
+          git push origin HEAD:${{ github.head_ref }}
