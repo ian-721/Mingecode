@@ -18,7 +18,7 @@ import type {
 } from "./types";
 
 const RELATION_ROLE: Readonly<
-  Record<Exclude<TenRelation, "日主">, Exclude<Role, "subject">>
+  Record<TenRelation, Exclude<Role, "subject">>
 > = {
   比肩: "peer",
   劫財: "peer",
@@ -143,12 +143,7 @@ export function adaptChartResolution(
 }
 
 function roleForRelation(relation: TenRelation): Exclude<Role, "subject"> {
-  if (relation === "日主") {
-    throw new Error("Only the day anchor may carry the subject role");
-  }
-  const role = RELATION_ROLE[relation];
-  if (!role) throw new Error(`Unsupported ten relation: ${relation}`);
-  return role;
+  return RELATION_ROLE[relation];
 }
 
 function deriveRoleElements(
@@ -191,7 +186,7 @@ function buildPhysicalBranchClusters(
     ["year", pillars.year.branch],
     ["month", pillars.month.branch],
     ["day", pillars.day.branch],
-    ...(pillars.hour ? ([ ["hour", pillars.hour.branch] ] as const) : []),
+    ...(pillars.hour ? ([["hour", pillars.hour.branch]] as const) : []),
   ] as const;
 
   return entries.map(([position, branch]) => ({
