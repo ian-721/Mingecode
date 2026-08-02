@@ -179,6 +179,12 @@ path `witnessKey` 精确为 `JSON.stringify([pathId, ...atomicRelationKeys])`；
 
 candidate 可选地携带 `interfaceContentionFacts`; 缺失等价于空数组。真实 adapter 默认输出空数组，不得根据 occurrence、object、origin 或 contributor 数量生成 fact。
 
+`interfaceContentionFacts` 的非空值还受独立的来源授权门约束。仅以下两类来源可以提供非空 facts：（1）身份与版本均由受信任内部调用路径静态固定、且经适用合同明确授权的 deterministic producer；（2）与 ordinary runtime 不可达、仅用于合同验证的隔离 fixture / test harness。尚无经合同明确授权的 producer 时，ordinary runtime 的唯一合法值是缺失或空数组。
+
+来自 UI、user input、`BirthInput`、external adapter DTO、API request 或除前述受信任 producer 路径以外的 ordinary runtime caller 的非空 `interfaceContentionFacts`，必须在进入 core evaluation 前 hard fail；不得过滤、忽略、静默改写为空数组或在 schema 通过后继续执行。真实 adapter 仍只能默认输出空数组。
+
+来源授权与 payload validation 是两个独立且都必须通过的门。通过下述 exact seven-field schema、`derivationVersion`、banned-semantic scan 或 basis/provenance validation，不构成来源授权；producer identity、producer version、trusted/authorized 标记或 caller metadata 不得作为第八字段进入 payload，也不得由 `factKey` 或 caller-supplied metadata 自证。本规则不改变下述七字段 schema、现有 fixture input 或 expected assertions。
+
 fact schema 必须精确为：
 
 ```ts

@@ -1,8 +1,12 @@
 # ADR-0013｜真实 occurrence multiplicity 与 relation interface
 
-**状态：Proposed**
+**状态：Accepted**
 
 **日期：2026-08-02**
+
+**授权人：赵焱阳**
+
+**Owner approval reference：[PR #24 Owner acceptance patch](https://github.com/ian-721/Mingecode/pull/24)，2026-08-02**
 
 ## 背景
 
@@ -95,7 +99,7 @@ S01—S04 保留为真实、匿名的结构诊断样本，不再断言 `S01→A0
 
 ## 与 ADR-0012 的关系
 
-本 ADR 为 Proposed。若被接受，仅在 `research/content-rebuild/v0.5/**` 静态研究线中允许定义 relation interface 与显式 contention；ADR-0012“回滚与停止条件”中关于重新定义 competition 的停止项，在这个窄范围内不构成阻断。
+本 ADR 已于 2026-08-02 经 Owner 批准为 Accepted。其效力仅限于在 `research/content-rebuild/v0.5/**` 静态研究线中定义 relation interface 与显式 contention；ADR-0012“回滚与停止条件”中关于重新定义 competition 的停止项，仅在这个窄范围内被替代。
 
 除此以外，ADR-0012 继续完整有效：
 
@@ -116,7 +120,7 @@ S01—S04 保留为真实、匿名的结构诊断样本，不再断言 `S01→A0
 
 ## 回滚与停止条件
 
-在本 ADR 被接受前，回滚是关闭或放弃 Proposed 合同候选；现行 ADR-0012 与 v0.4 不受影响。若未来接受后需要撤销，必须以新 ADR 明确替代，不回写 ADR-0012 或 v0.4 历史。
+若未来需要撤销本 ADR，必须以新 ADR 明确替代，不回写 ADR-0012、v0.4 或本 ADR 历史；v0.4 继续作为冻结历史保留。
 
 出现以下任一项立即停止：
 
