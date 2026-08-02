@@ -1,8 +1,8 @@
 # 内容重建 v0.5：真实 occurrence multiplicity 合同候选
 
-状态：`research_candidate / proposed`
+状态：`research_candidate / ADR-0013 Accepted`
 
-本目录承接 [ADR-0013（Proposed）](../../../docs/DECISIONS/ADR-0013-real-occurrence-multiplicity.md)，只定义 content-rebuild 静态研究线的 relation interface 与显式 contention。它不是代码实现、H5 `/test` 变更、PR #16 同步或部署授权。
+本目录承接 [ADR-0013（Accepted）](../../../docs/DECISIONS/ADR-0013-real-occurrence-multiplicity.md)，只定义 content-rebuild 静态研究线的 relation interface 与显式 contention。它不是代码实现、H5 `/test` 变更、PR #16 同步或部署授权。
 
 ## 继承与替代
 
@@ -46,4 +46,4 @@ atomic ChartFacts
 
 ## 代码边界
 
-本目录只有合同候选。ADR-0013 仍为 Proposed，Issue #22 也只授权 research/contract；不得据此修改 `lib/content-rebuild/**`、app、components、data、tests、依赖、配置、CI、workflow、Vercel 或 PR #16。
+本目录仍是研究候选材料；ADR-0013 已为 Accepted 只表示其窄范围合同边界生效，不构成代码 IMPLEMENT、PR #16 同步、部署、Ready 或 merge 授权。不得据此修改 `lib/content-rebuild/**`、app、components、data、tests、依赖、配置、CI、workflow、Vercel 或 PR #16。

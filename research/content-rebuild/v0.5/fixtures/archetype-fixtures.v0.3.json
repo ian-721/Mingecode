@@ -4783,7 +4783,7 @@
       },
       "E4": {
         "A01": "established",
-        "A02": "candidate",
+        "A02": "not_supported",
         "A03": "established",
         "A04": "candidate"
       },
@@ -4847,7 +4847,7 @@
             "baseState": "effective",
             "contentionFactKeys": [],
             "counterRelationKeys": [],
-            "state": "candidate"
+            "state": "not_supported"
           }
         ],
         "A03": [
@@ -8859,7 +8859,7 @@
       },
       "E4": {
         "A01": "not_supported",
-        "A02": "candidate",
+        "A02": "not_supported",
         "A03": "established",
         "A04": "not_supported"
       },
@@ -8895,7 +8895,7 @@
             "baseState": "effective",
             "contentionFactKeys": [],
             "counterRelationKeys": [],
-            "state": "candidate"
+            "state": "not_supported"
           }
         ],
         "A03": [
@@ -9590,7 +9590,7 @@
       },
       "E4": {
         "A01": "not_supported",
-        "A02": "candidate",
+        "A02": "not_supported",
         "A03": "established",
         "A04": "not_supported"
       },
@@ -9626,7 +9626,7 @@
             "baseState": "effective",
             "contentionFactKeys": [],
             "counterRelationKeys": [],
-            "state": "candidate"
+            "state": "not_supported"
           }
         ],
         "A03": [
@@ -11326,7 +11326,7 @@
       },
       "E4": {
         "A01": "not_supported",
-        "A02": "candidate",
+        "A02": "not_supported",
         "A03": "established",
         "A04": "not_supported"
       },
@@ -11362,7 +11362,7 @@
             "baseState": "effective",
             "contentionFactKeys": [],
             "counterRelationKeys": [],
-            "state": "candidate"
+            "state": "not_supported"
           }
         ],
         "A03": [
@@ -12078,7 +12078,7 @@
         }
       },
       "E4": {
-        "A01": "candidate",
+        "A01": "not_supported",
         "A02": "not_supported",
         "A03": "not_supported",
         "A04": "established"
@@ -12110,7 +12110,7 @@
             "baseState": "effective",
             "contentionFactKeys": [],
             "counterRelationKeys": [],
-            "state": "candidate"
+            "state": "not_supported"
           }
         ],
         "A02": [],
@@ -12805,7 +12805,7 @@
         }
       },
       "E4": {
-        "A01": "candidate",
+        "A01": "not_supported",
         "A02": "not_supported",
         "A03": "not_supported",
         "A04": "established"
@@ -12837,7 +12837,7 @@
             "baseState": "effective",
             "contentionFactKeys": [],
             "counterRelationKeys": [],
-            "state": "candidate"
+            "state": "not_supported"
           }
         ],
         "A02": [],
@@ -14732,8 +14732,8 @@
         }
       },
       "E4": {
-        "A01": "candidate",
-        "A02": "candidate",
+        "A01": "not_supported",
+        "A02": "not_supported",
         "A03": "established",
         "A04": "established"
       },
@@ -14764,7 +14764,7 @@
             "baseState": "effective",
             "contentionFactKeys": [],
             "counterRelationKeys": [],
-            "state": "candidate"
+            "state": "not_supported"
           }
         ],
         "A02": [
@@ -14797,7 +14797,7 @@
             "baseState": "effective",
             "contentionFactKeys": [],
             "counterRelationKeys": [],
-            "state": "candidate"
+            "state": "not_supported"
           }
         ],
         "A03": [
@@ -15680,7 +15680,7 @@
         }
       },
       "E4": {
-        "A01": "candidate",
+        "A01": "not_supported",
         "A02": "not_supported",
         "A03": "not_supported",
         "A04": "established"
@@ -15712,7 +15712,7 @@
             "baseState": "effective",
             "contentionFactKeys": [],
             "counterRelationKeys": [],
-            "state": "candidate"
+            "state": "not_supported"
           }
         ],
         "A02": [],
@@ -16589,7 +16589,7 @@
         }
       },
       "E4": {
-        "A01": "candidate",
+        "A01": "not_supported",
         "A02": "not_supported",
         "A03": "not_supported",
         "A04": "established"
@@ -16621,7 +16621,7 @@
             "baseState": "effective",
             "contentionFactKeys": [],
             "counterRelationKeys": [],
-            "state": "candidate"
+            "state": "not_supported"
           }
         ],
         "A02": [],
@@ -18859,19 +18859,21 @@
         "candidates": [
           {
             "candidateId": "candidate",
-            "factSetRef": "F13",
+            "factSetRef": "M02_INDEPENDENT",
             "interfaceContentionFacts": [
               {
                 "factKey": "icf:conversion-path-invalidation",
-                "interfaceKey": "generates:subject>output",
+                "interfaceKey": "generates:input>subject",
                 "basis": "path_invalidating",
-                "sharedEndpointObjectKey": "f13-o",
+                "sharedEndpointObjectKey": "f13-s",
                 "participantObjectKeys": [
-                  "f13-s",
+                  "f13-i",
                   "f13-o",
-                  "f13-r"
+                  "f13-r",
+                  "f13-s"
                 ],
                 "invalidatedInterfaceKeys": [
+                  "generates:subject>output",
                   "generates:output>resource"
                 ],
                 "derivationVersion": "interface_contention_v1"
@@ -18885,16 +18887,40 @@
         "conflictedCompoundPathKeys": [
           "conversion"
         ],
+        "matchedWitnessKeys": [
+          "[\"conversion\",\"generates:f13-i>f13-s\",\"generates:f13-s>f13-o\",\"generates:f13-o>f13-r\"]"
+        ],
+        "unmatchedWitnessKeys": [
+          "[\"conversion\",\"generates:m02-i-independent>f13-s\",\"generates:f13-s>f13-o\",\"generates:f13-o>f13-r\"]"
+        ],
         "unchangedDirectPathKeys": [
+          "input_subject",
           "subject_output",
-          "output_resource"
+          "output_resource",
+          "output_constraint",
+          "constraint_subject",
+          "constraint_input"
+        ],
+        "unchangedCompoundPathKeys": [
+          "output_mediated",
+          "input_mediated",
+          "output_constraint_feedback"
+        ],
+        "unchangedE4Mechanisms": [
+          "A01",
+          "A02",
+          "A03",
+          "A04"
         ],
         "contentionFactKeysByInterface": {
-          "generates:subject>output": [
+          "generates:input>subject": [
             "icf:conversion-path-invalidation"
           ]
         },
         "invalidatedByFactKeysByInterface": {
+          "generates:subject>output": [
+            "icf:conversion-path-invalidation"
+          ],
           "generates:output>resource": [
             "icf:conversion-path-invalidation"
           ]
@@ -19051,13 +19077,14 @@
             "interfaceContentionFacts": [
               {
                 "factKey": "icf:unrelated-path-invalidation",
-                "interfaceKey": "generates:subject>output",
+                "interfaceKey": "generates:input>subject",
                 "basis": "path_invalidating",
-                "sharedEndpointObjectKey": "f13-o",
+                "sharedEndpointObjectKey": "f13-s",
                 "participantObjectKeys": [
-                  "f13-s",
+                  "f13-i",
                   "f13-o",
-                  "f13-r"
+                  "f13-r",
+                  "f13-s"
                 ],
                 "invalidatedInterfaceKeys": [
                   "controls:constraint>subject"
@@ -19166,7 +19193,7 @@
         "commit": "07e8b945a5c56087a79b6db3b4176d9ff2f79b7a",
         "path": "app/content-preview/contract-self-check.ts",
         "normalization": "shared_adapter_chart_facts",
-        "decisionContract": "content-rebuild-v0.5-proposed"
+        "decisionContract": "content-rebuild-v0.5-accepted"
       },
       "input": {
         "candidates": [
@@ -21812,7 +21839,7 @@
           }
         },
         "E4": {
-          "A01": "candidate",
+          "A01": "not_supported",
           "A02": "not_supported",
           "A03": "not_supported",
           "A04": "established"
@@ -21844,7 +21871,7 @@
               "baseState": "effective",
               "contentionFactKeys": [],
               "counterRelationKeys": [],
-              "state": "candidate"
+              "state": "not_supported"
             },
             {
               "witnessKey": "[\"e4:A01\",\"generates:day:day_anchor:0:甲>day:hidden:1:丙\",\"generates:day:hidden:1:丙>month:hidden:0:己\"]",
@@ -21871,7 +21898,7 @@
               "baseState": "effective",
               "contentionFactKeys": [],
               "counterRelationKeys": [],
-              "state": "candidate"
+              "state": "not_supported"
             },
             {
               "witnessKey": "[\"e4:A01\",\"generates:day:day_anchor:0:甲>month:hidden:1:丁\",\"generates:month:hidden:1:丁>day:hidden:2:戊\"]",
@@ -21898,7 +21925,7 @@
               "baseState": "effective",
               "contentionFactKeys": [],
               "counterRelationKeys": [],
-              "state": "candidate"
+              "state": "not_supported"
             },
             {
               "witnessKey": "[\"e4:A01\",\"generates:day:day_anchor:0:甲>month:hidden:1:丁\",\"generates:month:hidden:1:丁>month:hidden:0:己\"]",
@@ -21925,7 +21952,7 @@
               "baseState": "effective",
               "contentionFactKeys": [],
               "counterRelationKeys": [],
-              "state": "candidate"
+              "state": "not_supported"
             }
           ],
           "A02": [],
@@ -22058,7 +22085,7 @@
           "E6": "not_supported"
         },
         "tensions": {
-          "A01": "candidate",
+          "A01": "not_supported",
           "A02": "not_supported",
           "A03": "not_supported",
           "A04": "established"
@@ -22185,7 +22212,7 @@
         "commit": "07e8b945a5c56087a79b6db3b4176d9ff2f79b7a",
         "path": "app/content-preview/contract-self-check.ts",
         "normalization": "shared_adapter_chart_facts",
-        "decisionContract": "content-rebuild-v0.5-proposed"
+        "decisionContract": "content-rebuild-v0.5-accepted"
       },
       "input": {
         "candidates": [
@@ -28470,7 +28497,7 @@
           }
         },
         "E4": {
-          "A01": "candidate",
+          "A01": "not_supported",
           "A02": "candidate",
           "A03": "candidate",
           "A04": "candidate"
@@ -28502,7 +28529,7 @@
               "baseState": "limited",
               "contentionFactKeys": [],
               "counterRelationKeys": [],
-              "state": "candidate"
+              "state": "not_supported"
             },
             {
               "witnessKey": "[\"e4:A01\",\"generates:day:day_anchor:0:乙>hour:hidden:0:丙\",\"generates:hour:hidden:0:丙>hour:hidden:2:戊\"]",
@@ -28529,7 +28556,7 @@
               "baseState": "limited",
               "contentionFactKeys": [],
               "counterRelationKeys": [],
-              "state": "candidate"
+              "state": "not_supported"
             },
             {
               "witnessKey": "[\"e4:A01\",\"generates:day:day_anchor:0:乙>hour:hidden:0:丙\",\"generates:hour:hidden:0:丙>month:hidden:1:己\"]",
@@ -28556,7 +28583,7 @@
               "baseState": "limited",
               "contentionFactKeys": [],
               "counterRelationKeys": [],
-              "state": "candidate"
+              "state": "not_supported"
             },
             {
               "witnessKey": "[\"e4:A01\",\"generates:day:day_anchor:0:乙>hour:hidden:0:丙\",\"generates:hour:hidden:0:丙>year:hidden:1:己\"]",
@@ -28583,7 +28610,7 @@
               "baseState": "limited",
               "contentionFactKeys": [],
               "counterRelationKeys": [],
-              "state": "candidate"
+              "state": "not_supported"
             },
             {
               "witnessKey": "[\"e4:A01\",\"generates:day:day_anchor:0:乙>month:hidden:0:丁\",\"generates:month:hidden:0:丁>day:hidden:0:己\"]",
@@ -28610,7 +28637,7 @@
               "baseState": "limited",
               "contentionFactKeys": [],
               "counterRelationKeys": [],
-              "state": "candidate"
+              "state": "not_supported"
             },
             {
               "witnessKey": "[\"e4:A01\",\"generates:day:day_anchor:0:乙>month:hidden:0:丁\",\"generates:month:hidden:0:丁>hour:hidden:2:戊\"]",
@@ -28637,7 +28664,7 @@
               "baseState": "limited",
               "contentionFactKeys": [],
               "counterRelationKeys": [],
-              "state": "candidate"
+              "state": "not_supported"
             },
             {
               "witnessKey": "[\"e4:A01\",\"generates:day:day_anchor:0:乙>month:hidden:0:丁\",\"generates:month:hidden:0:丁>month:hidden:1:己\"]",
@@ -28664,7 +28691,7 @@
               "baseState": "limited",
               "contentionFactKeys": [],
               "counterRelationKeys": [],
-              "state": "candidate"
+              "state": "not_supported"
             },
             {
               "witnessKey": "[\"e4:A01\",\"generates:day:day_anchor:0:乙>month:hidden:0:丁\",\"generates:month:hidden:0:丁>year:hidden:1:己\"]",
@@ -28691,7 +28718,7 @@
               "baseState": "limited",
               "contentionFactKeys": [],
               "counterRelationKeys": [],
-              "state": "candidate"
+              "state": "not_supported"
             },
             {
               "witnessKey": "[\"e4:A01\",\"generates:day:day_anchor:0:乙>month:visible:0:丙\",\"generates:month:visible:0:丙>day:hidden:0:己\"]",
@@ -28718,7 +28745,7 @@
               "baseState": "limited",
               "contentionFactKeys": [],
               "counterRelationKeys": [],
-              "state": "candidate"
+              "state": "not_supported"
             },
             {
               "witnessKey": "[\"e4:A01\",\"generates:day:day_anchor:0:乙>month:visible:0:丙\",\"generates:month:visible:0:丙>hour:hidden:2:戊\"]",
@@ -28745,7 +28772,7 @@
               "baseState": "limited",
               "contentionFactKeys": [],
               "counterRelationKeys": [],
-              "state": "candidate"
+              "state": "not_supported"
             },
             {
               "witnessKey": "[\"e4:A01\",\"generates:day:day_anchor:0:乙>month:visible:0:丙\",\"generates:month:visible:0:丙>month:hidden:1:己\"]",
@@ -28772,7 +28799,7 @@
               "baseState": "limited",
               "contentionFactKeys": [],
               "counterRelationKeys": [],
-              "state": "candidate"
+              "state": "not_supported"
             },
             {
               "witnessKey": "[\"e4:A01\",\"generates:day:day_anchor:0:乙>month:visible:0:丙\",\"generates:month:visible:0:丙>year:hidden:1:己\"]",
@@ -28799,7 +28826,7 @@
               "baseState": "limited",
               "contentionFactKeys": [],
               "counterRelationKeys": [],
-              "state": "candidate"
+              "state": "not_supported"
             },
             {
               "witnessKey": "[\"e4:A01\",\"generates:day:day_anchor:0:乙>year:hidden:0:丁\",\"generates:year:hidden:0:丁>day:hidden:0:己\"]",
@@ -28826,7 +28853,7 @@
               "baseState": "limited",
               "contentionFactKeys": [],
               "counterRelationKeys": [],
-              "state": "candidate"
+              "state": "not_supported"
             },
             {
               "witnessKey": "[\"e4:A01\",\"generates:day:day_anchor:0:乙>year:hidden:0:丁\",\"generates:year:hidden:0:丁>hour:hidden:2:戊\"]",
@@ -28853,7 +28880,7 @@
               "baseState": "limited",
               "contentionFactKeys": [],
               "counterRelationKeys": [],
-              "state": "candidate"
+              "state": "not_supported"
             },
             {
               "witnessKey": "[\"e4:A01\",\"generates:day:day_anchor:0:乙>year:hidden:0:丁\",\"generates:year:hidden:0:丁>month:hidden:1:己\"]",
@@ -28880,7 +28907,7 @@
               "baseState": "limited",
               "contentionFactKeys": [],
               "counterRelationKeys": [],
-              "state": "candidate"
+              "state": "not_supported"
             },
             {
               "witnessKey": "[\"e4:A01\",\"generates:day:day_anchor:0:乙>year:hidden:0:丁\",\"generates:year:hidden:0:丁>year:hidden:1:己\"]",
@@ -28907,7 +28934,7 @@
               "baseState": "limited",
               "contentionFactKeys": [],
               "counterRelationKeys": [],
-              "state": "candidate"
+              "state": "not_supported"
             }
           ],
           "A02": [
@@ -30110,7 +30137,7 @@
           "E6": "not_supported"
         },
         "tensions": {
-          "A01": "candidate",
+          "A01": "not_supported",
           "A02": "candidate",
           "A03": "candidate",
           "A04": "candidate"
@@ -30238,7 +30265,7 @@
         "commit": "07e8b945a5c56087a79b6db3b4176d9ff2f79b7a",
         "path": "app/content-preview/contract-self-check.ts",
         "normalization": "shared_adapter_chart_facts",
-        "decisionContract": "content-rebuild-v0.5-proposed"
+        "decisionContract": "content-rebuild-v0.5-accepted"
       },
       "input": {
         "candidates": [
@@ -33215,8 +33242,8 @@
           }
         },
         "E4": {
-          "A01": "candidate",
-          "A02": "candidate",
+          "A01": "not_supported",
+          "A02": "not_supported",
           "A03": "candidate",
           "A04": "established"
         },
@@ -33247,7 +33274,7 @@
               "baseState": "effective",
               "contentionFactKeys": [],
               "counterRelationKeys": [],
-              "state": "candidate"
+              "state": "not_supported"
             },
             {
               "witnessKey": "[\"e4:A01\",\"generates:day:day_anchor:0:己>day:hidden:2:辛\",\"generates:day:hidden:2:辛>hour:hidden:1:癸\"]",
@@ -33274,7 +33301,7 @@
               "baseState": "effective",
               "contentionFactKeys": [],
               "counterRelationKeys": [],
-              "state": "candidate"
+              "state": "not_supported"
             },
             {
               "witnessKey": "[\"e4:A01\",\"generates:day:day_anchor:0:己>day:hidden:2:辛\",\"generates:day:hidden:2:辛>month:visible:0:癸\"]",
@@ -33301,7 +33328,7 @@
               "baseState": "effective",
               "contentionFactKeys": [],
               "counterRelationKeys": [],
-              "state": "candidate"
+              "state": "not_supported"
             },
             {
               "witnessKey": "[\"e4:A01\",\"generates:day:day_anchor:0:己>hour:hidden:2:辛\",\"generates:hour:hidden:2:辛>day:hidden:1:癸\"]",
@@ -33328,7 +33355,7 @@
               "baseState": "effective",
               "contentionFactKeys": [],
               "counterRelationKeys": [],
-              "state": "candidate"
+              "state": "not_supported"
             },
             {
               "witnessKey": "[\"e4:A01\",\"generates:day:day_anchor:0:己>hour:hidden:2:辛\",\"generates:hour:hidden:2:辛>hour:hidden:1:癸\"]",
@@ -33355,7 +33382,7 @@
               "baseState": "effective",
               "contentionFactKeys": [],
               "counterRelationKeys": [],
-              "state": "candidate"
+              "state": "not_supported"
             },
             {
               "witnessKey": "[\"e4:A01\",\"generates:day:day_anchor:0:己>hour:hidden:2:辛\",\"generates:hour:hidden:2:辛>month:visible:0:癸\"]",
@@ -33382,7 +33409,7 @@
               "baseState": "effective",
               "contentionFactKeys": [],
               "counterRelationKeys": [],
-              "state": "candidate"
+              "state": "not_supported"
             },
             {
               "witnessKey": "[\"e4:A01\",\"generates:day:day_anchor:0:己>month:hidden:0:辛\",\"generates:month:hidden:0:辛>day:hidden:1:癸\"]",
@@ -33409,7 +33436,7 @@
               "baseState": "effective",
               "contentionFactKeys": [],
               "counterRelationKeys": [],
-              "state": "candidate"
+              "state": "not_supported"
             },
             {
               "witnessKey": "[\"e4:A01\",\"generates:day:day_anchor:0:己>month:hidden:0:辛\",\"generates:month:hidden:0:辛>hour:hidden:1:癸\"]",
@@ -33436,7 +33463,7 @@
               "baseState": "effective",
               "contentionFactKeys": [],
               "counterRelationKeys": [],
-              "state": "candidate"
+              "state": "not_supported"
             },
             {
               "witnessKey": "[\"e4:A01\",\"generates:day:day_anchor:0:己>month:hidden:0:辛\",\"generates:month:hidden:0:辛>month:visible:0:癸\"]",
@@ -33463,7 +33490,7 @@
               "baseState": "effective",
               "contentionFactKeys": [],
               "counterRelationKeys": [],
-              "state": "candidate"
+              "state": "not_supported"
             }
           ],
           "A02": [
@@ -33496,7 +33523,7 @@
               "baseState": "limited",
               "contentionFactKeys": [],
               "counterRelationKeys": [],
-              "state": "candidate"
+              "state": "not_supported"
             },
             {
               "witnessKey": "[\"e4:A02\",\"generates:day:day_anchor:0:己>day:hidden:2:辛\",\"controls:day:hidden:2:辛>year:hidden:0:乙\",\"controls:year:hidden:0:乙>day:day_anchor:0:己\"]",
@@ -33527,7 +33554,7 @@
               "baseState": "limited",
               "contentionFactKeys": [],
               "counterRelationKeys": [],
-              "state": "candidate"
+              "state": "not_supported"
             },
             {
               "witnessKey": "[\"e4:A02\",\"generates:day:day_anchor:0:己>hour:hidden:2:辛\",\"controls:hour:hidden:2:辛>hour:visible:0:乙\",\"controls:hour:visible:0:乙>day:day_anchor:0:己\"]",
@@ -33558,7 +33585,7 @@
               "baseState": "limited",
               "contentionFactKeys": [],
               "counterRelationKeys": [],
-              "state": "candidate"
+              "state": "not_supported"
             },
             {
               "witnessKey": "[\"e4:A02\",\"generates:day:day_anchor:0:己>hour:hidden:2:辛\",\"controls:hour:hidden:2:辛>year:hidden:0:乙\",\"controls:year:hidden:0:乙>day:day_anchor:0:己\"]",
@@ -33589,7 +33616,7 @@
               "baseState": "limited",
               "contentionFactKeys": [],
               "counterRelationKeys": [],
-              "state": "candidate"
+              "state": "not_supported"
             },
             {
               "witnessKey": "[\"e4:A02\",\"generates:day:day_anchor:0:己>month:hidden:0:辛\",\"controls:month:hidden:0:辛>hour:visible:0:乙\",\"controls:hour:visible:0:乙>day:day_anchor:0:己\"]",
@@ -33620,7 +33647,7 @@
               "baseState": "limited",
               "contentionFactKeys": [],
               "counterRelationKeys": [],
-              "state": "candidate"
+              "state": "not_supported"
             },
             {
               "witnessKey": "[\"e4:A02\",\"generates:day:day_anchor:0:己>month:hidden:0:辛\",\"controls:month:hidden:0:辛>year:hidden:0:乙\",\"controls:year:hidden:0:乙>day:day_anchor:0:己\"]",
@@ -33651,7 +33678,7 @@
               "baseState": "limited",
               "contentionFactKeys": [],
               "counterRelationKeys": [],
-              "state": "candidate"
+              "state": "not_supported"
             }
           ],
           "A03": [
@@ -34105,8 +34132,8 @@
           "E6": "candidate"
         },
         "tensions": {
-          "A01": "candidate",
-          "A02": "candidate",
+          "A01": "not_supported",
+          "A02": "not_supported",
           "A03": "candidate",
           "A04": "established"
         },
@@ -34238,7 +34265,7 @@
         "commit": "07e8b945a5c56087a79b6db3b4176d9ff2f79b7a",
         "path": "app/content-preview/contract-self-check.ts",
         "normalization": "shared_adapter_chart_facts",
-        "decisionContract": "content-rebuild-v0.5-proposed"
+        "decisionContract": "content-rebuild-v0.5-accepted"
       },
       "input": {
         "candidates": [

@@ -1,12 +1,12 @@
 # Real Occurrence Multiplicity Contract v0.5
 
-状态：`research_candidate / proposed`
+状态：`research_candidate / ADR-0013 Accepted`
 
 时间口径：`civil_time_v1`
 
 ## 1. 权威关系
 
-本合同由 [ADR-0013（Proposed）](../../../docs/DECISIONS/ADR-0013-real-occurrence-multiplicity.md) 路由，并继承 [`v0.4`](../v0.4/README.md) 未被本文件明确替代的内容。v0.4 的 occurrence、availability、role matrix、closure、E/D、排除、最近邻、candidate aggregation 与 manifestation 边界继续有效。
+本合同由 [ADR-0013（Accepted）](../../../docs/DECISIONS/ADR-0013-real-occurrence-multiplicity.md) 路由，并继承 [`v0.4`](../v0.4/README.md) 未被本文件明确替代的内容。v0.4 的 occurrence、availability、role matrix、closure、E/D、排除、最近邻、candidate aggregation 与 manifestation 边界继续有效。
 
 本文件只替代 v0.4 的 automatic cardinality competition 与 atomic-path-to-decision 接口。它不修改 threshold、role mapping、D1—D6、机制门或 `/test`。
 
@@ -231,10 +231,11 @@ validator 的失败优先级固定为：1）递归禁用语义扫描；2）七�
 `path_invalidating`：
 
 - `invalidatedInterfaceKeys` 必须非空、唯一、不得包含 `interfaceKey`；
-- 必须有一条固定 compound path 的 interface sequence 同时包含命名 interface 与全部 invalidated interfaces；分别存在多条 pairwise path 不足；
-- 必须有至少一个该 path 的 concrete atomic witness。participants 可跨命名与 invalidated interfaces，但必须全部出现在同一 witness 的 `objectPath`，并共同触达命名 interface 与每个 invalidated interface 的 constituent relation；
-- `sharedEndpointObjectKey` 非空时，必须是该 witness 的内部 join object，且 join 两侧 `originClusterKey` 相同；为 `null` 时仍必须由同一 witness 的 contributor provenance 完整闭合；
-- `path_invalidating` 只覆盖匹配的 compound witnesses，不自动覆盖 constituent direct paths 或其他 witnesses。
+- `interfaceKey` 与全部 `invalidatedInterfaceKeys` 的集合必须精确等于一条固定 compound path 或 E4 topology 的完整 ordered interface sequence；只命中该 sequence 的子集、分别命中多条 pairwise path，或让未声明 constituent 混入 sequence 都不足；顺序只由固定 topology 恢复，不从 fact 输入顺序推断；
+- validator 必须先枚举该完整 sequence 的 concrete atomic witnesses，再逐 witness 重建 ordered `atomicRelationKeys / objectPath / originPath`。每个 participant 必须解析到该 witness 的同一个 occurrence，出现在它的 `objectPath`，并共同触达命名 interface 与每个 invalidated interface 的 constituent relation；每条 constituent relation 的 source/target object 与 origin 必须分别等于 `objectPath / originPath` 的相邻位置；
+- `sharedEndpointObjectKey` 非空时，必须是该 witness 的内部 join object，且 join 两侧 relation 在该位置的 `originClusterKey` 精确相同；为 `null` 时仍必须由同一 witness 的 ordered contributor provenance 完整闭合；
+- validation 输出仅是满足上述全部条件的 concrete `witnessKey` 集合。`path_invalidating` 只覆盖这个集合；不得从 interface、path 或 mechanism 聚合状态反推、扩张或补选 witness；
+- constituent direct paths、未匹配 witnesses、其他 compound paths 与 interface base state 均不属于该 coverage set。
 
 未知 participant、alias-only contention、shared endpoint 不匹配、跨无关 interface 的 invalidation、空 participant 或禁用字段都必须 hard fail，不能忽略或降级。
 
@@ -244,10 +245,11 @@ validator 先验证 fact，再计算它覆盖的 concrete witnesses；不得先�
 
 - `mutually_exclusive` 覆盖命名 interface 中至少一个端点属于 participants 的 direct witness；包含该 direct constituent 的 compound/E4 witness 同样被覆盖。
 - `shared_capacity` 只覆盖命名 interface 中一端精确等于 shared endpoint、另一端精确属于 participants 的 direct witness；包含该 constituent 的 compound/E4 witness 同样被覆盖。
-- `path_invalidating` 只覆盖满足 5.2 全部条件的 compound/E4 witness。
+- `path_invalidating` 只覆盖 5.2 已计算出的 concrete compound/E4 `witnessKey`；overlay 阶段不得重新做更宽的 role-level、interface-level、path-level 或 mechanism-level 匹配。
 - covered witness 加入 factKey、`state=conflicted`，并把它的 atomic keys 记入 `counterRelationKeys`；未覆盖 witness 保持 base state。
 - 同一 witness 命中多个 facts 时只合并去重排序后的 fact keys，不重复计票。
-- `InterfacePath.state=conflicted` 当且仅当至少一个 witness conflicted；其他正常 witness 不能抵消明确冲突。path provenance 是全部 covered witnesses 的 fact/relation union。
+- `InterfacePath.state=conflicted` 当且仅当至少一个 witness conflicted；这是 matched-witness reduction，不能反向改写同 path 的未匹配 witness。其他正常 witness 不能抵消明确冲突，未匹配 witness 的 state、fact provenance 与 counter provenance 保持 base；path provenance 只是全部 covered witnesses 的 fact/relation union。
+- E4 也逐 concrete witness 应用同一 coverage set：只把精确匹配的 E4 witness 标为 conflicted，再按第 7 节的机制聚合顺序 reduction。不得因为一个 path 或某机制的聚合结果 conflicted，就污染该机制的其他 E4 witness 或任何其他机制；其他机制若要 conflicted，必须有自己的 concrete witness 独立满足 5.2 全部条件。
 - `mutually_exclusive` / `shared_capacity` 只把 factKey 加入命名 `interfaceKey` 的 `RelationInterface.contentionFactKeys`；其他 interface 的两个 provenance arrays 不因 compound/E4 传播而改变。
 - `path_invalidating` 把 factKey 加入命名 `interfaceKey` 的 `contentionFactKeys`，并分别加入每个 `invalidatedInterfaceKeys` 成员的 `invalidatedByFactKeys`；不得把它加入其他 constituent interface。若一个 interface 分别被不同 facts 命名和 invalidated，两个数组独立去重并按 factKey ordinal 排序。两数组都只是 interface-level 诊断 provenance，不改变 `RelationInterface.state` 或 direct path state。
 - base interface state、path baseState 与 atomic relation effectiveness 永不被 overlay 改写。
@@ -278,14 +280,29 @@ output_constraint_feedback = subject>output + output>constraint + constraint>sub
 
 ## 7. E4 与 atomic witness
 
-E4 必须同时读取 interface/path state 与具体 atomic witness：
+E4 必须同时读取 interface/path state 与具体 atomic witness。先按第 6 节生成 topology-correct witness；每个 witness 的 ordered constituent states 来自同一 traversal 中各 direct atomic witness 的 base state，不能用 interface 聚合状态替代具体 constituent，也不能从 mechanism、sample 或 expected 选择 witness。
 
-- A01：`subject>output=effective` 且 `output>resource=limited`，并且必须存在共享 output atomic witness；`output>resource=absent` 只由 interface/path 与 D6 保存 absence provenance，E4 A01 必须为 `not_supported`，不得制造 E4 witness 或 output→resource atomic relation；
-- A02：`subject>output=limited`、`output>constraint=effective`、`constraint>subject=limited`，且三边 witness 回到同一 subject object+origin；
-- A03：三边均 `effective`，且存在 output/constraint 连续 witness；
-- A04：`subject>output` 与 `output>resource` 均 `effective`，且存在共享 output witness。
+每个 concrete witness 严格按以下顺序裁决：
 
-candidate-local E4 的状态仍精确为 `established / candidate / conflicted / not_supported`，不得输出 `boundary_sensitive`。单 witness 判定优先级为：合法 overlay→conflicted；必需状态 unknown→not_supported；必需状态 absent 或缺 witness→not_supported；命中 exact pattern→established；命中冻结 weak/limited pattern→candidate；否则 not_supported。同一机制聚合顺序固定为 `conflicted > established > candidate > not_supported`；unknown witness 不能压过另一个已知 established witness。`absenceInterfaceKeys` 仅是已有 witness 的诊断字段；它不能创建 witness 或越过上述 absent gate。
+1. 该 witness 的 `witnessKey` 被 5.3 的合法 overlay coverage 精确命中：`conflicted`；
+2. 任一必需 interface/path 或 constituent state 为 `unknown`：`not_supported`；
+3. 任一必需 interface/path 为 `absent`，或不存在 topology-correct concrete witness：`not_supported`；
+4. 命中下表 strong pattern：`established`；
+5. 命中下表 frozen weak residual：`candidate`；
+6. 其余 present-known witness：保留 witness provenance，但 state 为 `not_supported`。
+
+| mechanism | ordered constituent states | strong pattern | frozen weak residual（strong 后） |
+| --- | --- | --- | --- |
+| A01 | `subject>output / output>resource` | `effective / limited` | `limited / limited` |
+| A02 | `subject>output / output>constraint / constraint>subject` | `limited / effective / limited` | 首边必须为 `limited`，三边全部属于 `effective / limited` 且不等于 strong；即 `L/E/E`、`L/L/E`、`L/L/L` |
+| A03 | 同 A02 三边 | `effective / effective / effective` | 三边全部属于 `effective / limited` 且至少一边 `limited` |
+| A04 | `subject>output / output>resource` | `effective / effective` | 两边全部属于 `effective / limited` 且至少一边 `limited` |
+
+A01 的 v0.5 特别收紧优先于 v0.4 的 legacy blocked 分支：`output>resource=absent` 只由 interface/path 与 D6 保存 absence provenance；E4 A01 必须为 `not_supported`，不得制造 E4 witness 或 output→resource atomic relation。因此 v0.4 raw weak 中的 blocked 情形在 v0.5 已被步骤 3 截断，strong 后的 residual candidate 只剩 `limited / limited`。
+
+A02 还要求三边 witness 回到同一 subject `objectKey + originClusterKey`；A03 只要求 output/constraint 连续 witness，不继承 A02 的闭环条件；A01/A04 都要求共享 output 的具体连续 witness。
+
+candidate-local E4 的状态仍精确为 `established / candidate / conflicted / not_supported`，不得输出 `boundary_sensitive`。同一机制只在所有 concrete witnesses 完成上述单 witness 裁决后聚合，顺序固定为 `conflicted > established > candidate > not_supported`；unknown witness 不能压过另一个已知 established witness。`absenceInterfaceKeys` 仅是已有 witness 的诊断字段；它不能创建 witness 或越过上述 absent gate。
 
 unknown boundary 只在 candidate aggregation 出现：任一 candidate-local node、atomic relation、interface 或 path unknown 时，E6 与 top-level finalState 为 `boundary_sensitive`。manifestation answers 不得消除该 boundary。
 
