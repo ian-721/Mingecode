@@ -43,6 +43,7 @@ Pull Request 不承担授权或 `STATUS`。若 Issue 与 Pull Request 表述冲�
 - ADR 总索引与状态：[`DECISIONS/README.md`](DECISIONS/README.md)。
 - 非生产 H5 的授权和工程边界：[`ADR-0011`](DECISIONS/ADR-0011-h5-demo-implementation-authorization.md)。
 - 当前“命盘起题 + 轻问答校准”决定及替代范围：[`ADR-0012`](DECISIONS/ADR-0012-chart-prompt-and-light-calibration.md)。
+- content-rebuild v0.5 真实 occurrence multiplicity 的静态研究候选来源：[`ADR-0013（Proposed）`](DECISIONS/ADR-0013-real-occurrence-multiplicity.md)、[`REAL_OCCURRENCE_MULTIPLICITY_CONTRACT.md`](../research/content-rebuild/v0.5/REAL_OCCURRENCE_MULTIPLICITY_CONTRACT.md) 与 [`FIXTURE_SPEC.md`](../research/content-rebuild/v0.5/FIXTURE_SPEC.md)。
 - 当前 R2 模型实现合同：[`HYBRID_CANDIDATE_MODEL_CONTRACT_v0.4.md`](../research/m1br/v0.3/HYBRID_CANDIDATE_MODEL_CONTRACT_v0.4.md)。
 - H5 页面、隐私、分享、响应式与技术边界：[`H5_DEMO_PRODUCT_AND_ACCEPTANCE_SPEC_v0.1.md`](../research/m1br/v0.3/H5_DEMO_PRODUCT_AND_ACCEPTANCE_SPEC_v0.1.md)。
 
