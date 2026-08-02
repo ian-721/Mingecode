@@ -587,9 +587,15 @@ function feedbackDimension(
   }
   if (subjectOutput === "conflicted") return "unresolved";
   if (
-    subjectOutput === "limited" &&
-    outputConstraint === "effective" &&
-    constraintSubject === "limited"
+    (subjectOutput === "limited" &&
+      outputConstraint === "effective" &&
+      constraintSubject === "limited") ||
+    (availability.subject === "limited" &&
+      availability.output === "usable" &&
+      availability.constraint === "limited" &&
+      subjectOutput === "limited" &&
+      outputConstraint === "limited" &&
+      constraintSubject === "limited")
   ) {
     return "output_constraint_regulating";
   }

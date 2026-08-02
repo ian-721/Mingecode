@@ -940,3 +940,231 @@ function firstDifference(
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
+
+
+describe("subject capacity peer-root contract", () => {
+  const seasonalStrength: ChartFacts["seasonalStrength"] = {
+    subject: "囚",
+    peer: "囚",
+    input: "死",
+    output: "死",
+    resource: "死",
+    constraint: "死",
+  };
+
+  function subjectCapacityCandidate(
+    occurrences: ChartFacts["occurrences"],
+    missingPositions: readonly string[] = [],
+    subjectStrength: ChartFacts["seasonalStrength"]["subject"] = "囚",
+  ): ChartCandidate {
+    return {
+      candidateId: "subject-capacity",
+      facts: {
+        precision: missingPositions.length > 0 ? "bounded" : "exact",
+        missingPositions,
+        seasonalStrength: { ...seasonalStrength, subject: subjectStrength },
+        occurrences,
+      },
+    };
+  }
+
+  const dayAnchor = {
+    role: "subject" as const,
+    kind: "day_anchor" as const,
+    objectKey: "day-anchor",
+    originClusterKey: "day-anchor:甲",
+    hiddenStemProportion: null,
+    rootOccurrence: false,
+  };
+
+  it("lets independent rooted peer occurrences support subject capacity without changing peer identity", () => {
+    const result = evaluateSingleCandidate(
+      subjectCapacityCandidate([
+        dayAnchor,
+        {
+role: "peer",
+kind: "hidden",
+objectKey: "peer-root-1",
+originClusterKey: "branch:day:寅",
+hiddenStemProportion: 0.6,
+rootOccurrence: true,
+        },
+        {
+role: "peer",
+kind: "hidden",
+objectKey: "peer-root-2",
+originClusterKey: "branch:year:亥",
+hiddenStemProportion: 0.3,
+rootOccurrence: true,
+        },
+      ]),
+    );
+
+    expect(result.nodeAvailability.subject).toBe("usable");
+    expect(result.nodeAvailability.peer).toBe("limited");
+    expect(result.closure.relations.every((relation) =>
+      ["subject", "peer"].includes(relation.sourceRole) &&
+      ["subject", "peer"].includes(relation.targetRole),
+    )).toBe(true);
+  });
+
+  it("deduplicates subject-capacity peer roots by origin cluster", () => {
+    const sameOrigin = evaluateSingleCandidate(
+      subjectCapacityCandidate([
+        dayAnchor,
+        {
+role: "peer",
+kind: "hidden",
+objectKey: "peer-root-a",
+originClusterKey: "branch:month:寅",
+hiddenStemProportion: 0.3,
+rootOccurrence: true,
+        },
+        {
+role: "peer",
+kind: "hidden",
+objectKey: "peer-root-b",
+originClusterKey: "branch:month:寅",
+hiddenStemProportion: 0.3,
+rootOccurrence: true,
+        },
+      ]),
+    );
+    const independentOrigins = evaluateSingleCandidate(
+      subjectCapacityCandidate([
+        dayAnchor,
+        {
+role: "peer",
+kind: "hidden",
+objectKey: "peer-root-c",
+originClusterKey: "branch:month:寅",
+hiddenStemProportion: 0.3,
+rootOccurrence: true,
+        },
+        {
+role: "peer",
+kind: "hidden",
+objectKey: "peer-root-d",
+originClusterKey: "branch:year:亥",
+hiddenStemProportion: 0.3,
+rootOccurrence: true,
+        },
+      ]),
+    );
+
+    expect(sameOrigin.nodeAvailability.subject).toBe("limited");
+    expect(independentOrigins.nodeAvailability.subject).toBe("usable");
+  });
+
+  it("does not let visible or unrooted peers increase subject capacity", () => {
+    const result = evaluateSingleCandidate(
+      subjectCapacityCandidate(
+        [
+dayAnchor,
+{
+  role: "peer",
+  kind: "visible",
+  objectKey: "visible-peer",
+  originClusterKey: "visible:year:乙",
+  hiddenStemProportion: null,
+  rootOccurrence: false,
+},
+        ],
+        [],
+        "休",
+      ),
+    );
+
+    expect(result.nodeAvailability.subject).toBe("limited");
+  });
+
+  it("preserves unknown handling when a missing hour can change capacity", () => {
+    const result = evaluateSingleCandidate(
+      subjectCapacityCandidate(
+        [dayAnchor],
+        ["hour.stem", "hour.branch"],
+        "囚",
+      ),
+    );
+
+    expect(result.nodeAvailability.subject).toBe("unknown");
+  });
+});
+
+describe("A02 limited regulating triad contract", () => {
+  it("accepts the endpoint-qualified limited triad without sample-specific logic", () => {
+    const facts: ChartFacts = {
+      precision: "exact",
+      missingPositions: [],
+      seasonalStrength: {
+        subject: "囚",
+        peer: "囚",
+        input: "死",
+        output: "旺",
+        resource: "死",
+        constraint: "休",
+      },
+      occurrences: [
+        {
+          role: "subject",
+          kind: "day_anchor",
+          objectKey: "limited-triad-subject",
+          originClusterKey: "limited-triad-subject-origin",
+          hiddenStemProportion: null,
+          rootOccurrence: false,
+        },
+        {
+          role: "output",
+          kind: "visible",
+          objectKey: "limited-triad-output",
+          originClusterKey: "limited-triad-output-origin",
+          hiddenStemProportion: null,
+          rootOccurrence: false,
+        },
+        {
+          role: "constraint",
+          kind: "visible",
+          objectKey: "limited-triad-constraint",
+          originClusterKey: "limited-triad-constraint-origin",
+          hiddenStemProportion: null,
+          rootOccurrence: false,
+        },
+      ],
+    };
+
+    const result = evaluateSingleCandidate({
+      candidateId: "limited-regulating-triad",
+      facts,
+    });
+
+    expect(result.nodeAvailability).toMatchObject({
+      subject: "limited",
+      output: "usable",
+      constraint: "limited",
+    });
+    expect(result.dimensions.D2).toBe("output_visible_asymmetric");
+    expect(result.dimensions.D5).toBe("output_constraint_regulating");
+    expect(result.nearestNeighbor.comparisons.find(
+      (comparison) => comparison.pair === "A01_A02",
+    )?.result).toBe("right");
+  });
+
+  it("preserves F05, F07, and F08 frozen outcomes", () => {
+    const established = profile("F05");
+    const capacityFailure = profile("F07");
+    const competition = profile("F08");
+
+    expect(established.dimensions.D5).toBe("output_constraint_regulating");
+    expect(established.coreMechanism).toBe("A02");
+    expect(established.candidateState).toBe("established");
+
+    expect(capacityFailure.nodeAvailability.output).toBe("limited");
+    expect(capacityFailure.dimensions.D5).toBe("unresolved");
+    expect(capacityFailure.coreMechanism).toBeNull();
+    expect(capacityFailure.candidateState).toBe("candidate");
+
+    expect(competition.dimensions.D5).toBe("shared_endpoint_competition");
+    expect(competition.coreMechanism).toBeNull();
+    expect(competition.candidateState).toBe("conflicted");
+  });
+});
