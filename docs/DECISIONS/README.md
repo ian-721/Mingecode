@@ -2,7 +2,7 @@
 
 **状态：冻结 / Accepted**
 
-本目录当前包含十二份 ADR。`Accepted` 表示冻结；`Proposed` 表示候选。改变已接受决定必须新增 ADR，不得静默改写历史。
+本目录当前包含十三份 ADR。`Accepted` 表示冻结；`Proposed` 表示候选。改变已接受决定必须新增 ADR，不得静默改写历史。
 
 | ADR | 状态 | 决定 |
 |---|---|---|
@@ -18,5 +18,8 @@
 | [ADR-0010](ADR-0010-backstage-rigor-frontstage-lightness.md) | Accepted | 后台保留严谨研究，前台保持轻松、幽默、易分享 |
 | [ADR-0011](ADR-0011-h5-demo-implementation-authorization.md) | Accepted | 窄范围授权非生产 H5 Demo；不授权部署或合并业务 PR |
 | [ADR-0012](ADR-0012-chart-prompt-and-light-calibration.md) | Accepted | 命盘只负责起题，四至六题独立裁决现实路线 |
+| [ADR-0013](ADR-0013-real-occurrence-multiplicity.md) | Proposed | 内容重建静态研究中的真实 occurrence multiplicity、relation interface 与显式 contention 候选 |
 
 ADR-0011 只在其明确范围内覆盖 ADR-0001 的代码禁令，不改变旧决定的历史状态。ADR-0012 在同一非生产 H5 边界内替代 ADR-0009 的运行模型。
+
+ADR-0013 目前为 Proposed；其替代提案仅限 content-rebuild 静态研究线，在 Accepted 前不改变 ADR-0012、当前 H5 `/test` 或现行 R2 实现合同。
