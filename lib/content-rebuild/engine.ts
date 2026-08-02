@@ -4,6 +4,11 @@ import {
   calculateDimensionsFromEvidence,
 } from "./evidence";
 import {
+  buildRelationInterfaceProjection,
+  buildRelationInterfaceProjectionForFixture,
+  ordinalCompare,
+} from "./relation-interface";
+import {
   ROLES,
   type CandidateEvaluation,
   type ChartCandidate,
@@ -75,13 +80,35 @@ interface CoreAggregate {
   readonly finalState: EvidenceState;
 }
 
+type EvaluationSource = "ordinary" | "isolated_contract_fixture";
+
 export function evaluateContentRebuild(
   input: StaticRuleEngineInput,
 ): StaticRuleEngineResult {
-  validateEngineInput(input);
+  return evaluateContentRebuildInternal(input, "ordinary");
+}
+
+// Deliberately not re-exported by lib/content-rebuild/index.ts. This fixed
+// source route exists only for the isolated v0.5 contract fixture harness.
+export function evaluateContentRebuildForFixture(
+  input: StaticRuleEngineInput,
+): StaticRuleEngineResult {
+  if (process.env.NODE_ENV !== "test") {
+    throw new Error(
+      "Contract fixture evaluation is only authorized in the isolated test harness",
+    );
+  }
+  return evaluateContentRebuildInternal(input, "isolated_contract_fixture");
+}
+
+function evaluateContentRebuildInternal(
+  input: StaticRuleEngineInput,
+  source: EvaluationSource,
+): StaticRuleEngineResult {
+  validateEngineInput(input, source);
 
   // Manifestation answers are deliberately unavailable to every core stage.
-  const core = evaluateCore(input.timeBasisVersion, input.candidates);
+  const core = evaluateCore(input.timeBasisVersion, input.candidates, source);
   const manifestationVariant = deriveManifestationVariant(
     input.manifestationAnswers ?? [],
   );
@@ -92,17 +119,18 @@ export function evaluateContentRebuild(
 export function evaluateSingleCandidate(
   candidate: ChartCandidate,
 ): CandidateEvaluation {
-  validateCandidate(candidate, "candidate");
-  return deepFreeze(evaluateCandidate(candidate));
+  validateCandidate(candidate, "candidate", "ordinary");
+  return deepFreeze(evaluateCandidate(candidate, "ordinary"));
 }
 
 function evaluateCore(
   timeBasisVersion: "civil_time_v1",
   candidates: readonly ChartCandidate[],
+  source: EvaluationSource,
 ): CoreAggregate {
   const candidateResults = [...candidates]
-    .sort((left, right) => left.candidateId.localeCompare(right.candidateId))
-    .map(evaluateCandidate);
+    .sort((left, right) => ordinalCompare(left.candidateId, right.candidateId))
+    .map((candidate) => evaluateCandidate(candidate, source));
   const stability = aggregateCandidateStability(candidateResults);
   const evidence = aggregateEvidence(candidateResults, stability.E6);
 
@@ -136,13 +164,30 @@ function evaluateCore(
   };
 }
 
-function evaluateCandidate(candidate: ChartCandidate): CandidateEvaluation {
+function evaluateCandidate(
+  candidate: ChartCandidate,
+  source: EvaluationSource,
+): CandidateEvaluation {
   const nodeAvailability = calculateNodeAvailability(candidate.facts);
   const closure = buildRelationClosure(candidate.facts, nodeAvailability);
+  const projection =
+    source === "isolated_contract_fixture"
+      ? buildRelationInterfaceProjectionForFixture(
+          candidate.facts.occurrences,
+          nodeAvailability,
+          closure,
+          candidate.interfaceContentionFacts ?? [],
+        )
+      : buildRelationInterfaceProjection(
+          candidate.facts.occurrences,
+          nodeAvailability,
+          closure,
+        );
   const evidenceGraph = buildEvidenceGraph(
     candidate.facts,
     nodeAvailability,
     closure,
+    projection,
   );
   const dimensionEvaluation = calculateDimensionsFromEvidence(evidenceGraph);
   const decision = evaluateCandidateDecision(
@@ -154,6 +199,10 @@ function evaluateCandidate(candidate: ChartCandidate): CandidateEvaluation {
     candidateId: candidate.candidateId,
     nodeAvailability,
     closure,
+    contributors: projection.contributors,
+    interfaces: projection.interfaces,
+    paths: projection.paths,
+    e4Witnesses: projection.e4Witnesses,
     evidenceGraph,
     evidence: decision.evidence,
     dimensions: dimensionEvaluation.states,
@@ -242,7 +291,7 @@ function buildRelationClosure(
   nodeAvailability: NodeAvailabilityByRole,
 ): RelationClosure {
   const occurrences = [...facts.occurrences].sort((left, right) =>
-    left.objectKey.localeCompare(right.objectKey),
+    ordinalCompare(left.objectKey, right.objectKey),
   );
   const expectedRelationCount =
     (occurrences.length * (occurrences.length - 1)) / 2;
@@ -260,6 +309,9 @@ function buildRelationClosure(
     }
   }
 
+  rawRelations.sort((left, right) =>
+    ordinalCompare(left.canonicalRelationKey, right.canonicalRelationKey),
+  );
   const canonicalKeys = new Set(
     rawRelations.map((relation) => relation.canonicalRelationKey),
   );
@@ -267,56 +319,24 @@ function buildRelationClosure(
     throw new Error("Relation closure generated duplicate canonical keys");
   }
 
-  const sourceRepresentativeMap = new Map<
-    string,
-    RelationWithoutEffectiveness
-  >();
+  const sourceGroups = new Map<string, RelationWithoutEffectiveness[]>();
   for (const relation of rawRelations) {
-    if (!sourceRepresentativeMap.has(relation.sourceDedupeKey)) {
-      sourceRepresentativeMap.set(relation.sourceDedupeKey, relation);
-    }
+    const group = sourceGroups.get(relation.sourceDedupeKey) ?? [];
+    group.push(relation);
+    sourceGroups.set(relation.sourceDedupeKey, group);
   }
-  const sourceRepresentatives = [...sourceRepresentativeMap.values()];
-  const baseEffectiveness = new Map<string, RelationEffectiveness>();
-  for (const relation of sourceRepresentatives) {
-    baseEffectiveness.set(
-      relation.sourceDedupeKey,
-      calculateBaseEffectiveness(relation, nodeAvailability),
+  const sourceRepresentatives = [...sourceGroups.entries()]
+    .sort(([left], [right]) => ordinalCompare(left, right))
+    .map(([, group]) =>
+      [...group].sort((left, right) =>
+        ordinalCompare(left.canonicalRelationKey, right.canonicalRelationKey),
+      )[0],
     );
-  }
-
-  const competitionGroups = new Map<string, Set<string>>();
-  for (const relation of sourceRepresentatives) {
-    if (relation.kind === "same_role") continue;
-    addCompetitionGroup(
-      competitionGroups,
-      `${relation.kind}:${relation.direction}:${relation.sourceObjectKey}:${relation.targetRole}`,
-      relation.sourceDedupeKey,
-    );
-    addCompetitionGroup(
-      competitionGroups,
-      `${relation.kind}:${relation.direction}:${relation.targetObjectKey}:${relation.sourceRole}`,
-      relation.sourceDedupeKey,
-    );
-  }
-  const competitionSourceKeys = new Set<string>();
-  for (const sourceKeys of competitionGroups.values()) {
-    if (sourceKeys.size < 2) continue;
-    for (const sourceKey of sourceKeys) competitionSourceKeys.add(sourceKey);
-  }
 
   const relations = rawRelations.map((relation): NormalizedRelation => {
-    const base = baseEffectiveness.get(relation.sourceDedupeKey);
-    if (!base) throw new Error("Missing relation effectiveness");
-    const competesForInterface = competitionSourceKeys.has(
-      relation.sourceDedupeKey,
-    );
-    const limitedByCompetition = base === "effective" && competesForInterface;
     return {
       ...relation,
-      effectiveness: limitedByCompetition ? "limited" : base,
-      competesForInterface,
-      limitedByCompetition,
+      effectiveness: calculateBaseEffectiveness(relation, nodeAvailability),
     };
   });
 
@@ -329,7 +349,7 @@ function buildRelationClosure(
       return relation;
     })
     .sort((left, right) =>
-      left.canonicalRelationKey.localeCompare(right.canonicalRelationKey),
+      ordinalCompare(left.canonicalRelationKey, right.canonicalRelationKey),
     );
   const relationEffectivenessCounts: Record<RelationEffectiveness, number> = {
     effective: 0,
@@ -409,7 +429,7 @@ function createRelation(
   let target = targetInput;
   if (
     kind === "same_role" &&
-    source.objectKey.localeCompare(target.objectKey) > 0
+    ordinalCompare(source.objectKey, target.objectKey) > 0
   ) {
     source = targetInput;
     target = sourceInput;
@@ -430,13 +450,13 @@ function createRelation(
       source.originClusterKey,
       target.originClusterKey,
     ]),
-    sourceDedupeKey: [
+    sourceDedupeKey: JSON.stringify([
       kind,
       source.role,
       target.role,
       source.originClusterKey,
       target.originClusterKey,
-    ].join(":"),
+    ]),
   };
 }
 
@@ -456,16 +476,6 @@ function calculateBaseEffectiveness(
   return "limited";
 }
 
-function addCompetitionGroup(
-  groups: Map<string, Set<string>>,
-  groupKey: string,
-  relationKey: string,
-): void {
-  const group = groups.get(groupKey) ?? new Set<string>();
-  group.add(relationKey);
-  groups.set(groupKey, group);
-}
-
 function aggregateCandidateStability(
   results: readonly CandidateEvaluation[],
 ): { readonly E6: EvidenceState; readonly evidence: EvidenceSourceData } {
@@ -476,7 +486,11 @@ function aggregateCandidateStability(
         Object.values(result.nodeAvailability).includes("unknown") ||
         result.closure.relations.some(
           (relation) => relation.effectiveness === "unknown",
-        ),
+        ) ||
+        Object.values(result.interfaces).some(
+          (relationInterface) => relationInterface.state === "unknown",
+        ) ||
+        Object.values(result.paths).some((path) => path.state === "unknown"),
     )
   ) {
     E6 = "boundary_sensitive";
@@ -580,7 +594,10 @@ function deriveManifestationVariant(
     : "selected";
 }
 
-function validateEngineInput(input: StaticRuleEngineInput): void {
+function validateEngineInput(
+  input: StaticRuleEngineInput,
+  source: EvaluationSource,
+): void {
   assertRecord(input, "input");
   assertExactKeys(
     input,
@@ -596,7 +613,7 @@ function validateEngineInput(input: StaticRuleEngineInput): void {
   }
   const candidateIds = new Set<string>();
   input.candidates.forEach((candidate, index) => {
-    validateCandidate(candidate, `input.candidates[${index}]`);
+    validateCandidate(candidate, `input.candidates[${index}]`, source);
     if (candidateIds.has(candidate.candidateId)) {
       throw new Error(`Duplicate candidateId: ${candidate.candidateId}`);
     }
@@ -605,15 +622,29 @@ function validateEngineInput(input: StaticRuleEngineInput): void {
   validateManifestationAnswers(input.manifestationAnswers ?? []);
 }
 
-function validateCandidate(candidate: ChartCandidate, path: string): void {
+function validateCandidate(
+  candidate: ChartCandidate,
+  path: string,
+  source: EvaluationSource,
+): void {
   assertRecord(candidate, path);
   assertExactKeys(
     candidate,
-    ["candidateId", "facts"],
+    ["candidateId", "facts", "interfaceContentionFacts"],
     ["candidateId", "facts"],
     path,
   );
   assertNonEmptyString(candidate.candidateId, `${path}.candidateId`);
+  if (
+    source === "ordinary" &&
+    candidate.interfaceContentionFacts !== undefined &&
+    (!Array.isArray(candidate.interfaceContentionFacts) ||
+      candidate.interfaceContentionFacts.length > 0)
+  ) {
+    throw new Error(
+      "interfaceContentionFacts are not authorized for ordinary runtime",
+    );
+  }
   validateChartFacts(candidate.facts, `${path}.facts`);
 }
 
@@ -822,7 +853,7 @@ function validateUniqueStringArray(value: unknown, path: string): void {
 }
 
 function sortedUnique<T extends string>(values: readonly T[]): T[] {
-  return [...new Set(values)].sort((left, right) => left.localeCompare(right));
+  return [...new Set(values)].sort(ordinalCompare);
 }
 
 function arraysEqual<T>(left: readonly T[], right: readonly T[]): boolean {

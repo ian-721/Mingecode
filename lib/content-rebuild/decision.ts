@@ -19,6 +19,7 @@ import {
   type TensionState,
 } from "./types";
 import { aggregatePathStatus } from "./evidence";
+import { ordinalCompare } from "./relation-interface";
 
 type BoundarySupport = NeighborComparison["leftSupport"];
 
@@ -637,7 +638,8 @@ function pathHasStatus(
   pathId: EvidencePathId,
   ...allowed: readonly ("effective" | "limited" | "blocked" | "unknown")[]
 ): boolean {
-  return allowed.includes(aggregatePathStatus(graph.paths, pathId));
+  const state = aggregatePathStatus(graph.paths, pathId);
+  return state !== "conflicted" && allowed.includes(state);
 }
 
 function evaluateExclusion(
@@ -880,5 +882,5 @@ function aggregateTensions(states: readonly TensionState[]): TensionState {
 }
 
 function sortedUnique<T extends string>(values: readonly T[]): T[] {
-  return [...new Set(values)].sort((left, right) => left.localeCompare(right));
+  return [...new Set(values)].sort(ordinalCompare);
 }
