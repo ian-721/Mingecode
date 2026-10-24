@@ -36,7 +36,6 @@ Pull Request 不承担授权或 `STATUS`。若 Issue 与 Pull Request 表述冲�
 | 产品定位、用户价值、表达边界 | [`PRODUCT_VISION.md`](PRODUCT_VISION.md) |
 | 产品目标、范围、成功与失败标准 | [`PROJECT_CHARTER.md`](PROJECT_CHARTER.md) |
 | 品牌分层与命名状态 | [`BRAND_ARCHITECTURE.md`](BRAND_ARCHITECTURE.md) |
-| 协作角色与决策边界 | [`COLLABORATION.md`](COLLABORATION.md) |
 
 ## 5. 架构、ADR 与规则合同
 
