@@ -1,71 +1,98 @@
-# 命格译码 / Mingecode
+# Mingecode (命格译码)
 
-**状态：M1-BR 混合译码研究冻结；非生产 H5 Demo 已授权**
+**Not telling your fortune. Finding a more useful way to describe you.**
 
-> 基于传统八字结构的东方现代人格解释系统：不是替你算命，而是重新翻译你。
+[English](README.md) · [简体中文](README.zh-CN.md)
 
-## 当前阶段
+Mingecode is a **BaZi-inspired cultural personality-interpretation experiment**. It uses a traditional Chinese birth-chart structure to choose which questions to ask, then uses answers about real-life behavior to shape the result. The aim is a short, approachable, shareable experience—not a prediction, diagnosis, or scientific personality assessment.
 
-M1-BR 已冻结“命盘只负责起题，默认四道、最多六道现实行为题完成校准”的混合路径。ADR-0011 仅授权建立一个完整、响应式、非生产 H5 Demo，用于验证从生辰输入到结果与分享的真实产品闭环。
+> **Current status: research candidate + non-production H5 demo implementation.** The repository contains a responsive Next.js/TypeScript prototype, deterministic rules, documentation, fixtures, and tests. Its personality interpretations and underlying research hypotheses have **not** been established through human validation. Public source access is not a production launch.
 
-本轮不代表人工验证完成，不授权生产部署，也不允许宣传准确率或科学人格效度。
+## The experience
 
-## Demo 闭环
+~~~text
+Birth date, time, and city
+  → Extract five stable cue families from a BaZi chart
+  → Use those cues to order four question routes
+  → Answer four real-life behavior questions by default
+  → Ask up to two more only when the answers remain ambiguous
+  → Get a result: aligned / adapted / mixed / unresolved
+  → Read the full interpretation or make a privacy-safe share card
+~~~
 
-```text
-出生日期、时间和城市
-→ 命盘提取五类稳定 cue 并安排四条提问路线
-→ 默认四道、最多六道校准题
-→ aligned / adapted / mixed / unresolved
-→ 完整结果与无敏感信息的分享卡
-```
+The most important distinction: **the birth chart sets up the questions; it does not decide the person's behavior**. Real-life answers determine the interpretation route. The experience is allowed to say that what a person does today differs from the theme suggested by the chart.
 
-运行时确定，不使用大模型裁决；用户无需登录，原始出生资料默认不保存。
+The five internal cue families are `input`, `output`, `peer`, `authority`, and `completion`. They affect question order, not scores. The result may remain unresolved rather than manufacture certainty.
 
-## 品牌分层
+## What is in the repository
 
-| 层级 | 名称 | 状态 | 职责 |
-|---|---|---|---|
-| 内部项目、规则工程与仓库 | 命格译码 / Mingecode / `mingecode` | Accepted | 技术资产、规则标识和内部项目识别 |
-| 公开产品名首选 | 八字没一撇 | Proposed / 待命名测试 | 面向用户的候选产品名称 |
-| 内容栏目 | 古人误会你了 | Accepted | 传播内容系列 |
-| 类别说明 | 东方人格翻译器 | Proposed / 待验证 | 帮助用户理解产品类别 |
+| Part | What you can inspect |
+| --- | --- |
+| **Responsive H5 demo** | Mobile-first Next.js App Router, React, TypeScript, and a static-export configuration |
+| **Deterministic interpretation** | Chart/cue extraction, question selection, behavior-based calibration, and four possible result states; no LLM is used to decide an outcome |
+| **Privacy-aware sharing** | A result card and share flow that do not carry birth details or individual answers |
+| **Research records** | Earlier candidate models, rule/evidence contracts, fixtures, and explicit decision changes |
+| **Tests** | Vitest unit tests, Playwright end-to-end tests, and lint/type/build scripts |
 
-公开产品名未来变化不应触发仓库、规则标识或技术资产整体重命名。
+This is an implemented demo codebase, **not** evidence that personality validity, user satisfaction, real-world reliability, or a live production service has been demonstrated.
 
-## 核心边界
+## Run the H5 demo
 
-- MVP 不是传统算命、命运预测、心理诊断、改运消灾或付费批命服务。
-- 当前所有结构签名与结果仍是研究候选。
-- 用户界面不展示精确人格分数、百分比、数值雷达图、命盘、规则编号或古籍页码。
-- 性别不参与核心裁决。
-- 运行时采用确定性规则；大模型不得排盘或裁决人格。
-- 用户无需注册或登录即可获得完整结果。
-- 原始出生日期、时间和地点只在当前页面内存计算，不持久化、不进入 URL 或网络请求。
-- 默认时间口径为 `civil_time_v1`，不启用真太阳时。
-- H5 Demo 不增加数据库、API、支付、会员、排行榜、好友匹配或复杂社交。
-- 当前文案是 `demo-copy-v0.1`，不是正式产品文案。
-- 未经单独批准，不部署、不把业务 Draft PR 转 Ready、不合并。
+You will need Node.js and npm.
 
-## 项目负责人
+~~~bash
+git clone https://github.com/ian-721/Mingecode.git
+cd Mingecode
+npm ci
+npm run dev
+~~~
 
-- **赵焱阳**：项目发起人、产品负责人、人格译码架构负责人；承担最终产品与实施决策。
+Then open [http://localhost:3000](http://localhost:3000). The home page links to the interactive flow at [http://localhost:3000/test](http://localhost:3000/test).
 
-## 文档索引
+To run the repository's configured lint, TypeScript, unit-test, and production-build checks:
 
-- [项目章程](docs/PROJECT_CHARTER.md)
-- [产品愿景](docs/PRODUCT_VISION.md)
-- [品牌架构](docs/BRAND_ARCHITECTURE.md)
-- [M0 基线](docs/M0_BASELINE.md)
-- [M1 研究计划](docs/M1_RESEARCH_PLAN.md)
-- [术语表](docs/GLOSSARY.md)
-- [架构决策记录](docs/DECISIONS/README.md)
-- [M1-BR v0.3 H5 Demo 实施基线](research/m1br/v0.3/README.md)
-- [研究区](research/README.md)
-- [设计区](design/README.md)
-- [贡献者](CONTRIBUTORS.md)
-- [代理协作规则](AGENTS.md)
+~~~bash
+npm run check
+~~~
 
-## 用途声明
+The end-to-end suite has a separate command:
 
-本项目仅用于文化研究与娱乐表达，不构成心理诊断、医疗建议、人生决策依据或命运预测。
+~~~bash
+npm run test:e2e
+~~~
+
+Playwright browser installation may be needed for local E2E execution. The build is configured for static export. A local build is not a production deployment or a human study.
+
+## Product and evidence boundaries
+
+- **Cultural interpretation, not fortune-telling:** no claims about destiny, luck, curing misfortune, or future events.
+- **Not psychological or medical advice:** do not use the result as a diagnosis or as a basis for consequential life decisions.
+- **No invented precision:** the UI does not present precise personality scores, accuracy percentages, numerical radar charts, hidden rule IDs, or traditional chart data as proof of truth.
+- **No LLM arbitration:** the runtime uses deterministic rules, not model-generated judgments of personality.
+- **No account or backend data collection:** the demo requires no registration, API, database, payment, or social graph. Birth date, time, and place are processed in the current page's memory and are not stored or placed in a URL.
+- **Explicit time convention:** the baseline uses `civil_time_v1`, without defaulting to true solar time. Ambiguous calendar/time inputs have defined handling boundaries.
+- **Demo wording:** current user-facing text is `demo-copy-v0.1`, not final production copy.
+
+The prototype has no validated scientific accuracy claim. The share experience is designed to avoid exporting sensitive birth or answer data.
+
+## Naming and research context
+
+**Mingecode / 命格译码** is the accepted internal project and repository name. The public-facing name **八字没一撇** is a **proposal, not a finalized brand**. The content-series title **古人误会你了** is accepted; **东方人格翻译器** remains a candidate description. These labels should not be confused with validation of the product itself.
+
+The decision history matters: an earlier chart-led signature model was replaced by a lighter approach in which chart cues only order questions and behavior answers determine the result. Historical research documents remain accessible as research history, not necessarily as the current runtime contract.
+
+For details:
+
+- [Product vision](docs/PRODUCT_VISION.md) · [Project charter](docs/PROJECT_CHARTER.md)
+- [Decision record index](docs/DECISIONS/README.md) · [Current chart/question contract (ADR-0012)](docs/DECISIONS/ADR-0012-chart-prompt-and-light-calibration.md)
+- [H5 demo implementation baseline](research/m1br/v0.3/README.md) · [Research archive](research/README.md)
+- [Design exploration](design/README.md) · [Contributor record](CONTRIBUTORS.md)
+- [Maintainer/agent working rules](AGENTS.md)
+
+## Maintainer and source availability
+
+Created and maintained by **[Yanyang (Ian) Zhao](https://github.com/ian-721)** as an independent product and research prototype.
+
+The source is publicly viewable, but this repository does not currently include a repository-wide open-source license. A public repository is not equivalent to permission to reuse all code or assets.
+
+**Disclaimer:** Mingecode is for cultural exploration and entertainment. It is not a psychological assessment, medical advice, life-decision guidance, or a prediction of fate.
