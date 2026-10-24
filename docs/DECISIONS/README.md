@@ -11,7 +11,6 @@
 | [ADR-0003](ADR-0003-no-user-facing-precise-personality-scores.md) | Accepted | 不向用户展示未经验证的精确人格分数 |
 | [ADR-0004](ADR-0004-deterministic-runtime-no-llm-arbitration.md) | Accepted | 确定性运行时，大模型不承担人格裁决 |
 | [ADR-0005](ADR-0005-minimise-birth-data-storage.md) | Accepted | 最小化出生资料处理 |
-| [ADR-0006](ADR-0006-collaboration-and-decision-boundaries.md) | Accepted | 冻结双人角色与决策边界 |
 | [ADR-0007](ADR-0007-brand-architecture-and-public-name-candidate.md) | Proposed | 品牌分层与公开产品名候选 |
 | [ADR-0008](ADR-0008-mvp-civil-time-convention.md) | Accepted | MVP 使用 `civil_time_v1`，暂不启用真太阳时 |
 | [ADR-0009](ADR-0009-hybrid-chart-candidate-and-calibration.md) | Accepted（研究方向） | 历史混合模型：命盘候选 + 默认三题校准 |
@@ -19,6 +18,7 @@
 | [ADR-0011](ADR-0011-h5-demo-implementation-authorization.md) | Accepted | 窄范围授权非生产 H5 Demo；不授权部署或合并业务 PR |
 | [ADR-0012](ADR-0012-chart-prompt-and-light-calibration.md) | Accepted | 命盘只负责起题，四至六题独立裁决现实路线 |
 | [ADR-0013](ADR-0013-real-occurrence-multiplicity.md) | Accepted | 冻结 content-rebuild 静态研究线的真实 occurrence multiplicity、relation interface 与显式 contention 边界 |
+| [ADR-0014](ADR-0014-sole-maintainer-and-authorship.md) | Accepted | 独立维护与按实际贡献署名，取消未实施的双人审批安排 |
 
 ADR-0011 只在其明确范围内覆盖 ADR-0001 的代码禁令，不改变旧决定的历史状态。ADR-0012 在同一非生产 H5 边界内替代 ADR-0009 的运行模型。
 

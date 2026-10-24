@@ -47,17 +47,15 @@ M1-BR 已冻结“命盘只负责起题，默认四道、最多六道现实行�
 - 当前文案是 `demo-copy-v0.1`，不是正式产品文案。
 - 未经单独批准，不部署、不把业务 Draft PR 转 Ready、不合并。
 
-## 角色
+## 项目负责人
 
 - **赵焱阳**：项目发起人、产品负责人、人格译码架构负责人；承担最终产品与实施决策。
-- **延雨婷**：视觉与体验负责人、MVP 核心合作人；承担视觉、版式、卡片系统与 UI 表现决策。
 
 ## 文档索引
 
 - [项目章程](docs/PROJECT_CHARTER.md)
 - [产品愿景](docs/PRODUCT_VISION.md)
 - [品牌架构](docs/BRAND_ARCHITECTURE.md)
-- [协作治理](docs/COLLABORATION.md)
 - [M0 基线](docs/M0_BASELINE.md)
 - [M1 研究计划](docs/M1_RESEARCH_PLAN.md)
 - [术语表](docs/GLOSSARY.md)
